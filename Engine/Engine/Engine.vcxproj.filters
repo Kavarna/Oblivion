@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\winmain.cpp" />
+    <ClCompile Include="src\common\common.cpp" />
+    <ClCompile Include="src\graphics\WICTextureLoader.cpp" />
+    <ClCompile Include="src\graphics\Texture.cpp" />
+    <ClCompile Include="src\graphics\Direct3D11.cpp" />
+    <ClCompile Include="src\Game.cpp" />
+    <ClCompile Include="src\input\Keyboard.cpp" />
+    <ClCompile Include="src\input\Mouse.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\common\commonmath.h" />
+    <ClInclude Include="src\common\common.h" />
+    <ClInclude Include="src\OblivionInclude.h" />
+    <ClInclude Include="src\graphics\WICTextureLoader.h" />
+    <ClInclude Include="src\graphics\TextureUtilities.h" />
+    <ClInclude Include="src\graphics\ShaderHelper.h" />
+    <ClInclude Include="src\graphics\Texture.h" />
+    <ClInclude Include="src\graphics\Direct3D11.h" />
+    <ClInclude Include="src\Game.h" />
+    <ClInclude Include="src\input\Keyboard.h" />
+    <ClInclude Include="src\input\Mouse.h" />
+    <ClInclude Include="src\input\PlatformHelpers.h" />
+  </ItemGroup>
+</Project>
