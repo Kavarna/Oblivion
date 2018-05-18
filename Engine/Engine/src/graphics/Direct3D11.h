@@ -24,6 +24,9 @@ public:
 	void Begin();
 	void End();
 
+private:
+	void CreateDepthStencilView(uint32_t width, uint32_t height);
+
 public:
 	inline bool Available() const { return m_available; };
 
@@ -32,10 +35,14 @@ private: // Attributes
 	bool										m_hasVerticalSync			= false;
 
 	bool										m_available					= false;
+
+private:
+	D3D11_VIEWPORT								m_viewPort;
 private:
 	MicrosoftPointer<ID3D11Device>				m_d3d11Device				= nullptr;
 	MicrosoftPointer<ID3D11DeviceContext>		m_d3d11Context				= nullptr;
 	MicrosoftPointer<ID3D11RenderTargetView>	m_defaultRenderTarget		= nullptr;
+	MicrosoftPointer<ID3D11DepthStencilView>	m_depthStencilView			= nullptr;
 	MicrosoftPointer<IDXGISwapChain>			m_dxgiSwapChain				= nullptr;
 	
 };

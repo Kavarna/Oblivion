@@ -83,7 +83,8 @@ void Direct3D11::OnResize(HWND hWnd, uint32_t width, uint32_t height, bool fulls
 		ThrowIfFailed(
 			m_d3d11Device->CreateRenderTargetView(renderTargetResource.Get(), nullptr, &m_defaultRenderTarget)
 			);
-		// TODO: Recreate the depth buffer
+		// TODO: Fullscreen
+		CreateDepthStencilView(width, height);
 	}
 	else
 	{ // Create it
@@ -128,10 +129,39 @@ void Direct3D11::OnResize(HWND hWnd, uint32_t width, uint32_t height, bool fulls
 					m_d3d11Device->CreateRenderTargetView(renderTargetResource.Get(), nullptr, &m_defaultRenderTarget)
 					);
 				m_available = true;
-				// TODO: add depth buffer
+				CreateDepthStencilView(width, height);
 			}
 		}
 	}
+}
+
+void Direct3D11::CreateDepthStencilView(uint32_t width, uint32_t height)
+{
+	D3D11_TEXTURE2D_DESC texDesc = {};
+	texDesc.ArraySize = 1;
+	texDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_DEPTH_STENCIL;
+	texDesc.Format = DXGI_FORMAT::DXGI_FORMAT_D32_FLOAT;
+	texDesc.Width = width;
+	texDesc.Height = height;
+	texDesc.MipLevels = 1;
+
+	// TODO: Add MSAA
+	texDesc.SampleDesc.Count = 1;
+	texDesc.SampleDesc.Quality = 0;
+
+	texDesc.Usage = D3D11_USAGE::D3D11_USAGE_DEFAULT;
+
+	MicrosoftPointer<ID3D11Texture2D> depthBuffer;
+	ThrowIfFailed(
+		m_d3d11Device->CreateTexture2D(&texDesc, nullptr, &depthBuffer)
+		);
+	D3D11_DEPTH_STENCIL_VIEW_DESC dsViewDesc;
+	dsViewDesc.Format = texDesc.Format;
+	dsViewDesc.Texture2D.MipSlice = 0;
+	dsViewDesc.ViewDimension = D3D11_DSV_DIMENSION::D3D11_DSV_DIMENSION_TEXTURE2D;
+	ThrowIfFailed(
+		m_d3d11Device->CreateDepthStencilView(depthBuffer.Get(), &dsViewDesc, &m_depthStencilView)
+		);
 }
 
 void Direct3D11::Begin()
@@ -139,6 +169,7 @@ void Direct3D11::Begin()
 	m_d3d11Context->OMSetRenderTargets(1, m_defaultRenderTarget.GetAddressOf(), nullptr);
 	static FLOAT color[4] = { 0.0f,0.0f,0.0f,1.0f };
 	m_d3d11Context->ClearRenderTargetView(m_defaultRenderTarget.Get(), color);
+	m_d3d11Context->ClearDepthStencilView(m_depthStencilView.Get(), D3D11_CLEAR_FLAG::D3D11_CLEAR_DEPTH, 1.0f, 0);
 }
 
 void Direct3D11::End()
