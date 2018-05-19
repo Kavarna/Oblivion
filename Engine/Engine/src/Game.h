@@ -4,8 +4,11 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_dx11.h"
 
+LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+
 class Game sealed
 {
+	friend LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 public:
 	static Game* GetInstance();
 
@@ -20,6 +23,7 @@ public:
 public:
 	void Create(HINSTANCE hInstance, uint32_t width = 800, uint32_t height = 600);
 	void Run();
+	void Destroy();
 
 public:
 	void OnSize(uint32_t width, uint32_t height);
@@ -49,4 +53,3 @@ private:
 	std::unique_ptr<DirectX::Keyboard>			m_keyboard;
 };
 
-LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);

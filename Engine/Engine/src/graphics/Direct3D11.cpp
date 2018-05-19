@@ -23,6 +23,7 @@ Direct3D11::~Direct3D11()
 	m_d3d11Context.Reset();
 	m_defaultRenderTarget.Reset();
 	m_dxgiSwapChain.Reset();
+	m_depthStencilView.Reset();
 }
 
 void Direct3D11::Create(HWND window)
@@ -66,16 +67,17 @@ void Direct3D11::Create(HWND window)
 	}
 }
 
-void Direct3D11::OnResize(HWND hWnd, uint32_t width, uint32_t height, bool fullscreen)
+void Direct3D11::OnResize(HWND hWnd, uint32_t width, uint32_t height)
 {
 	if (!m_d3d11Device)
 		return;
 	static DXGI_FORMAT swapChainFormat = DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM;
 	static uint16_t bufferCount = 2;
+	static UINT swapChainFlags = DXGI_SWAP_CHAIN_FLAG::DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 	if (m_dxgiSwapChain)
 	{ // Resize it
 		m_defaultRenderTarget.Reset();
-		m_dxgiSwapChain->ResizeBuffers(bufferCount, width, height, swapChainFormat, 0);
+		m_dxgiSwapChain->ResizeBuffers(bufferCount, width, height, swapChainFormat, swapChainFlags);
 		MicrosoftPointer<ID3D11Texture2D> renderTargetResource;
 		ThrowIfFailed(
 			m_dxgiSwapChain->GetBuffer(0, __uuidof( ID3D11Texture2D ), &renderTargetResource)
@@ -83,8 +85,8 @@ void Direct3D11::OnResize(HWND hWnd, uint32_t width, uint32_t height, bool fulls
 		ThrowIfFailed(
 			m_d3d11Device->CreateRenderTargetView(renderTargetResource.Get(), nullptr, &m_defaultRenderTarget)
 			);
-		// TODO: Fullscreen
 		CreateDepthStencilView(width, height);
+		// TODO: Add fullscreen
 	}
 	else
 	{ // Create it
@@ -107,6 +109,7 @@ void Direct3D11::OnResize(HWND hWnd, uint32_t width, uint32_t height, bool fulls
 				swapDesc.BufferDesc.Scaling = DXGI_MODE_SCALING::DXGI_MODE_SCALING_UNSPECIFIED;
 				swapDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER::DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 				swapDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+				swapDesc.Flags = DXGI_SWAP_CHAIN_FLAG::DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 				swapDesc.OutputWindow = hWnd;
 
 				if (m_hasMSAA)
@@ -129,7 +132,7 @@ void Direct3D11::OnResize(HWND hWnd, uint32_t width, uint32_t height, bool fulls
 
 				swapDesc.SwapEffect = DXGI_SWAP_EFFECT::DXGI_SWAP_EFFECT_DISCARD;
 				
-				swapDesc.Windowed = !fullscreen;
+				swapDesc.Windowed = true;
 
 				ThrowIfFailed(
 					finalFactory->CreateSwapChain(m_d3d11Device.Get(), &swapDesc, &m_dxgiSwapChain)
@@ -185,7 +188,10 @@ void Direct3D11::CreateDepthStencilView(uint32_t width, uint32_t height)
 	D3D11_DEPTH_STENCIL_VIEW_DESC dsViewDesc = {};
 	dsViewDesc.Format = texDesc.Format;
 	dsViewDesc.Texture2D.MipSlice = 0;
-	dsViewDesc.ViewDimension = D3D11_DSV_DIMENSION::D3D11_DSV_DIMENSION_TEXTURE2D;
+	if (m_hasMSAA)
+		dsViewDesc.ViewDimension = D3D11_DSV_DIMENSION::D3D11_DSV_DIMENSION_TEXTURE2DMS;
+	else
+		dsViewDesc.ViewDimension = D3D11_DSV_DIMENSION::D3D11_DSV_DIMENSION_TEXTURE2D;
 	ThrowIfFailed(
 		m_d3d11Device->CreateDepthStencilView(depthBuffer.Get(), &dsViewDesc, &m_depthStencilView)
 		);

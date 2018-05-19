@@ -18,10 +18,17 @@ Game::Game()
 
 Game::~Game()
 {
+	Destroy();
+}
+
+void Game::Destroy()
+{
+	ImGui_ImplDX11_Shutdown();
+	ImGui::DestroyContext();
+
 	UnregisterClass(ENGINE_NAME, m_windowInstance);
 	DestroyWindow(m_windowHandle);
 }
-
 
 void Game::Create(HINSTANCE hInstance, uint32_t width, uint32_t height)
 {
@@ -50,7 +57,7 @@ void Game::InitWindow()
 
 	RegisterClassEx(&wndClass);
 
-	m_windowHandle = CreateWindow(ENGINE_NAME, ENGINE_NAME,
+	m_windowHandle = CreateWindowEx(WS_EX_CLIENTEDGE, ENGINE_NAME, ENGINE_NAME,
 		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
 		m_windowWidth, m_windowHeight, nullptr, nullptr,
 		m_windowInstance, nullptr);
@@ -72,7 +79,7 @@ void Game::InitDirect3D()
 {
 	Direct3D11 * d3d = Direct3D11::GetInstance();
 	d3d->Create(m_windowHandle);
-	d3d->OnResize(m_windowHandle, m_windowWidth, m_windowHeight, false);
+	d3d->OnResize(m_windowHandle, m_windowWidth, m_windowHeight);
 }
 
 void Game::InitImGui()
@@ -84,7 +91,7 @@ void Game::InitImGui()
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 	ImGui_ImplDX11_Init(m_windowHandle, d3d->getDevice(), d3d->getContext());
 
-	ImGui::StyleColorsDark();
+	ImGui::StyleColorsClassic();
 }
 
 void Game::Run()
@@ -99,9 +106,11 @@ void Game::Run()
 			TranslateMessage(&message);
 			DispatchMessage(&message);
 		}
-
-		Update();
-		Render();
+		else
+		{
+			Update();
+			Render();
+		}
 	}
 }
 
@@ -110,6 +119,8 @@ void Game::Update()
 	auto kb = m_keyboard->GetState();
 	if (kb.Escape)
 		PostQuitMessage(0);
+	if (kb.B)
+		DX::OutputVDebugString(L"Hello world!\n");
 }
 
 void Game::Begin()
@@ -131,9 +142,17 @@ void Game::End()
 	ImGui::End();
 #endif
 
-	ImGui::Begin("Settings");
+	bool hasMSAA = renderer->m_hasMSAA;
+
+	ImGui::Begin("Settings", 0, ImGuiWindowFlags_NoNav);
 	ImGui::Checkbox("Vertical sync", &renderer->m_hasVerticalSync);
 	ImGui::Checkbox("Use 4xMSAA", &renderer->m_hasMSAA);
+
+	if (hasMSAA != renderer->m_hasMSAA)
+	{
+		renderer->resetSwapChain();
+		renderer->OnResize(m_windowHandle, m_windowWidth, m_windowHeight);
+	}
 
 	ImGui::End();
 
@@ -154,10 +173,12 @@ void Game::Render()
 
 void Game::OnSize(uint32_t width, uint32_t height)
 {
+	if (width < 10 || height < 10)
+		return;
 	m_windowWidth = width;
 	m_windowHeight = height;
 
-	Direct3D11::GetInstance()->OnResize(m_windowHandle, m_windowWidth, m_windowHeight, false);
+	Direct3D11::GetInstance()->OnResize(m_windowHandle, m_windowWidth, m_windowHeight);
 
 	ImGui_ImplDX11_InvalidateDeviceObjects();
 	ImGui_ImplDX11_CreateDeviceObjects();

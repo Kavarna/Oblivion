@@ -2718,6 +2718,8 @@ void ImGui::DestroyContext(ImGuiContext* ctx)
 {
     if (ctx == NULL)
         ctx = GImGui;
+	if (ctx == NULL)
+		return;
     Shutdown(ctx);
     if (GImGui == ctx)
         SetCurrentContext(NULL);
