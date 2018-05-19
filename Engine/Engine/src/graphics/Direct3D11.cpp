@@ -109,9 +109,23 @@ void Direct3D11::OnResize(HWND hWnd, uint32_t width, uint32_t height, bool fulls
 				swapDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 				swapDesc.OutputWindow = hWnd;
 
-				// TODO: ADD MSAA
-				swapDesc.SampleDesc.Quality = 0;
-				swapDesc.SampleDesc.Count = 1;
+				if (m_hasMSAA)
+				{
+					m_d3d11Device->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM, 4, &m_maxMSAAQualityLevel);
+					if (m_maxMSAAQualityLevel > 0)
+						swapDesc.SampleDesc.Quality = m_maxMSAAQualityLevel - 1;
+					else
+					{
+						swapDesc.SampleDesc.Quality = 0;
+						m_hasMSAA = false;
+					}
+					swapDesc.SampleDesc.Count = 4;
+				}
+				else
+				{
+					swapDesc.SampleDesc.Quality = 0;
+					swapDesc.SampleDesc.Count = 1;
+				}
 
 				swapDesc.SwapEffect = DXGI_SWAP_EFFECT::DXGI_SWAP_EFFECT_DISCARD;
 				
@@ -145,9 +159,22 @@ void Direct3D11::CreateDepthStencilView(uint32_t width, uint32_t height)
 	texDesc.Height = height;
 	texDesc.MipLevels = 1;
 
-	// TODO: Add MSAA
-	texDesc.SampleDesc.Count = 1;
-	texDesc.SampleDesc.Quality = 0;
+	if (m_hasMSAA)
+	{
+		if (m_maxMSAAQualityLevel > 0)
+			texDesc.SampleDesc.Quality = m_maxMSAAQualityLevel - 1;
+		else
+		{
+			texDesc.SampleDesc.Quality = 0;
+			m_hasMSAA = false;
+		}
+		texDesc.SampleDesc.Count = 4;
+	}
+	else
+	{
+		texDesc.SampleDesc.Quality = 0;
+		texDesc.SampleDesc.Count = 1;
+	}
 
 	texDesc.Usage = D3D11_USAGE::D3D11_USAGE_DEFAULT;
 
@@ -155,7 +182,7 @@ void Direct3D11::CreateDepthStencilView(uint32_t width, uint32_t height)
 	ThrowIfFailed(
 		m_d3d11Device->CreateTexture2D(&texDesc, nullptr, &depthBuffer)
 		);
-	D3D11_DEPTH_STENCIL_VIEW_DESC dsViewDesc;
+	D3D11_DEPTH_STENCIL_VIEW_DESC dsViewDesc = {};
 	dsViewDesc.Format = texDesc.Format;
 	dsViewDesc.Texture2D.MipSlice = 0;
 	dsViewDesc.ViewDimension = D3D11_DSV_DIMENSION::D3D11_DSV_DIMENSION_TEXTURE2D;

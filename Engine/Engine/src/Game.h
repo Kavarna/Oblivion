@@ -1,9 +1,10 @@
 #pragma once
 
 #include "OblivionInclude.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_dx11.h"
 
-
-class Game
+class Game sealed
 {
 public:
 	static Game* GetInstance();
@@ -27,6 +28,10 @@ private:
 	void InitWindow();
 	void InitInput();
 	void InitDirect3D();
+	void InitImGui();
+
+	void Begin();
+	void End();
 
 private:
 	void Update();

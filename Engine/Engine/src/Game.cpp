@@ -32,6 +32,7 @@ void Game::Create(HINSTANCE hInstance, uint32_t width, uint32_t height)
 	InitWindow();
 	InitInput();
 	InitDirect3D();
+	InitImGui();
 }
 
 void Game::InitWindow()
@@ -64,7 +65,7 @@ void Game::InitInput()
 	m_keyboard = std::make_unique<DirectX::Keyboard>();
 	m_mouse = std::make_unique<DirectX::Mouse>();
 	m_mouse->SetWindow(m_windowHandle);
-	m_mouse->SetVisible(false);
+	m_mouse->SetVisible(true);
 }
 
 void Game::InitDirect3D()
@@ -72,6 +73,18 @@ void Game::InitDirect3D()
 	Direct3D11 * d3d = Direct3D11::GetInstance();
 	d3d->Create(m_windowHandle);
 	d3d->OnResize(m_windowHandle, m_windowWidth, m_windowHeight, false);
+}
+
+void Game::InitImGui()
+{
+	Direct3D11 * d3d = Direct3D11::GetInstance();
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	auto& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+	ImGui_ImplDX11_Init(m_windowHandle, d3d->getDevice(), d3d->getContext());
+
+	ImGui::StyleColorsDark();
 }
 
 void Game::Run()
@@ -99,14 +112,44 @@ void Game::Update()
 		PostQuitMessage(0);
 }
 
+void Game::Begin()
+{
+	auto renderer = Direct3D11::GetInstance();
+	renderer->Begin();
+	ImGui_ImplDX11_NewFrame();
+}
+
+void Game::End()
+{
+	auto renderer = Direct3D11::GetInstance();
+
+#if DEBUG || _DEBUG
+	ImGui::Begin("Debug");
+	
+	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+	ImGui::End();
+#endif
+
+	ImGui::Begin("Settings");
+	ImGui::Checkbox("Vertical sync", &renderer->m_hasVerticalSync);
+	ImGui::Checkbox("Use 4xMSAA", &renderer->m_hasMSAA);
+
+	ImGui::End();
+
+	ImGui::Render();
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	renderer->End();
+}
+
 void Game::Render()
 {
 	auto renderer = Direct3D11::GetInstance();
 	if (!renderer->Available())
 		return;
-	renderer->Begin();
+	Begin();
 
-	renderer->End();
+	End();
 }
 
 void Game::OnSize(uint32_t width, uint32_t height)
@@ -115,15 +158,23 @@ void Game::OnSize(uint32_t width, uint32_t height)
 	m_windowHeight = height;
 
 	Direct3D11::GetInstance()->OnResize(m_windowHandle, m_windowWidth, m_windowHeight, false);
+
+	ImGui_ImplDX11_InvalidateDeviceObjects();
+	ImGui_ImplDX11_CreateDeviceObjects();
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 {
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, Message, wParam, lParam))
+		return true;
+
 	switch (Message)
 	{
 	case WM_ACTIVATEAPP:
 	DirectX::Keyboard::ProcessMessage(Message, wParam, lParam);
 	DirectX::Mouse::ProcessMessage(Message, wParam, lParam);
+
+
 	break;
 
 	case WM_INPUT:

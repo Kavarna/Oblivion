@@ -18,11 +18,14 @@ public:
 	~Direct3D11();
 
 public:
-	void Create(HWND window);
-	void OnResize(HWND hWnd, uint32_t width, uint32_t height, bool fullscreen);
+	void					Create(HWND window);
+	void					OnResize(HWND hWnd, uint32_t width, uint32_t height, bool fullscreen);
 
-	void Begin();
-	void End();
+	ID3D11Device*			getDevice()		const { return m_d3d11Device.Get(); };
+	ID3D11DeviceContext*	getContext()	const { return m_d3d11Context.Get(); };
+
+	void					Begin();
+	void					End();
 
 private:
 	void CreateDepthStencilView(uint32_t width, uint32_t height);
@@ -30,11 +33,13 @@ private:
 public:
 	inline bool Available() const { return m_available; };
 
-private: // Attributes
-	bool										m_hasMSAA					= false; // TODO: Add
-	bool										m_hasVerticalSync			= false;
+public:
+	bool										m_hasMSAA = false; // TODO: Add
+	bool										m_hasVerticalSync = false;
 
+private: // Attributes
 	bool										m_available					= false;
+	UINT										m_maxMSAAQualityLevel		= 0;
 
 private:
 	D3D11_VIEWPORT								m_viewPort;
