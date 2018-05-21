@@ -13,6 +13,9 @@
     <ClCompile Include="src\imgui\imgui_demo.cpp" />
     <ClCompile Include="src\imgui\imgui_draw.cpp" />
     <ClCompile Include="src\imgui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="src\graphics\BasicShader.cpp" />
+    <ClCompile Include="src\graphics\Camera.cpp" />
+    <ClCompile Include="src\graphics\Model.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\commonmath.h" />
@@ -34,5 +37,16 @@
     <ClInclude Include="src\imgui\stb_rect_pack.h" />
     <ClInclude Include="src\imgui\stb_textedit.h" />
     <ClInclude Include="src\imgui\stb_truetype.h" />
+    <ClInclude Include="src\graphics\interfaces\Shader.h" />
+    <ClInclude Include="src\graphics\BasicShader.h" />
+    <ClInclude Include="src\graphics\interfaces\GameObject.h" />
+    <ClInclude Include="src\graphics\interfaces\AlignedObject.h" />
+    <ClInclude Include="src\graphics\interfaces\Camera.h" />
+    <ClInclude Include="src\graphics\Camera.h" />
+    <ClInclude Include="src\graphics\Model.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="src\shaders\BasicVertexShader.hlsl" />
+    <FxCompile Include="src\shaders\BasicPixelShader.hlsl" />
   </ItemGroup>
 </Project>

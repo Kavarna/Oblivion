@@ -3,6 +3,9 @@
 #include "OblivionInclude.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_dx11.h"
+#include "graphics/BasicShader.h"
+#include "graphics/Camera.h"
+#include "graphics/Model.h"
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -33,6 +36,10 @@ private:
 	void InitInput();
 	void InitDirect3D();
 	void InitImGui();
+	void InitShaders();
+	void Init3D();
+
+	void InitSizeDependent();
 
 	void Begin();
 	void End();
@@ -47,7 +54,12 @@ private:
 	
 	uint32_t									m_windowWidth;
 	uint32_t									m_windowHeight;
+	bool										m_menuActive = true;
+private:
+	std::shared_ptr<BasicShader>				m_basicShader;
 
+	std::unique_ptr<Camera>						m_camera;
+	std::unique_ptr<Model<BasicShader>>			m_basicModel;
 private:
 	std::unique_ptr<DirectX::Mouse>				m_mouse;
 	std::unique_ptr<DirectX::Keyboard>			m_keyboard;

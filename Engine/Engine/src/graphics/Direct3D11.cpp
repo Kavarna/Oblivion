@@ -69,6 +69,12 @@ void Direct3D11::Create(HWND window)
 
 void Direct3D11::OnResize(HWND hWnd, uint32_t width, uint32_t height)
 {
+	m_viewPort.TopLeftX = 0;
+	m_viewPort.TopLeftY = 0;
+	m_viewPort.Width	= (FLOAT) width;
+	m_viewPort.Height	= (FLOAT) height;
+	m_viewPort.MinDepth = 0.0f;
+	m_viewPort.MaxDepth = 1.0f;
 	if (!m_d3d11Device)
 		return;
 	static DXGI_FORMAT swapChainFormat = DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -203,6 +209,7 @@ void Direct3D11::Begin()
 	static FLOAT color[4] = { 0.0f,0.0f,0.0f,1.0f };
 	m_d3d11Context->ClearRenderTargetView(m_defaultRenderTarget.Get(), color);
 	m_d3d11Context->ClearDepthStencilView(m_depthStencilView.Get(), D3D11_CLEAR_FLAG::D3D11_CLEAR_DEPTH, 1.0f, 0);
+	m_d3d11Context->RSSetViewports(1, &m_viewPort);
 }
 
 void Direct3D11::End()
@@ -211,4 +218,36 @@ void Direct3D11::End()
 		m_dxgiSwapChain->Present(1, 0);
 	else
 		m_dxgiSwapChain->Present(0, 0);
+}
+
+void Direct3D11::createShader(IShader * shader)
+{
+	shader->Create(m_d3d11Device.Get());
+}
+
+void Direct3D11::bindShader(IShader const* shader)
+{
+#if DEBUG || _DEBUG
+	CheckCommonShaderParts(shader);
+#endif
+	shader->bind(m_d3d11Context.Get());
+}
+
+void Direct3D11::CheckCommonShaderParts(IShader const* shader)
+{
+	if (m_shaderCode.m_vertexShader == shader->m_shaderCode.m_vertexShader && shader->m_shaderCode.m_vertexShader != 0)
+		DX::OutputVDebugString(L"[LOG]: Same vertex shader being bind multiple times. This is a performance hit.\n");
+	m_shaderCode.m_vertexShader = shader->m_shaderCode.m_vertexShader;
+	if (m_shaderCode.m_geometryShader == shader->m_shaderCode.m_geometryShader && shader->m_shaderCode.m_geometryShader != 0)
+		DX::OutputVDebugString(L"[LOG]: Same geometry shader being bind multiple times. This is a performance hit.\n");
+	m_shaderCode.m_geometryShader = shader->m_shaderCode.m_geometryShader;
+	if (m_shaderCode.m_hullShader == shader->m_shaderCode.m_hullShader && shader->m_shaderCode.m_hullShader != 0)
+		DX::OutputVDebugString(L"[LOG]: Same hull shader being bind multiple times. This is a performance hit.\n");
+	m_shaderCode.m_hullShader = shader->m_shaderCode.m_hullShader;
+	if (m_shaderCode.m_pixelShader == shader->m_shaderCode.m_pixelShader && shader->m_shaderCode.m_domainShader != 0)
+		DX::OutputVDebugString(L"[LOG]: Same pixel shader being bind multiple times. This is a performance hit.\n");
+	m_shaderCode.m_pixelShader = shader->m_shaderCode.m_pixelShader;
+	if (m_shaderCode.m_pixelShader == shader->m_shaderCode.m_pixelShader && shader->m_shaderCode.m_pixelShader != 0)
+		DX::OutputVDebugString(L"[LOG]: Same pixel shader being bind multiple times. This is a performance hit.\n");
+	m_shaderCode.m_pixelShader = shader->m_shaderCode.m_pixelShader;
 }

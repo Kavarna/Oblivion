@@ -23,6 +23,9 @@ Game::~Game()
 
 void Game::Destroy()
 {
+	m_basicModel.reset();
+	m_basicShader.reset();
+
 	ImGui_ImplDX11_Shutdown();
 	ImGui::DestroyContext();
 
@@ -40,6 +43,9 @@ void Game::Create(HINSTANCE hInstance, uint32_t width, uint32_t height)
 	InitInput();
 	InitDirect3D();
 	InitImGui();
+	InitShaders();
+	Init3D();
+	InitSizeDependent();
 }
 
 void Game::InitWindow()
@@ -73,6 +79,7 @@ void Game::InitInput()
 	m_mouse = std::make_unique<DirectX::Mouse>();
 	m_mouse->SetWindow(m_windowHandle);
 	m_mouse->SetVisible(true);
+	m_mouse->SetMode(DirectX::Mouse::Mode::MODE_ABSOLUTE);
 }
 
 void Game::InitDirect3D()
@@ -92,6 +99,30 @@ void Game::InitImGui()
 	ImGui_ImplDX11_Init(m_windowHandle, d3d->getDevice(), d3d->getContext());
 
 	ImGui::StyleColorsClassic();
+}
+
+void Game::InitShaders()
+{
+	auto renderer = Direct3D11::GetInstance();
+	m_basicShader = std::make_unique<BasicShader>();
+	renderer->createShader(m_basicShader.get());
+}
+
+void Game::Init3D()
+{
+	auto renderer = Direct3D11::GetInstance();
+	m_basicModel = std::make_unique<Model<BasicShader>>();
+	renderer->createGameObject(m_basicModel.get(), m_basicShader.get());
+}
+
+void Game::InitSizeDependent()
+{
+	//float FOV, float HByW, float NearZ, float FarZ
+	float FOV = DirectX::XM_PI / 5;
+	float HByW = (float)m_windowHeight / (float)m_windowWidth;
+	float nearZ = 1.0f;
+	float farZ = 1000.0f;
+	m_camera = std::make_unique<Camera>(FOV, HByW, nearZ, farZ);
 }
 
 void Game::Run()
@@ -116,11 +147,34 @@ void Game::Run()
 
 void Game::Update()
 {
+	float frameTime = 1000.0f / ImGui::GetIO().Framerate;
 	auto kb = m_keyboard->GetState();
-	if (kb.Escape)
-		PostQuitMessage(0);
-	if (kb.B)
-		DX::OutputVDebugString(L"Hello world!\n");
+	auto mouse = m_mouse->GetState();
+	static bool bEscape = false;
+	if (kb.Escape && !bEscape)
+	{
+		bEscape = true;
+		if (m_menuActive)
+			m_mouse->SetMode(DirectX::Mouse::Mode::MODE_RELATIVE);
+		else
+			m_mouse->SetMode(DirectX::Mouse::Mode::MODE_ABSOLUTE);
+		m_menuActive = !m_menuActive;
+	}
+	else if (!kb.Escape)
+		bEscape = false;
+	float cameraFrameTime = frameTime;
+	if (kb.LeftShift)
+		cameraFrameTime *= 10;
+	if (kb.W)
+		m_camera->WalkForward(cameraFrameTime);
+	if (kb.S)
+		m_camera->WalkBackward(cameraFrameTime);
+	if (kb.D)
+		m_camera->StrafeRight(cameraFrameTime);
+	if (kb.A)
+		m_camera->StrafeLeft(cameraFrameTime);
+
+	m_camera->Update(frameTime, 0.0f, 0.0f);
 }
 
 void Game::Begin()
@@ -132,6 +186,7 @@ void Game::Begin()
 
 void Game::End()
 {
+	auto mouse = m_mouse->GetState();
 	auto renderer = Direct3D11::GetInstance();
 
 #if DEBUG || _DEBUG
@@ -168,6 +223,8 @@ void Game::Render()
 		return;
 	Begin();
 
+	renderer->renderGameObject(m_camera.get(), m_basicModel.get());
+
 	End();
 }
 
@@ -177,6 +234,8 @@ void Game::OnSize(uint32_t width, uint32_t height)
 		return;
 	m_windowWidth = width;
 	m_windowHeight = height;
+
+	InitSizeDependent();
 
 	Direct3D11::GetInstance()->OnResize(m_windowHandle, m_windowWidth, m_windowHeight);
 

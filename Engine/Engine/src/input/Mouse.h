@@ -10,7 +10,13 @@
 
 #pragma once
 
+#ifndef UNICODE
+#define UNICODE
+#endif // !UNICODE
+
+
 #include <memory>
+#include <Windows.h>
 
 #if (defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)) || (defined(_XBOX_ONE) && defined(_TITLE) && (_XDK_VER >= 0x42D907D1))
 namespace ABI { namespace Windows { namespace UI { namespace Core { struct ICoreWindow; } } } }

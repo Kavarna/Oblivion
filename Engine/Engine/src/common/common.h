@@ -79,6 +79,8 @@ MessageBoxA(NULL,"Unexpected error occured", "Error", MB_ICONERROR| MB_OK); exit
 #include <unordered_map>
 #include <functional>
 #include <mutex>
+#include <bitset>
+#include <type_traits>
 
 #include "commonmath.h"
 
