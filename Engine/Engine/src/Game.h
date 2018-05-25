@@ -55,6 +55,7 @@ private:
 	uint32_t									m_windowWidth;
 	uint32_t									m_windowHeight;
 	bool										m_menuActive = true;
+	float										m_mouseSensivity = 0.5f;
 private:
 	std::shared_ptr<BasicShader>				m_basicShader;
 

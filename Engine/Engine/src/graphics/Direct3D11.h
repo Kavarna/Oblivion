@@ -34,7 +34,7 @@ public:
 
 public:
 	void					createShader(IShader *);
-	void					bindShader(IShader const* shader);
+	void					bindShader(IShader const*, IShader::SCameraInformations const* = nullptr, IShader::SMaterialInformations const * = nullptr);
 	template <class shader>
 	void					createGameObject(IGameObject<shader>*, IShader*);
 	template <class shader>
@@ -50,15 +50,15 @@ private:
 	void CheckCommonShaderParts(IShader const* shader);
 
 public:
-	bool										m_hasMSAA = false;
-	bool										m_hasVerticalSync = false;
+	bool										m_hasMSAA					= false;
+	bool										m_hasVerticalSync			= true;
 
 private: // Attributes
 	bool										m_available					= false;
 	UINT										m_maxMSAAQualityLevel		= 0;
 
 private: // On pipeline
-	IShader::SShaderCode						m_shaderCode				= { 0 };
+	uint64_t									m_shaderCode				= { 0 };
 
 private:
 	D3D11_VIEWPORT								m_viewPort;
@@ -80,7 +80,12 @@ inline void Direct3D11::createGameObject(IGameObject<shaderType>* object, IShade
 template<class shader>
 inline void Direct3D11::renderGameObject(ICamera * camera, IGameObject<shader>* object, int instanceCount)
 {
-	bindShader(object->m_shader);
+	IShader::SCameraInformations cam;
+	cam.World = DirectX::XMMatrixTranspose(object->GetObjectWorld());
+	cam.View = DirectX::XMMatrixTranspose(camera->GetView());
+	cam.Projection = DirectX::XMMatrixTranspose(camera->GetProjection());
+	IShader::SMaterialInformations mat;
+	bindShader(object->m_shader, &cam, &mat);
 	object->Render(m_d3d11Context.Get());
 	if (instanceCount == 1)
 		m_d3d11Context->DrawIndexed(object->GetIndexCount(),

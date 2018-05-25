@@ -118,7 +118,7 @@ void Game::Init3D()
 void Game::InitSizeDependent()
 {
 	//float FOV, float HByW, float NearZ, float FarZ
-	float FOV = DirectX::XM_PI / 5;
+	float FOV = DirectX::XM_PI / 4;
 	float HByW = (float)m_windowHeight / (float)m_windowWidth;
 	float nearZ = 1.0f;
 	float farZ = 1000.0f;
@@ -147,21 +147,9 @@ void Game::Run()
 
 void Game::Update()
 {
-	float frameTime = 1000.0f / ImGui::GetIO().Framerate;
+	float frameTime = 1.0f / ImGui::GetIO().Framerate;
 	auto kb = m_keyboard->GetState();
 	auto mouse = m_mouse->GetState();
-	static bool bEscape = false;
-	if (kb.Escape && !bEscape)
-	{
-		bEscape = true;
-		if (m_menuActive)
-			m_mouse->SetMode(DirectX::Mouse::Mode::MODE_RELATIVE);
-		else
-			m_mouse->SetMode(DirectX::Mouse::Mode::MODE_ABSOLUTE);
-		m_menuActive = !m_menuActive;
-	}
-	else if (!kb.Escape)
-		bEscape = false;
 	float cameraFrameTime = frameTime;
 	if (kb.LeftShift)
 		cameraFrameTime *= 10;
@@ -174,7 +162,23 @@ void Game::Update()
 	if (kb.A)
 		m_camera->StrafeLeft(cameraFrameTime);
 
-	m_camera->Update(frameTime, 0.0f, 0.0f);
+	if (m_menuActive)
+		m_camera->Update(frameTime, 0.0f, 0.0f);
+	else
+		m_camera->Update(frameTime, mouse.x * m_mouseSensivity, mouse.y * m_mouseSensivity);
+
+	static bool bEscape = false;
+	if (kb.Escape && !bEscape)
+	{
+		bEscape = true;
+		if (m_menuActive)
+			m_mouse->SetMode(DirectX::Mouse::Mode::MODE_RELATIVE);
+		else
+			m_mouse->SetMode(DirectX::Mouse::Mode::MODE_ABSOLUTE);
+		m_menuActive = !m_menuActive;
+	}
+	else if (!kb.Escape)
+		bEscape = false;
 }
 
 void Game::Begin()
@@ -192,7 +196,7 @@ void Game::End()
 #if DEBUG || _DEBUG
 	ImGui::Begin("Debug");
 	
-	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+	ImGui::Text("Application average %.5f s/frame (%.1f FPS)", 1.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
 	ImGui::End();
 #endif
@@ -202,6 +206,7 @@ void Game::End()
 	ImGui::Begin("Settings", 0, ImGuiWindowFlags_NoNav);
 	ImGui::Checkbox("Vertical sync", &renderer->m_hasVerticalSync);
 	ImGui::Checkbox("Use 4xMSAA", &renderer->m_hasMSAA);
+	ImGui::DragFloat("Mouse sensivity", &m_mouseSensivity, 0.01f, 0.1f, 2.0f);
 
 	if (hasMSAA != renderer->m_hasMSAA)
 	{

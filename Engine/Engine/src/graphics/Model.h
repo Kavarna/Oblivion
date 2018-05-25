@@ -56,6 +56,8 @@ protected:
 		ShaderHelper::CreateBuffer(device, &m_indexBuffer,
 			D3D11_USAGE::D3D11_USAGE_IMMUTABLE, D3D11_BIND_FLAG::D3D11_BIND_INDEX_BUFFER,
 			sizeof(decltype( m_indices[0] )) * 3, 0, &m_indices[0]);
+
+		m_objectWorld = DirectX::XMMatrixIdentity();
 	};
 	void Render(ID3D11DeviceContext* context)
 	{

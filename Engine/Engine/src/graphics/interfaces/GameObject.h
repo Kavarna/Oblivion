@@ -37,9 +37,16 @@ protected:
 		return m_startVertexLocation;
 	};
 
+	DirectX::XMMATRIX& GetObjectWorld()
+	{
+		return m_objectWorld;
+	};
+
 protected:
 
 	IShader* m_shader;
+
+	DirectX::XMMATRIX m_objectWorld;
 
 	uint32_t m_startIndexLocation = 0;
 	uint32_t m_startVertexLocation = 0;
