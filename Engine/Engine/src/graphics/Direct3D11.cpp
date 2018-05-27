@@ -52,19 +52,19 @@ void Direct3D11::Create(HWND window)
 	if (FAILED(hr))
 		throw std::exception("Can't create direct3d device");
 
+#if DEBUG || _DEBUG
 	MicrosoftPointer<ID3D11Debug> debug;
 	if (SUCCEEDED(m_d3d11Device.As(&debug)))
 	{
 		MicrosoftPointer<ID3D11InfoQueue> infoQueue;
 		if (SUCCEEDED(debug.As(&infoQueue)))
 		{
-#if DEBUG || _DEBUG
 			infoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY::D3D11_MESSAGE_SEVERITY_ERROR, true);
 			infoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY::D3D11_MESSAGE_SEVERITY_CORRUPTION, true);
-#endif
 			// TODO: Add disabled messages
 		}
 	}
+#endif
 }
 
 void Direct3D11::OnResize(HWND hWnd, uint32_t width, uint32_t height)

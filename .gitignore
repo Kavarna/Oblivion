@@ -213,3 +213,5 @@ ModelManifest.xml
 
 *.VC.opendb
 *.opendb
+/Engine/Engine/Shaders
+/Engine/Engine/imgui.ini
