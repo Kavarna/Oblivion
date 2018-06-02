@@ -219,30 +219,3 @@ void Direct3D11::End()
 	else
 		m_dxgiSwapChain->Present(0, 0);
 }
-
-void Direct3D11::createShader(IShader * shader)
-{
-	shader->Create(m_d3d11Device.Get());
-}
-
-void Direct3D11::bindShader(IShader const* shader, IShader::SCameraInformations const* cam, IShader::SMaterialInformations const* mat)
-{
-#if DEBUG || _DEBUG
-	CheckCommonShaderParts(shader);
-#endif
-	if (!shader->additionalData())
-		shader->bind(m_d3d11Context.Get());
-	else
-	{
-		shader->bindCameraInformations(m_d3d11Context.Get(), cam);
-		shader->bindMaterialInformations(m_d3d11Context.Get(), mat);
-		shader->bind(m_d3d11Context.Get());
-	}
-}
-
-void Direct3D11::CheckCommonShaderParts(IShader const* shader)
-{
-	if (m_shaderCode == shader->m_shaderCode)
-		DX::OutputVDebugString(L"[LOG]: Same shader being bind multiple times. This is a performance hit.\n");
-	m_shaderCode = shader->m_shaderCode;
-}

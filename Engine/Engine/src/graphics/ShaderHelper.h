@@ -102,6 +102,22 @@ namespace ShaderHelper
 			device, ShaderBlob, Shader, soe, numLayout);
 	}
 
+	inline void* MapBuffer(ID3D11DeviceContext * context, ID3D11Buffer * buffer,
+		D3D11_MAP mapType = D3D11_MAP::D3D11_MAP_WRITE_DISCARD, uint16_t subResource = 0)
+	{
+		static D3D11_MAPPED_SUBRESOURCE mappedSubresource;
+		ThrowIfFailed(
+			context->Map(buffer, subResource, mapType, 0, &mappedSubresource)
+		);
+		return mappedSubresource.pData;
+	}
+
+	inline void UnmapBuffer(ID3D11DeviceContext * context, ID3D11Buffer * buffer,
+		uint16_t subResource = 0)
+	{
+		context->Unmap(buffer, subResource);
+	}
+
 	inline void CreateBuffer(ID3D11Device * device, ID3D11Buffer ** FinalBuffer,
 		D3D11_USAGE Usage, D3D11_BIND_FLAG flag, size_t DataSize, int CPUAccessFlag,
 		void* data = nullptr, UINT MiscFlag = 0, UINT StructureByteStride = 0)

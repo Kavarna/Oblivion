@@ -6,48 +6,35 @@
 #include "AlignedObject.h"
 #include "Shader.h"
 
-class Direct3D11;
 
-template <class Shader>
+template <class shader>
 class IGameObject : public AlignedObject
 {
+	static_assert(std::is_base_of<IShader, shader>::value,
+		"Can't create a game object with a non-shader generic argument");
 	friend class Direct3D11;
 public:
 	IGameObject() {};
-	virtual ~IGameObject() {};
+	virtual ~IGameObject() 
+	{
+		m_d3d11Device.Reset();
+		m_d3d11Context.Reset();
+	};
 
 public:
-
+	virtual void Create(LPWSTR lpPath) = 0;
+	virtual void Render(ICamera *, int) const = 0;
 	virtual void Update(float frameTime) = 0;
+	virtual void Destroy() = 0;
+
+
 
 protected:
-	virtual void Create(Shader*, ID3D11Device*, ID3D11DeviceContext*) = 0;
-	virtual void Render(ID3D11DeviceContext*) = 0;
-	virtual void Destroy() = 0;
 	virtual uint32_t GetIndexCount() const = 0;
 	virtual uint32_t GetVertexCount() const = 0;
 
 protected:
-	virtual uint32_t GetStartIndexLocation()
-	{
-		return m_startIndexLocation;
-	};
-	virtual uint32_t GetStartVertexLocation()
-	{
-		return m_startVertexLocation;
-	};
-
-	DirectX::XMMATRIX& GetObjectWorld()
-	{
-		return m_objectWorld;
-	};
-
-protected:
-
-	IShader* m_shader;
-
-	DirectX::XMMATRIX m_objectWorld;
-
-	uint32_t m_startIndexLocation = 0;
-	uint32_t m_startVertexLocation = 0;
+	MicrosoftPointer<ID3D11Device>			m_d3d11Device;
+	MicrosoftPointer<ID3D11DeviceContext>	m_d3d11Context;
+	DirectX::XMMATRIX						m_objectWorld;
 };

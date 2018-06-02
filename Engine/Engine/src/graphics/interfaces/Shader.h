@@ -7,39 +7,42 @@ class Direct3D11;
 
 class IShader
 {
-private:
-	friend class Direct3D11;
 public:
-	struct SVertex; // In this order: Position, Texture, Normals, Tangents, Binormals
-public:
-	IShader(uint64_t code) : m_shaderCode(code) {};
-	virtual ~IShader() {};
-
-public:
-	struct SCameraInformations
+	struct SVertex; // For consistency
+protected:
+	IShader() {};
+	virtual ~IShader()
 	{
-		DirectX::XMMATRIX World;
-		DirectX::XMMATRIX View;
-		DirectX::XMMATRIX Projection;
-	};
-	struct SMaterialInformations
-	{
-		// To be added
+		m_d3d11Device.Reset();
+		m_d3d11Context.Reset();
 	};
 
 private:
-	virtual void		bind(ID3D11DeviceContext*) const	= 0;
-	virtual void		Create(ID3D11Device*)				= 0;
-	virtual bool		additionalData() const				= 0;
-	virtual void		bindCameraInformations(ID3D11DeviceContext*, SCameraInformations const*) const
+	static std::type_index					m_currentlyBoundShader;
+
+protected:
+	template <class Shader>
+	static bool								shouldBind()
 	{
-		return;
-	}
-	virtual void		bindMaterialInformations(ID3D11DeviceContext*, SMaterialInformations const*) const
+		// Gets the shader type and checks if it's already 
+		std::type_index shaderType(typeid(Shader));
+		if (shaderType == m_currentlyBoundShader)
+			return false;
+		m_currentlyBoundShader = shaderType;
+		return true;
+	};
+
+public:
+	virtual void							bind() const	= 0;
+	virtual void							Create()		= 0;
+	
+	static IShader*							Get()
 	{
-		return;
+		return nullptr;
 	}
 
-private:
-	uint64_t			m_shaderCode; // To remember which shader is bound to the pipeline
+protected:
+	MicrosoftPointer<ID3D11Device>			m_d3d11Device;
+	MicrosoftPointer<ID3D11DeviceContext>	m_d3d11Context;
 };
+

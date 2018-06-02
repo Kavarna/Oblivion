@@ -24,7 +24,6 @@ Game::~Game()
 void Game::Destroy()
 {
 	m_basicModel.reset();
-	m_basicShader.reset();
 
 	ImGui_ImplDX11_Shutdown();
 	ImGui::DestroyContext();
@@ -43,7 +42,6 @@ void Game::Create(HINSTANCE hInstance, uint32_t width, uint32_t height)
 	InitInput();
 	InitDirect3D();
 	InitImGui();
-	InitShaders();
 	Init3D();
 	InitSizeDependent();
 }
@@ -96,23 +94,16 @@ void Game::InitImGui()
 	ImGui::CreateContext();
 	auto& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-	ImGui_ImplDX11_Init(m_windowHandle, d3d->getDevice(), d3d->getContext());
+	ImGui_ImplDX11_Init(m_windowHandle, d3d->getDevice().Get(), d3d->getContext().Get());
 
 	ImGui::StyleColorsClassic();
 }
 
-void Game::InitShaders()
-{
-	auto renderer = Direct3D11::GetInstance();
-	m_basicShader = std::make_unique<BasicShader>();
-	renderer->createShader(m_basicShader.get());
-}
-
 void Game::Init3D()
 {
-	auto renderer = Direct3D11::GetInstance();
+	// auto renderer = Direct3D11::GetInstance();
 	m_basicModel = std::make_unique<Model<BasicShader>>();
-	renderer->createGameObject(m_basicModel.get(), m_basicShader.get());
+	m_basicModel->Create(L"");
 }
 
 void Game::InitSizeDependent()
@@ -228,7 +219,7 @@ void Game::Render()
 		return;
 	Begin();
 
-	renderer->renderGameObject(m_camera.get(), m_basicModel.get());
+	m_basicModel->Render(m_camera.get());
 
 	End();
 }

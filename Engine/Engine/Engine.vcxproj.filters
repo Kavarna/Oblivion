@@ -16,6 +16,7 @@
     <ClCompile Include="src\graphics\BasicShader.cpp" />
     <ClCompile Include="src\graphics\Camera.cpp" />
     <ClCompile Include="src\graphics\Model.cpp" />
+    <ClCompile Include="src\graphics\interfaces\Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\commonmath.h" />

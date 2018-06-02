@@ -52,6 +52,10 @@ MessageBoxA(NULL,"Unexpected error occured", "Error", MB_ICONERROR| MB_OK); exit
 }
 #endif
 
+#pragma warning (push)
+#pragma warning (disable : 5043)
+// TODO: Add other warnings to be disabled
+
 #include <windows.h>
 #include <d3d11.h>
 #include <d3d10.h>
@@ -81,6 +85,8 @@ MessageBoxA(NULL,"Unexpected error occured", "Error", MB_ICONERROR| MB_OK); exit
 #include <mutex>
 #include <bitset>
 #include <type_traits>
+#include <typeinfo>
+#include <typeindex>
 
 #include "commonmath.h"
 
@@ -89,6 +95,7 @@ MessageBoxA(NULL,"Unexpected error occured", "Error", MB_ICONERROR| MB_OK); exit
 #pragma comment (lib, "dxguid.lib")
 #pragma comment (lib, "dxgi.lib")
 #pragma comment (lib, "D3Dcompiler.lib")
+#pragma warning (pop)
 
 template <class type>
 using MicrosoftPointer = Microsoft::WRL::ComPtr<type>;

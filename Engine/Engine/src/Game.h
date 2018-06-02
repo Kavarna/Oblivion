@@ -36,7 +36,6 @@ private:
 	void InitInput();
 	void InitDirect3D();
 	void InitImGui();
-	void InitShaders();
 	void Init3D();
 
 	void InitSizeDependent();
@@ -57,8 +56,6 @@ private:
 	bool										m_menuActive = true;
 	float										m_mouseSensivity = 0.5f;
 private:
-	std::shared_ptr<BasicShader>				m_basicShader;
-
 	std::unique_ptr<Camera>						m_camera;
 	std::unique_ptr<Model<BasicShader>>			m_basicModel;
 private:
