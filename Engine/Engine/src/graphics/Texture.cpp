@@ -2,7 +2,7 @@
 
 
 
-CTexture::CTexture(LPWSTR lpPath, ID3D11Device * device, ID3D11DeviceContext * context, bool hasUAV) :
+Texture::Texture(LPWSTR lpPath, ID3D11Device * device, ID3D11DeviceContext * context, bool hasUAV) :
 	mDevice(device)
 {
 	if (hasUAV)
@@ -25,12 +25,12 @@ CTexture::CTexture(LPWSTR lpPath, ID3D11Device * device, ID3D11DeviceContext * c
 }
 
 
-CTexture::~CTexture()
+Texture::~Texture()
 {
 	mTextureSRV.Reset();
 }
 
-void CTexture::CreateUAV()
+void Texture::CreateUAV()
 {
 	ID3D11Texture2D * texture;
 	mTextureSRV->GetResource(reinterpret_cast<ID3D11Resource**>( &texture ));

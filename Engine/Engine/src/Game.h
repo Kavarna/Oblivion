@@ -3,7 +3,8 @@
 #include "OblivionInclude.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_dx11.h"
-#include "graphics/BasicShader.h"
+#include "graphics/Shaders/BasicShader.h"
+#include "graphics/Shaders/TextureLightShader.h"
 #include "graphics/Camera.h"
 #include "graphics/Model.h"
 
@@ -57,7 +58,8 @@ private:
 	float										m_mouseSensivity = 0.5f;
 private:
 	std::unique_ptr<Camera>						m_camera;
-	std::unique_ptr<Model<BasicShader>>			m_basicModel;
+	std::unique_ptr<Model>						m_sphereModel;
+	std::unique_ptr<Model>						m_groundModel;
 private:
 	std::unique_ptr<DirectX::Mouse>				m_mouse;
 	std::unique_ptr<DirectX::Keyboard>			m_keyboard;

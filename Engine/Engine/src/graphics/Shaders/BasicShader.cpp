@@ -1,12 +1,12 @@
 #include "BasicShader.h"
-#include "Direct3D11.h"
+#include "../Direct3D11.h"
 
 std::once_flag					BasicShader::m_shaderFlags;
 std::unique_ptr<BasicShader>	BasicShader::m_shaderInstance;
 
 BasicShader::BasicShader()
 {
-	auto renderer = Direct3D11::GetInstance();
+	auto renderer = Direct3D11::Get();
 	m_d3d11Device = renderer->getDevice();
 	m_d3d11Context = renderer->getContext();
 }
@@ -54,19 +54,26 @@ void BasicShader::Create()
 
 void BasicShader::bind() const
 {
+#if DEBUG || _DEBUG
 	if (IShader::shouldBind<BasicShader>())
+#endif
 	{
 		m_d3d11Context->IASetInputLayout(m_layout.Get());
 		m_d3d11Context->VSSetShader(m_vertexShader.Get(), nullptr, 0);
 		m_d3d11Context->PSSetShader(m_pixelShader.Get(), nullptr, 0);
 	}
+#if DEBUG || _DEBUG
+	else
+	{
+		DX::OutputVDebugString(L"[LOG]: Attempting to bind the same shader multiple times. This might be a performance hit.\n");
+	}
+#endif
 }
 
 void BasicShader::SetCameraInformations(SCameraInfo const & info) const
 {
-	void * data = ShaderHelper::MapBuffer(m_d3d11Context.Get(), m_cameraBuffer.Get());
-	memcpy_s(data, sizeof(SCameraInfo), &info, sizeof(SCameraInfo));
-	ShaderHelper::UnmapBuffer(m_d3d11Context.Get(), m_cameraBuffer.Get());
+	ShaderHelper::MapBuffer(m_d3d11Context.Get(), m_cameraBuffer.Get(),
+		(void*)&info, sizeof(SCameraInfo));
 	m_d3d11Context->VSSetConstantBuffers(0, 1, m_cameraBuffer.GetAddressOf());
 }
 

@@ -134,6 +134,35 @@ namespace DX
 	{
 		return a + ( float(rand()) / RAND_MAX ) * ( b - a );
 	}
+	/// <summary>Returns the minimum value</summary>
+	template <class type>
+	inline type Min(type first, type second)
+	{
+		return first < second ? first : second;
+	}
+	/// <summary>Returns the polar angle of the point (x,y) in [0, 2*PI).</summary>
+	inline float AngleFromXY(float x, float y)
+	{
+		using namespace DirectX;
+		float theta = 0.0f;
+
+		// Quadrant I or IV
+		if (x >= 0.0f)
+		{
+			// If x = 0, then atanf(y/x) = +pi/2 if y > 0
+			//                atanf(y/x) = -pi/2 if y < 0
+			theta = atanf(y / x); // in [-pi/2, +pi/2]
+
+			if (theta < 0.0f)
+				theta += 2.0f * XM_PI; // in [0, 2*pi).
+		}
+
+		// Quadrant II or III
+		else
+			theta = atanf(y / x) + XM_PI; // in [0, 2*pi).
+
+		return theta;
+	}
 	/// <summary>Gets the component count from known simple formats (RGBA,BGRA...); -1 if it's an invalid format</summary>
 	int GetComponentCountFromFormat(DXGI_FORMAT format);
 	/// <summary>Initializes Direct3D states</summary>

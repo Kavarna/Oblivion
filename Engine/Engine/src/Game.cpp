@@ -23,7 +23,7 @@ Game::~Game()
 
 void Game::Destroy()
 {
-	m_basicModel.reset();
+	m_sphereModel.reset();
 
 	ImGui_ImplDX11_Shutdown();
 	ImGui::DestroyContext();
@@ -82,14 +82,20 @@ void Game::InitInput()
 
 void Game::InitDirect3D()
 {
-	Direct3D11 * d3d = Direct3D11::GetInstance();
+	Direct3D11 * d3d = Direct3D11::Get();
 	d3d->Create(m_windowHandle);
 	d3d->OnResize(m_windowHandle, m_windowWidth, m_windowHeight);
+	Sun sunLight{
+		{0.5f,-0.5f,0.0f,1.0f},
+		{1.0f,1.0f,1.0f,1.0f},
+		{0.2f,0.2f,0.2f,1.0f}
+	};
+	TextureLightShader::Get()->SetLightInformations(sunLight);
 }
 
 void Game::InitImGui()
 {
-	Direct3D11 * d3d = Direct3D11::GetInstance();
+	Direct3D11 * d3d = Direct3D11::Get();
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	auto& io = ImGui::GetIO();
@@ -101,15 +107,21 @@ void Game::InitImGui()
 
 void Game::Init3D()
 {
-	// auto renderer = Direct3D11::GetInstance();
-	m_basicModel = std::make_unique<Model<BasicShader>>();
-	m_basicModel->Create(L"");
+	// auto renderer = Direct3D11::Get();
+	m_sphereModel = std::make_unique<Model>();
+	m_sphereModel->Create(EDefaultObject::Sphere);
+	m_sphereModel->Translate(0.0f, 1.0f, 0.0f);
+
+	m_groundModel = std::make_unique<Model>();
+	m_groundModel->Create(EDefaultObject::Grid);
+
+	TextureLightShader::Get()->bind(); // TODO: REMOVE THIS WHEN THERE ARE MULTIPLE SHADERS IN RUNTIME
 }
 
 void Game::InitSizeDependent()
 {
 	//float FOV, float HByW, float NearZ, float FarZ
-	float FOV = DirectX::XM_PI / 4;
+	float FOV = DirectX::XM_PI / 2;
 	float HByW = (float)m_windowHeight / (float)m_windowWidth;
 	float nearZ = 1.0f;
 	float farZ = 1000.0f;
@@ -174,7 +186,7 @@ void Game::Update()
 
 void Game::Begin()
 {
-	auto renderer = Direct3D11::GetInstance();
+	auto renderer = Direct3D11::Get();
 	renderer->Begin();
 	ImGui_ImplDX11_NewFrame();
 }
@@ -182,10 +194,11 @@ void Game::Begin()
 void Game::End()
 {
 	auto mouse = m_mouse->GetState();
-	auto renderer = Direct3D11::GetInstance();
+	auto renderer = Direct3D11::Get();
 
 #if DEBUG || _DEBUG
-	ImGui::Begin("Debug");
+	ImGui::Begin("Debug", 0, ImGuiWindowFlags_NoNav |
+		ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 	
 	ImGui::Text("Application average %.5f s/frame (%.1f FPS)", 1.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
@@ -194,9 +207,10 @@ void Game::End()
 
 	bool hasMSAA = renderer->m_hasMSAA;
 
-	ImGui::Begin("Settings", 0, ImGuiWindowFlags_NoNav);
+	ImGui::Begin("Settings", 0, ImGuiWindowFlags_NoNav |
+		ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 	ImGui::Checkbox("Vertical sync", &renderer->m_hasVerticalSync);
-	ImGui::Checkbox("Use 4xMSAA", &renderer->m_hasMSAA);
+	ImGui::Checkbox("Use MSAA", &renderer->m_hasMSAA);
 	ImGui::DragFloat("Mouse sensivity", &m_mouseSensivity, 0.01f, 0.1f, 2.0f);
 
 	if (hasMSAA != renderer->m_hasMSAA)
@@ -214,12 +228,13 @@ void Game::End()
 
 void Game::Render()
 {
-	auto renderer = Direct3D11::GetInstance();
+	auto renderer = Direct3D11::Get();
 	if (!renderer->Available())
 		return;
 	Begin();
 
-	m_basicModel->Render(m_camera.get());
+	m_sphereModel->Render<TextureLightShader>(m_camera.get());
+	m_groundModel->Render<TextureLightShader>(m_camera.get());
 
 	End();
 }
@@ -233,7 +248,7 @@ void Game::OnSize(uint32_t width, uint32_t height)
 
 	InitSizeDependent();
 
-	Direct3D11::GetInstance()->OnResize(m_windowHandle, m_windowWidth, m_windowHeight);
+	Direct3D11::Get()->OnResize(m_windowHandle, m_windowWidth, m_windowHeight);
 
 	ImGui_ImplDX11_InvalidateDeviceObjects();
 	ImGui_ImplDX11_CreateDeviceObjects();

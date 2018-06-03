@@ -13,18 +13,18 @@
     <ClCompile Include="src\imgui\imgui_demo.cpp" />
     <ClCompile Include="src\imgui\imgui_draw.cpp" />
     <ClCompile Include="src\imgui\imgui_impl_dx11.cpp" />
-    <ClCompile Include="src\graphics\BasicShader.cpp" />
     <ClCompile Include="src\graphics\Camera.cpp" />
     <ClCompile Include="src\graphics\Model.cpp" />
     <ClCompile Include="src\graphics\interfaces\Shader.cpp" />
+    <ClCompile Include="src\graphics\Helpers\GeometryGenerator.cpp" />
+    <ClCompile Include="src\graphics\Shaders\BasicShader.cpp" />
+    <ClCompile Include="src\graphics\Shaders\TextureLightShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\commonmath.h" />
     <ClInclude Include="src\common\common.h" />
     <ClInclude Include="src\OblivionInclude.h" />
     <ClInclude Include="src\graphics\WICTextureLoader.h" />
-    <ClInclude Include="src\graphics\TextureUtilities.h" />
-    <ClInclude Include="src\graphics\ShaderHelper.h" />
     <ClInclude Include="src\graphics\Texture.h" />
     <ClInclude Include="src\graphics\Direct3D11.h" />
     <ClInclude Include="src\Game.h" />
@@ -39,15 +39,25 @@
     <ClInclude Include="src\imgui\stb_textedit.h" />
     <ClInclude Include="src\imgui\stb_truetype.h" />
     <ClInclude Include="src\graphics\interfaces\Shader.h" />
-    <ClInclude Include="src\graphics\BasicShader.h" />
     <ClInclude Include="src\graphics\interfaces\GameObject.h" />
     <ClInclude Include="src\graphics\interfaces\AlignedObject.h" />
     <ClInclude Include="src\graphics\interfaces\Camera.h" />
     <ClInclude Include="src\graphics\Camera.h" />
     <ClInclude Include="src\graphics\Model.h" />
+    <ClInclude Include="src\graphics\Helpers\ShaderHelper.h" />
+    <ClInclude Include="src\graphics\Helpers\GeometryGenerator.h" />
+    <ClInclude Include="src\graphics\Helpers\TextureUtilities.h" />
+    <ClInclude Include="src\graphics\Shaders\BasicShader.h" />
+    <ClInclude Include="src\graphics\Shaders\TextureLightShader.h" />
+    <ClInclude Include="src\graphics\Helpers\Lights.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\BasicVertexShader.hlsl" />
     <FxCompile Include="src\shaders\BasicPixelShader.hlsl" />
+    <FxCompile Include="src\shaders\TextureLightVertexShader.hlsl" />
+    <FxCompile Include="src\shaders\TextureLightPixelShader.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\shaders\Lights.hlsli" />
   </ItemGroup>
 </Project>

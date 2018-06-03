@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../common/common.h"
+#include "../../common/common.h"
 
 
 namespace ShaderHelper
@@ -116,6 +116,15 @@ namespace ShaderHelper
 		uint16_t subResource = 0)
 	{
 		context->Unmap(buffer, subResource);
+	}
+	
+	inline void MapBuffer(ID3D11DeviceContext * context, ID3D11Buffer * buffer,
+		void * data, std::size_t size, D3D11_MAP mapType = D3D11_MAP::D3D11_MAP_WRITE_DISCARD,
+		uint16_t subresource = 0)
+	{
+		auto buffMem = MapBuffer(context, buffer, mapType, subresource);
+		memcpy_s(buffMem, size, data, size);
+		UnmapBuffer(context, buffer);
 	}
 
 	inline void CreateBuffer(ID3D11Device * device, ID3D11Buffer ** FinalBuffer,

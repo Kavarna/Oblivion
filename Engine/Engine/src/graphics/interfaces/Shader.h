@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../common/common.h"
-#include "../ShaderHelper.h"
+#include "../Helpers/ShaderHelper.h"
 
 class Direct3D11;
 

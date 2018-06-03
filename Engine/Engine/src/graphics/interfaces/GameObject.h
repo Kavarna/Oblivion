@@ -2,16 +2,15 @@
 
 
 #include "../../common/common.h"
+#include "../Texture.h"
 #include "Camera.h"
 #include "AlignedObject.h"
 #include "Shader.h"
 
 
-template <class shader>
+
 class IGameObject : public AlignedObject
 {
-	static_assert(std::is_base_of<IShader, shader>::value,
-		"Can't create a game object with a non-shader generic argument");
 	friend class Direct3D11;
 public:
 	IGameObject() {};
@@ -23,7 +22,7 @@ public:
 
 public:
 	virtual void Create(LPWSTR lpPath) = 0;
-	virtual void Render(ICamera *, int) const = 0;
+	//virtual void Render(ICamera *, int) const = 0; /// Should be templated
 	virtual void Update(float frameTime) = 0;
 	virtual void Destroy() = 0;
 

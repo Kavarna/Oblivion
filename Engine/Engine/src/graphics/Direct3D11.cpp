@@ -5,7 +5,7 @@ std::once_flag					Direct3D11::m_d3d11Flag;
 std::unique_ptr<Direct3D11>		Direct3D11::m_d3d11Instance = nullptr;
 
 
-Direct3D11* Direct3D11::GetInstance()
+Direct3D11* Direct3D11::Get()
 {
 	std::call_once(m_d3d11Flag, [&] { m_d3d11Instance = std::make_unique<Direct3D11>(); });
 
@@ -65,6 +65,8 @@ void Direct3D11::Create(HWND window)
 		}
 	}
 #endif
+
+	InitializeStates();
 }
 
 void Direct3D11::OnResize(HWND hWnd, uint32_t width, uint32_t height)
@@ -203,9 +205,28 @@ void Direct3D11::CreateDepthStencilView(uint32_t width, uint32_t height)
 		);
 }
 
+void Direct3D11::InitializeStates()
+{
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SAMPLER STATES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	ZeroMemoryAndDeclare(D3D11_SAMPLER_DESC, sampDesc);
+	sampDesc.AddressU =
+		sampDesc.AddressV =
+		sampDesc.AddressW =
+		D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_WRAP;
+	sampDesc.Filter = D3D11_FILTER::D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	sampDesc.MaxAnisotropy = 16;
+	sampDesc.MaxLOD = FLT_MAX;
+	sampDesc.MinLOD = 0;
+	sampDesc.MipLODBias = 0;
+	ThrowIfFailed(
+		m_d3d11Device->CreateSamplerState(&sampDesc, &m_linearWrapSamplerState)
+	);
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+}
+
 void Direct3D11::Begin()
 {
-	m_d3d11Context->OMSetRenderTargets(1, m_defaultRenderTarget.GetAddressOf(), nullptr);
+	m_d3d11Context->OMSetRenderTargets(1, m_defaultRenderTarget.GetAddressOf(), m_depthStencilView.Get());
 	static FLOAT color[4] = { 0.0f,0.0f,0.0f,1.0f };
 	m_d3d11Context->ClearRenderTargetView(m_defaultRenderTarget.Get(), color);
 	m_d3d11Context->ClearDepthStencilView(m_depthStencilView.Get(), D3D11_CLEAR_FLAG::D3D11_CLEAR_DEPTH, 1.0f, 0);

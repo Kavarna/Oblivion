@@ -1,13 +1,13 @@
 #pragma once
 
 #include "WICTextureLoader.h"
-#include "TextureUtilities.h"
+#include "Helpers/TextureUtilities.h"
 #include "../common/common.h"
 
 
 
 
-class CTexture
+class Texture
 {
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> mTexture;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> mTextureSRV;
@@ -17,9 +17,9 @@ class CTexture
 
 	ID3D11Device * mDevice;
 public:
-	CTexture() = default;
-	CTexture(LPWSTR lpPath, ID3D11Device *, ID3D11DeviceContext *, bool hasUAV = false);
-	~CTexture();
+	Texture() = default;
+	Texture(LPWSTR lpPath, ID3D11Device *, ID3D11DeviceContext *, bool hasUAV = false);
+	~Texture();
 public:
 	ID3D11ShaderResourceView* GetTextureSRV() const
 	{

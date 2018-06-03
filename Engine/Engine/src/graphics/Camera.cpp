@@ -4,7 +4,7 @@
 const DirectX::XMVECTOR Camera::Forward = DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 const DirectX::XMVECTOR Camera::Right = DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
 const DirectX::XMVECTOR Camera::Up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-const DirectX::XMVECTOR Camera::DefaultPosition = DirectX::XMVectorSet(0.0f, 0.0f, -5.0f, 1.0f);
+const DirectX::XMVECTOR Camera::DefaultPosition = DirectX::XMVectorSet(0.0f, 3.0f, -5.0f, 1.0f);
 const DirectX::XMMATRIX Camera::DefaultView = DirectX::XMMatrixLookToLH(DefaultPosition, Forward, Up);
 
 Camera::Camera(float FOV, float HByW, float NearZ, float FarZ)

@@ -6,8 +6,8 @@ cbuffer cbCamera : register( b0 )
 };
 
 
-float4 main( float4 pos : POSITION ) : SV_POSITION
+float4 main( float3 pos : POSITION ) : SV_POSITION
 {
-	float4 posH = mul(pos,WVP);
+	float4 posH = mul(float4(pos,1.0f),WVP);
 	return posH;
 }

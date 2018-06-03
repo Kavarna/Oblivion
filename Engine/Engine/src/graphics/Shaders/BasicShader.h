@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "interfaces/Shader.h"
+#include "../interfaces/Shader.h"
 
 class BasicShader : public IShader
 {
@@ -19,8 +19,8 @@ public:
 		DirectX::XMMATRIX WVP;
 	};
 public:
-	void Create();
-	void bind() const;
+	void Create() override;
+	void bind() const override;
 
 	void SetCameraInformations(SCameraInfo const& info) const;
 private:

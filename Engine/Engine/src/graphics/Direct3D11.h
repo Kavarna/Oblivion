@@ -10,7 +10,7 @@ class Direct3D11
 	template <class type>
 	using Ptr = MicrosoftPointer<type>;
 public:
-	static Direct3D11* GetInstance();
+	static Direct3D11* Get();
 
 private:
 	static std::once_flag						m_d3d11Flag;
@@ -21,22 +21,22 @@ public:
 	~Direct3D11();
 
 public:
-	void						Create(HWND window);
-	void						OnResize(HWND hWnd, uint32_t width, uint32_t height);
+	void										Create(HWND window);
+	void										OnResize(HWND hWnd, uint32_t width, uint32_t height);
 
-	Ptr<ID3D11Device>			getDevice()		const { return m_d3d11Device; };
-	Ptr<ID3D11DeviceContext>	getContext()	const { return m_d3d11Context; };
-	void						resetSwapChain() { m_dxgiSwapChain.Reset(); m_dxgiSwapChain = nullptr; };
+	Ptr<ID3D11Device>							getDevice()		const { return m_d3d11Device; };
+	Ptr<ID3D11DeviceContext>					getContext()	const { return m_d3d11Context; };
+	void										resetSwapChain() { m_dxgiSwapChain.Reset(); m_dxgiSwapChain = nullptr; };
 
-	void						Begin();
-	void						End();
+	void										Begin();
+	void										End();
 
 
 private:
-	void						CreateDepthStencilView(uint32_t width, uint32_t height);
-
+	void										CreateDepthStencilView(uint32_t width, uint32_t height);
+	void										InitializeStates();
 public:
-	inline bool					Available() const { return m_available; };
+	inline bool									Available() const { return m_available; };
 
 public:
 	bool										m_hasMSAA					= false;
@@ -48,6 +48,9 @@ private: // Attributes
 
 private: // On pipeline
 	uint64_t									m_shaderCode				= { 0 };
+
+public: // States
+	MicrosoftPointer<ID3D11SamplerState>		m_linearWrapSamplerState			= nullptr;
 
 private:
 	D3D11_VIEWPORT								m_viewPort;
