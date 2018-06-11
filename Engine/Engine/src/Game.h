@@ -55,7 +55,7 @@ private:
 	uint32_t									m_windowWidth;
 	uint32_t									m_windowHeight;
 	bool										m_menuActive = true;
-	float										m_mouseSensivity = 0.5f;
+	float										m_mouseSensivity = 2.0f;
 private:
 	std::unique_ptr<Camera>						m_camera;
 	std::unique_ptr<Model>						m_sphereModel;

@@ -121,8 +121,8 @@ void Game::Init3D()
 void Game::InitSizeDependent()
 {
 	//float FOV, float HByW, float NearZ, float FarZ
-	float FOV = DirectX::XM_PI / 2;
-	float HByW = (float)m_windowHeight / (float)m_windowWidth;
+	float FOV = DirectX::XM_PI / 4;
+	float HByW = (float)m_windowWidth / (float)m_windowHeight;
 	float nearZ = 1.0f;
 	float farZ = 1000.0f;
 	m_camera = std::make_unique<Camera>(FOV, HByW, nearZ, farZ);
@@ -211,7 +211,7 @@ void Game::End()
 		ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 	ImGui::Checkbox("Vertical sync", &renderer->m_hasVerticalSync);
 	ImGui::Checkbox("Use MSAA", &renderer->m_hasMSAA);
-	ImGui::DragFloat("Mouse sensivity", &m_mouseSensivity, 0.01f, 0.1f, 2.0f);
+	ImGui::DragFloat("Mouse sensivity", &m_mouseSensivity, 0.01f, 1.0f, 5.0f);
 
 	if (hasMSAA != renderer->m_hasMSAA)
 	{

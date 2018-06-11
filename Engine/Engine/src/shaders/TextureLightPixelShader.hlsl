@@ -25,11 +25,7 @@ float4 main(PSIn input) : SV_TARGET
 
 	float4 color = g_sunLight.Ambient;
 
-	float howMuchLight = dot(input.NormalW, -g_sunLight.Direction.xyz);
-	if (howMuchLight > 0.0f)
-	{
-		color += howMuchLight * g_sunLight.Diffuse;
-	}
+	color += g_sunLight.GetAmountOfLight(input.NormalW);
 
 	float4 finalColor = color * matColor;
 	return finalColor;

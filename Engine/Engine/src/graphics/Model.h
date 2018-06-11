@@ -125,6 +125,9 @@ void Model::Render(ICamera * cam, int instanceCount) const
 		// TODO: Add message with shader type
 	}
 
+	if (instanceCount != 0)
+		DX::OutputVDebugString(L"Unable to draw instanced for moment.\n");
+
 	uint32_t offset = 0;
 	uint32_t stride = sizeof(SVertex);
 	assert(stride >= 0);
