@@ -46,3 +46,10 @@ protected:
 	MicrosoftPointer<ID3D11DeviceContext>	m_d3d11Context;
 };
 
+class sh : IShader
+{
+	virtual void							bind() const
+	{};
+	virtual void							Create()
+	{};
+};

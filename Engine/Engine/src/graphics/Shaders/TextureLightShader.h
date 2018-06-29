@@ -20,7 +20,6 @@ private:
 public:
 	struct SCameraInfo
 	{
-		DirectX::XMMATRIX World;
 		DirectX::XMMATRIX View;
 		DirectX::XMMATRIX Projection;
 	};

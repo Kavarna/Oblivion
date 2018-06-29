@@ -19,6 +19,7 @@
     <ClCompile Include="src\graphics\Helpers\GeometryGenerator.cpp" />
     <ClCompile Include="src\graphics\Shaders\BasicShader.cpp" />
     <ClCompile Include="src\graphics\Shaders\TextureLightShader.cpp" />
+    <ClCompile Include="src\graphics\interfaces\GameObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\commonmath.h" />
@@ -50,6 +51,7 @@
     <ClInclude Include="src\graphics\Shaders\BasicShader.h" />
     <ClInclude Include="src\graphics\Shaders\TextureLightShader.h" />
     <ClInclude Include="src\graphics\Helpers\Lights.h" />
+    <ClInclude Include="src\common\commontypes.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\BasicVertexShader.hlsl" />

@@ -129,6 +129,7 @@
   <ItemGroup>
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\common\common.cpp" />
+    <ClCompile Include="src\graphics\interfaces\GameObject.cpp" />
     <ClCompile Include="src\graphics\Shaders\BasicShader.cpp" />
     <ClCompile Include="src\graphics\Camera.cpp" />
     <ClCompile Include="src\graphics\Direct3D11.cpp" />
@@ -147,6 +148,7 @@
     <ClCompile Include="src\winmain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\common\commontypes.h" />
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\common\common.h" />
     <ClInclude Include="src\common\commonmath.h" />

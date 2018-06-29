@@ -110,12 +110,18 @@ void Game::Init3D()
 	// auto renderer = Direct3D11::Get();
 	m_sphereModel = std::make_unique<Model>();
 	m_sphereModel->Create(EDefaultObject::Sphere);
-	m_sphereModel->Translate(0.0f, 1.0f, 0.0f);
+	//m_sphereModel->AddInstance();
+	//m_sphereModel->Translate(0.0f, 1.0f, 0.0f);
+	for (float i = -50; i <= 50; i += 2.0f)
+		for (float j = -50; j <= 50; j += 2.0f)
+			m_sphereModel->AddInstance(DirectX::XMMatrixTranslation(i, 1.0f, j));
 
 	m_groundModel = std::make_unique<Model>();
 	m_groundModel->Create(EDefaultObject::Grid);
+	m_groundModel->AddInstance();
 
 	TextureLightShader::Get()->bind(); // TODO: REMOVE THIS WHEN THERE ARE MULTIPLE SHADERS IN RUNTIME
+	IGameObject::BindStaticVertexBuffer(); // TODO: REMOVE THIS WHEN THERE ARE MUTLIPLA KIND OF OBJECTS IN RUNTIME
 }
 
 void Game::InitSizeDependent()
@@ -131,6 +137,7 @@ void Game::InitSizeDependent()
 void Game::Run()
 {
 	MSG message;
+	Update();
 	while (true)
 	{
 		if (PeekMessage(&message, 0, 0, 0, PM_REMOVE))
@@ -142,14 +149,15 @@ void Game::Run()
 		}
 		else
 		{
-			Update();
-			Render();
+				Update();
+				Render();
 		}
 	}
 }
 
 void Game::Update()
 {
+	auto renderer = Direct3D11::Get();
 	float frameTime = 1.0f / ImGui::GetIO().Framerate;
 	auto kb = m_keyboard->GetState();
 	auto mouse = m_mouse->GetState();
@@ -164,6 +172,15 @@ void Game::Update()
 		m_camera->StrafeRight(cameraFrameTime);
 	if (kb.A)
 		m_camera->StrafeLeft(cameraFrameTime);
+
+	if (kb.U)
+	{
+		renderer->RSWireframeRender();
+	}
+	if (kb.O)
+	{
+		renderer->RSSolidRender();
+	}
 
 	if (m_menuActive)
 		m_camera->Update(frameTime, 0.0f, 0.0f);
@@ -182,6 +199,23 @@ void Game::Update()
 	}
 	else if (!kb.Escape)
 		bEscape = false;
+
+	static float time = 0.0f;
+	time += frameTime;
+	float xSun, ySun, zSun;
+	xSun = 0.0f;
+	ySun = cosf(time);
+	zSun = sinf(time);
+
+	DX::OutputVDebugString(L"%.2f\n", time);
+
+	Sun sunLight{
+		{ xSun,ySun,zSun,1.0f },
+		{ 1.0f,1.0f,1.0f,1.0f },
+		{ 0.2f,0.2f,0.2f,1.0f }
+	};
+
+	TextureLightShader::Get()->SetLightInformations(sunLight);
 }
 
 void Game::Begin()

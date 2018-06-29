@@ -158,6 +158,7 @@ void Direct3D11::OnResize(HWND hWnd, uint32_t width, uint32_t height)
 			}
 		}
 	}
+	RSSolidRender();
 }
 
 void Direct3D11::CreateDepthStencilView(uint32_t width, uint32_t height)
@@ -207,6 +208,21 @@ void Direct3D11::CreateDepthStencilView(uint32_t width, uint32_t height)
 
 void Direct3D11::InitializeStates()
 {
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~RASTERIZER STATES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	ZeroMemoryAndDeclare(D3D11_RASTERIZER_DESC, rastDesc);
+	rastDesc.AntialiasedLineEnable = TRUE;
+	rastDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_NONE;
+	rastDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_WIREFRAME;
+	rastDesc.MultisampleEnable = m_hasMSAA ? TRUE : FALSE;
+	ThrowIfFailed(
+		m_d3d11Device->CreateRasterizerState(&rastDesc, &m_wireFrameNoCulling)
+	);
+	rastDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
+	rastDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_BACK;
+	ThrowIfFailed(
+		m_d3d11Device->CreateRasterizerState(&rastDesc, &m_solidBackfaceCulling)
+	);
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SAMPLER STATES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	ZeroMemoryAndDeclare(D3D11_SAMPLER_DESC, sampDesc);
 	sampDesc.AddressU =
@@ -239,4 +255,14 @@ void Direct3D11::End()
 		m_dxgiSwapChain->Present(1, 0);
 	else
 		m_dxgiSwapChain->Present(0, 0);
+}
+
+void Direct3D11::RSWireframeRender()
+{
+	m_d3d11Context->RSSetState(m_wireFrameNoCulling.Get());
+}
+
+void Direct3D11::RSSolidRender()
+{
+	m_d3d11Context->RSSetState(m_solidBackfaceCulling.Get());
 }

@@ -1,12 +1,6 @@
 #pragma once
 
 #include "OblivionInclude.h"
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_dx11.h"
-#include "graphics/Shaders/BasicShader.h"
-#include "graphics/Shaders/TextureLightShader.h"
-#include "graphics/Camera.h"
-#include "graphics/Model.h"
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 

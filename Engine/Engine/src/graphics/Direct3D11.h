@@ -30,6 +30,8 @@ public:
 
 	void										Begin();
 	void										End();
+	void										RSWireframeRender();
+	void										RSSolidRender();
 
 
 private:
@@ -46,11 +48,10 @@ private: // Attributes
 	bool										m_available					= false;
 	UINT										m_maxMSAAQualityLevel		= 0;
 
-private: // On pipeline
-	uint64_t									m_shaderCode				= { 0 };
-
 public: // States
-	MicrosoftPointer<ID3D11SamplerState>		m_linearWrapSamplerState			= nullptr;
+	MicrosoftPointer<ID3D11RasterizerState>		m_wireFrameNoCulling		= nullptr;
+	MicrosoftPointer<ID3D11RasterizerState>		m_solidBackfaceCulling		= nullptr;
+	MicrosoftPointer<ID3D11SamplerState>		m_linearWrapSamplerState	= nullptr;
 
 private:
 	D3D11_VIEWPORT								m_viewPort;
