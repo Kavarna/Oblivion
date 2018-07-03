@@ -1,4 +1,14 @@
 
+#if _WIN32 || _WIN64
+#if _WIN64
+#define IS64BIT
+#else
+#define IS32BIT
+#endif
+#endif
+
+#if defined IS32BIT
+
 // C / C++
 #include <iostream>
 #include <cstdlib>
@@ -344,3 +354,12 @@ int main(int argc, char* argv[])
 	}
 	ConvertFile(inputFile, outputFile, flags);
 }
+
+#elif defined IS64BIT
+
+int main()
+{
+
+}
+
+#endif
