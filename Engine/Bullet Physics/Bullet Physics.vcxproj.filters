@@ -385,6 +385,7 @@
     <ClInclude Include="..\..\..\GPU Raytracer\GPU Raytracer\Bullet Physics\Bullet Physics\LinearMath\btTransform.h" />
     <ClInclude Include="..\..\..\GPU Raytracer\GPU Raytracer\Bullet Physics\Bullet Physics\LinearMath\btTransformUtil.h" />
     <ClInclude Include="..\..\..\GPU Raytracer\GPU Raytracer\Bullet Physics\Bullet Physics\LinearMath\btVector3.h" />
+    <ClInclude Include="Bullet Physics\LinearMath\btMatrix4x4.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\GPU Raytracer\GPU Raytracer\Bullet Physics\Bullet Physics\Bullet3Collision\BroadPhaseCollision\b3DynamicBvh.cpp" />
