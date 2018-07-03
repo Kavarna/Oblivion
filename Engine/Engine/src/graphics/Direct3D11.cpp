@@ -222,6 +222,10 @@ void Direct3D11::InitializeStates()
 	ThrowIfFailed(
 		m_d3d11Device->CreateRasterizerState(&rastDesc, &m_solidBackfaceCulling)
 	);
+	rastDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_NONE;
+	ThrowIfFailed(
+		m_d3d11Device->CreateRasterizerState(&rastDesc, &m_solidNoCulling)
+	);
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SAMPLER STATES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	ZeroMemoryAndDeclare(D3D11_SAMPLER_DESC, sampDesc);
@@ -236,6 +240,22 @@ void Direct3D11::InitializeStates()
 	sampDesc.MipLODBias = 0;
 	ThrowIfFailed(
 		m_d3d11Device->CreateSamplerState(&sampDesc, &m_linearWrapSamplerState)
+	);
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~BLEND STATES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	ZeroMemoryAndDeclare(D3D11_BLEND_DESC, blendDesc);
+	blendDesc.AlphaToCoverageEnable = FALSE;
+	blendDesc.IndependentBlendEnable = FALSE;
+	blendDesc.RenderTarget[0].BlendEnable = TRUE;
+	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP::D3D11_BLEND_OP_MIN;
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND::D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND::D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND::D3D11_BLEND_BLEND_FACTOR;
+	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND::D3D11_BLEND_INV_BLEND_FACTOR;
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE::D3D11_COLOR_WRITE_ENABLE_ALL;
+	ThrowIfFailed(
+		m_d3d11Device->CreateBlendState(&blendDesc, &m_transparencyBlendState)
 	);
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }
@@ -265,4 +285,20 @@ void Direct3D11::RSWireframeRender()
 void Direct3D11::RSSolidRender()
 {
 	m_d3d11Context->RSSetState(m_solidBackfaceCulling.Get());
+}
+
+void Direct3D11::RSCullNone()
+{
+	m_d3d11Context->RSSetState(m_solidNoCulling.Get());
+}
+
+void Direct3D11::OMTransparency(float blendFactor)
+{
+	const FLOAT blendFactorArr[4] = { blendFactor,blendFactor,blendFactor,blendFactor };
+	m_d3d11Context->OMSetBlendState(m_transparencyBlendState.Get(), blendFactorArr, 0xffffffff);
+}
+
+void Direct3D11::OMDefault()
+{
+	m_d3d11Context->OMSetBlendState(nullptr, nullptr, 0xffffffff);
 }

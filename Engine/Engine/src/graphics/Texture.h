@@ -19,7 +19,10 @@ class Texture
 public:
 	Texture() = default;
 	Texture(LPWSTR lpPath, ID3D11Device *, ID3D11DeviceContext *, bool hasUAV = false);
+	Texture(LPSTR lpPath, ID3D11Device *, ID3D11DeviceContext *, bool hasUAV = false);
 	~Texture();
+private:
+	void Create(LPWSTR lpPath, ID3D11Device *, ID3D11DeviceContext *, bool hasUAV);
 public:
 	ID3D11ShaderResourceView* GetTextureSRV() const
 	{

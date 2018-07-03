@@ -1,6 +1,6 @@
 #include "GeometryGenerator.h"
 
-typedef Model::SVertex Vertex;
+typedef Oblivion::SVertex Vertex;
 
 void GeometryGenerator::CreateBox(float width, float height, float depth, MeshData& meshData)
 {
@@ -209,14 +209,14 @@ void GeometryGenerator::Subdivide(MeshData& meshData)
 	//       v1
 	//       *
 	//      / \
-		//     /   \
+	//     /   \
 	//  m0*-----*m1
-//   / \   / \
+	//   / \   / \
 	//  /   \ /   \
 	// *-----*-----*
-// v0    m2     v2
+	// v0    m2     v2
 
-	UINT numTris = inputCopy.Indices.size() / 3;
+	UINT numTris = (UINT) inputCopy.Indices.size() / 3;
 	for (UINT i = 0; i < numTris; ++i)
 	{
 		Vertex v0 = inputCopy.Vertices[inputCopy.Indices[i * 3 + 0]];

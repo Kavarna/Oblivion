@@ -2,11 +2,6 @@
 
 #define UNICODE
 
-#define ZeroMemoryAndDeclare(type, name) type name;\
-ZeroMemory(&name,sizeof(type));
-#define ZeroVariable(name) ZeroMemory(&name,sizeof(decltype(name)))
-#define ALIGN16 __declspec(align(16))
-
 #if !(defined UNICODE)
 #define ENGINE_NAME	"Oblivion"
 #else // defined UNICODE
@@ -88,6 +83,8 @@ MessageBoxA(NULL,"Unexpected error occured", "Error", MB_ICONERROR| MB_OK); exit
 #include <typeinfo>
 #include <typeindex>
 
+#include <OblivionObjects.h>
+
 #include "commonmath.h"
 
 #pragma comment (lib, "d3d11.lib")
@@ -95,6 +92,7 @@ MessageBoxA(NULL,"Unexpected error occured", "Error", MB_ICONERROR| MB_OK); exit
 #pragma comment (lib, "dxguid.lib")
 #pragma comment (lib, "dxgi.lib")
 #pragma comment (lib, "D3Dcompiler.lib")
+
 #pragma warning (pop)
 
 template <class type>

@@ -8,7 +8,28 @@
 #include "AlignedObject.h"
 #include "Shader.h"
 
+#include <OblivionObjects.h>
 
+namespace Rendering
+{
+	typedef struct material_t
+	{
+		std::string name;
+		bool hasTexture;
+		bool hasBumpMap;
+		bool hasSpecularMap;
+		DirectX::XMFLOAT4 diffuseColor;
+		float specular;
+		float opacity;
+		std::unique_ptr<Texture> diffuseTexture;
+		std::unique_ptr<Texture> bumpMap;
+		std::unique_ptr<Texture> specularMap;
+
+		material_t() : hasTexture(false),
+			hasBumpMap(false),
+			hasSpecularMap(false) {};
+	} SMaterial, Material;
+}
 
 class IGameObject : public AlignedObject
 {
@@ -22,45 +43,7 @@ public:
 	};
 
 public:
-	struct SVertex
-	{
-		SVertex() = default;
-		SVertex(float x, float y, float z,
-			float tu, float tv,
-			float nx, float ny, float nz) :
-			Position(x, y, z), TexC(tu, tv),
-			Normal(nx, ny, nz) {};
-		SVertex(const DirectX::XMFLOAT3& p, const DirectX::XMFLOAT3& n, const DirectX::XMFLOAT3& t, const DirectX::XMFLOAT2& uv) :
-			Position(p), Normal(n), TangentU(t), TexC(uv)
-		{
-			DirectX::XMVECTOR Normal, Tangent;
-			Normal = DirectX::XMLoadFloat3(&this->Normal);
-			Tangent = DirectX::XMLoadFloat3(&this->TangentU);
-			DirectX::XMStoreFloat3(&this->Binormal, DirectX::XMVector3Cross(Normal, Tangent));
-		}
-		SVertex(
-			float px, float py, float pz,
-			float nx, float ny, float nz,
-			float tx, float ty, float tz,
-			float u, float v)
-			: Position(px, py, pz), Normal(nx, ny, nz),
-			TangentU(tx, ty, tz), TexC(u, v)
-		{
-			DirectX::XMVECTOR Normal, Tangent;
-			Normal = DirectX::XMLoadFloat3(&this->Normal);
-			Tangent = DirectX::XMLoadFloat3(&this->TangentU);
-			DirectX::XMStoreFloat3(&this->Binormal, DirectX::XMVector3Cross(Normal, Tangent));
-		}
-
-		DirectX::XMFLOAT3 Position;
-		DirectX::XMFLOAT2 TexC;
-		DirectX::XMFLOAT3 Normal;
-		DirectX::XMFLOAT3 TangentU;
-		DirectX::XMFLOAT3 Binormal;
-	};
-
-public:
-	virtual void Create(LPWSTR lpPath) = 0;
+	virtual void Create(std::string const&) = 0;
 	virtual void Update(float frameTime) = 0;
 	virtual void Destroy() = 0;
 
@@ -89,14 +72,15 @@ protected:
 	/*
 	* Range between start index and end index
 	*/
-	static CommonTypes::Range				AddVertices(std::vector<SVertex> & vertices);
+	static CommonTypes::Range				AddVertices(std::vector<Oblivion::SVertex> & vertices);
+	static CommonTypes::Range				AddVertices(std::vector<Oblivion::SVertex> & vertices, int start, int end);
 	static void								RemoveVertices(CommonTypes::Range const&);
 	
 public:
 	static void								BindStaticVertexBuffer();
 
 protected:
-	static std::vector<SVertex>				m_staticVertices;
+	static std::vector<Oblivion::SVertex>	m_staticVertices;
 	static MicrosoftPointer<ID3D11Buffer>	m_staticVerticesBuffer;
 
 protected:

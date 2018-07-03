@@ -1,14 +1,20 @@
 
 #include "Lights.hlsli"
+#include "Materials.hlsli"
 
 
 Texture2D ObjTexture : register(t0);
 SamplerState ObjWrapSampler : register(s0);
 
-cbuffer cbLight
+cbuffer cbLight : register(b0)
 {
 	Sun g_sunLight;
 };
+
+cbuffer cbLight : register(b2)
+{
+	Material g_material;
+}
 
 struct PSIn
 {
@@ -21,8 +27,12 @@ struct PSIn
 float4 main(PSIn input) : SV_TARGET
 {
 	input.NormalW = normalize(input.NormalW);
-	float4 matColor = ObjTexture.Sample(ObjWrapSampler, input.TexCoord);
-
+	float4 matColor;
+	if (g_material.hasTexture)
+		matColor = ObjTexture.Sample(ObjWrapSampler, input.TexCoord);
+	else
+		matColor = g_material.color;
+	
 	float4 color = g_sunLight.Ambient;
 
 	color += g_sunLight.GetAmountOfLight(input.NormalW);

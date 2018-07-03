@@ -5,6 +5,28 @@
 
 class Direct3D11;
 
+namespace Shader
+{
+	typedef struct material_t
+	{
+		DirectX::XMFLOAT4 color; // 16
+		float specular; // 4
+		BOOL hasTexture; // 4
+		BOOL hasBump; // 4
+		BOOL hasSpecular; // 4
+	} SMaterial, Material;
+
+	enum class ShaderType
+	{
+		eVertex = 0b00001,
+		eHull = 0b00010,
+		eDomain = 0b00100,
+		eGeometry = 0b01000,
+		ePixel = 0b10000
+	};
+
+}
+
 class IShader
 {
 public:
@@ -44,12 +66,4 @@ public:
 protected:
 	MicrosoftPointer<ID3D11Device>			m_d3d11Device;
 	MicrosoftPointer<ID3D11DeviceContext>	m_d3d11Context;
-};
-
-class sh : IShader
-{
-	virtual void							bind() const
-	{};
-	virtual void							Create()
-	{};
 };

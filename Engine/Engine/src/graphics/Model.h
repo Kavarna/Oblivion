@@ -18,40 +18,41 @@ public:
 	~Model();
 
 public:
-	void Update(float frameTime)
+	virtual void Update(float frameTime) override
 	{
 	};
 
 public:
-			void		Create(LPWSTR lpPath);
-			void		Create(EDefaultObject object);
+	virtual void							Create(std::string const& filename) override;
+			void							Create(EDefaultObject object);
 	template <class Shader, bool bindShader = false>
-			void		Render(ICamera * cam) const;
-			void		Destroy();
+			void							Render(ICamera * cam) const;
+	virtual void							Destroy() override;
 
 public:
-	inline	uint32_t	GetIndexCount(int subObject = 0) const;
-	inline	uint32_t	GetVertexCount() const;
+	inline	uint32_t						GetIndexCount(int subObject = 0) const;
+	inline	uint32_t						GetVertexCount() const;
 
 protected:
-	virtual bool		ShouldRenderInstance() const;
+	virtual bool							ShouldRenderInstance() const;
 
 private:
-			void		RenderBasicShader(ICamera * cam) const;
-			void		RenderTextureLightShader(ICamera * cam) const;
+			void							RenderBasicShader(ICamera * cam) const;
+			void							RenderTextureLightShader(ICamera * cam) const;
 
 private:
-			void		DrawIndexedInstanced() const;
-
+			void							DrawIndexedInstanced() const;
+			void							BindMaterial(int index, int shader) const;
 private:
-	MicrosoftPointer<ID3D11Buffer>	m_indexBuffer;
-
-	std::unique_ptr<Texture>		m_texture;
+	MicrosoftPointer<ID3D11Buffer>			m_indexBuffer;
+	MicrosoftPointer<ID3D11Buffer>			m_materialBuffer;
 	
-	CommonTypes::Range				m_verticesRange;
-	std::vector<CommonTypes::Range> m_startIndices;
-	std::vector<SVertex>			m_vertices;
-	std::vector<uint32_t>			m_indices;
+	std::vector<CommonTypes::Range>			m_verticesRange;
+	std::vector<CommonTypes::Range>			m_startIndices;
+	std::vector<int>						m_materialIndices;
+	std::vector<Rendering::Material>		m_materials;
+	std::vector<Oblivion::SVertex>			m_vertices;
+	std::vector<uint32_t>					m_indices;
 };
 
 
@@ -64,6 +65,9 @@ void Model::Render(ICamera * cam) const
 	m_d3d11Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_d3d11Context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
 	
+	if (m_objectWorld.size() < 1)
+		return;
+
 	if constexpr (std::is_same<Shader,BasicShader>::value)
 	{
 		RenderBasicShader(cam);

@@ -3,13 +3,15 @@
 #include "../../common/common.h"
 #include "../Model.h"
 
+#include <OblivionObjects.h>
+
 class GeometryGenerator
 {
 public:
 
 	struct MeshData
 	{
-		std::vector<Model::SVertex> Vertices;
+		std::vector<Oblivion::SVertex> Vertices;
 		std::vector<UINT> Indices;
 	};
 

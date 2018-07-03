@@ -2,8 +2,9 @@
 #include "../Direct3D11.h"
 
 using CommonTypes::Range;
+using namespace Oblivion;
 
-std::vector<IGameObject::SVertex>	IGameObject::m_staticVertices;
+std::vector<SVertex>				IGameObject::m_staticVertices;
 MicrosoftPointer<ID3D11Buffer>		IGameObject::m_staticVerticesBuffer;
 
 DirectX::XMMATRIX& IGameObject::AddInstance(DirectX::FXMMATRIX const& mat)
@@ -20,7 +21,7 @@ DirectX::XMMATRIX& IGameObject::AddInstance(DirectX::FXMMATRIX const& mat)
 
 DirectX::XMMATRIX* IGameObject::AddInstance(uint32_t number)
 {
-	uint32_t start = m_objectWorld.size();
+	uint32_t start = (uint32_t)m_objectWorld.size();
 	m_objectWorld.reserve(start + number);
 	
 	for (uint32_t i = 0; i < number; ++i)
@@ -56,18 +57,36 @@ Range IGameObject::AddVertices(std::vector<SVertex> & vertices)
 {
 	auto renderer = Direct3D11::Get();
 	Range res;
-	res.begin = m_staticVertices.size();
+	res.begin = (uint32_t)m_staticVertices.size();
 	m_staticVertices.reserve(m_staticVertices.size() + vertices.size());
-	m_staticVertices.insert(m_staticVertices.end(), std::make_move_iterator(vertices.begin()),
-		std::make_move_iterator(vertices.end()));
-	vertices.clear();
-	res.end = m_staticVertices.size();
+	m_staticVertices.insert(m_staticVertices.end(), vertices.begin(),
+		vertices.end());
+	res.end = (uint32_t)m_staticVertices.size();
 	ShaderHelper::CreateBuffer(renderer->getDevice().Get(),
 		&m_staticVerticesBuffer, D3D11_USAGE::D3D11_USAGE_IMMUTABLE,
 		D3D11_BIND_FLAG::D3D11_BIND_VERTEX_BUFFER,
 		sizeof(SVertex) * m_staticVertices.size(), 0,
 		m_staticVertices.data());
 	return res;
+}
+
+CommonTypes::Range IGameObject::AddVertices(std::vector<Oblivion::SVertex>& vertices, int start, int end)
+{
+	assert(end > start);
+	auto renderer = Direct3D11::Get();
+	Range res;
+	res.begin = (uint32_t)m_staticVertices.size();
+	m_staticVertices.reserve(m_staticVertices.size() + end - start);
+	for (int i = start; i < end; ++i)
+		m_staticVertices.push_back(vertices[i]);
+	res.end = (uint32_t)m_staticVertices.size();
+	ShaderHelper::CreateBuffer(renderer->getDevice().Get(),
+		&m_staticVerticesBuffer, D3D11_USAGE::D3D11_USAGE_IMMUTABLE,
+		D3D11_BIND_FLAG::D3D11_BIND_VERTEX_BUFFER,
+		sizeof(SVertex) * m_staticVertices.size(), 0,
+		m_staticVertices.data());
+	return res;
+	
 }
 
 void IGameObject::RemoveVertices(Range const & range)

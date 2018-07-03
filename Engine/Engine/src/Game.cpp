@@ -110,15 +110,17 @@ void Game::Init3D()
 	// auto renderer = Direct3D11::Get();
 	m_sphereModel = std::make_unique<Model>();
 	m_sphereModel->Create(EDefaultObject::Sphere);
-	//m_sphereModel->AddInstance();
-	//m_sphereModel->Translate(0.0f, 1.0f, 0.0f);
-	for (float i = -50; i <= 50; i += 2.0f)
-		for (float j = -50; j <= 50; j += 2.0f)
-			m_sphereModel->AddInstance(DirectX::XMMatrixTranslation(i, 1.0f, j));
+	m_sphereModel->AddInstance();
+	m_sphereModel->Translate(0.0f, 1.0f, 0.0f);
 
 	m_groundModel = std::make_unique<Model>();
 	m_groundModel->Create(EDefaultObject::Grid);
 	m_groundModel->AddInstance();
+	m_groundModel->Translate(0.0f, -0.1f, 0.0f);
+
+	m_spaceCompound = std::make_unique<Model>();
+	m_spaceCompound->Create("Resources\\spaceCompound.obl");
+	m_spaceCompound->AddInstance();
 
 	TextureLightShader::Get()->bind(); // TODO: REMOVE THIS WHEN THERE ARE MULTIPLE SHADERS IN RUNTIME
 	IGameObject::BindStaticVertexBuffer(); // TODO: REMOVE THIS WHEN THERE ARE MUTLIPLA KIND OF OBJECTS IN RUNTIME
@@ -131,7 +133,18 @@ void Game::InitSizeDependent()
 	float HByW = (float)m_windowWidth / (float)m_windowHeight;
 	float nearZ = 1.0f;
 	float farZ = 1000.0f;
-	m_camera = std::make_unique<Camera>(FOV, HByW, nearZ, farZ);
+	//m_camera = std::make_unique<Camera>(FOV, HByW, nearZ, farZ);
+	if (m_camera)
+	{
+		Camera * cam = new Camera(FOV, HByW, nearZ, farZ);
+		auto camDir = m_camera->GetCamDir();
+		cam->SetDirection({ camDir.x,camDir.y,camDir.z,1.0f });
+		auto camPos = m_camera->GetCamPos();
+		cam->SetPosition({ camPos.x,camPos.y,camPos.z,1.0f });
+		m_camera.reset(cam);
+	}
+	else
+		m_camera = std::make_unique<Camera>(FOV, HByW, nearZ, farZ);
 }
 
 void Game::Run()
@@ -149,8 +162,8 @@ void Game::Run()
 		}
 		else
 		{
-				Update();
-				Render();
+			Update();
+			Render();
 		}
 	}
 }
@@ -159,6 +172,8 @@ void Game::Update()
 {
 	auto renderer = Direct3D11::Get();
 	float frameTime = 1.0f / ImGui::GetIO().Framerate;
+	if (frameTime > 0.15)
+		return;
 	auto kb = m_keyboard->GetState();
 	auto mouse = m_mouse->GetState();
 	float cameraFrameTime = frameTime;
@@ -199,23 +214,6 @@ void Game::Update()
 	}
 	else if (!kb.Escape)
 		bEscape = false;
-
-	static float time = 0.0f;
-	time += frameTime;
-	float xSun, ySun, zSun;
-	xSun = 0.0f;
-	ySun = cosf(time);
-	zSun = sinf(time);
-
-	DX::OutputVDebugString(L"%.2f\n", time);
-
-	Sun sunLight{
-		{ xSun,ySun,zSun,1.0f },
-		{ 1.0f,1.0f,1.0f,1.0f },
-		{ 0.2f,0.2f,0.2f,1.0f }
-	};
-
-	TextureLightShader::Get()->SetLightInformations(sunLight);
 }
 
 void Game::Begin()
@@ -269,6 +267,7 @@ void Game::Render()
 
 	m_sphereModel->Render<TextureLightShader>(m_camera.get());
 	m_groundModel->Render<TextureLightShader>(m_camera.get());
+	m_spaceCompound->Render<TextureLightShader>(m_camera.get());
 
 	End();
 }

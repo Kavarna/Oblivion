@@ -4,9 +4,9 @@ struct Sun
 	float4 Diffuse;
 	float4 Ambient;
 
-	float GetAmountOfLight(in float3 normal)
+	float4 GetAmountOfLight(in float3 normal)
 	{
-		float howMuchLight = dot(normal, -Direction);
+		float howMuchLight = dot(normal, -Direction.xyz);
 		[flatten]
 		if (howMuchLight > 0.0f)
 		{
