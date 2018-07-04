@@ -368,9 +368,9 @@ Materials 3 {
 			Opacity 1
 	}
 	Window {
-			Color 1 0 0.0 1
+			Color 1 1 1 1
 			Shininess 128
-			Opacity 0.8
+			Opacity 0.4
 	}
 	MetalPanels {
 			Texture metalpanel.jpg

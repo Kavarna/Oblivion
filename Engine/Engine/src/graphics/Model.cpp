@@ -169,9 +169,27 @@ void Model::BindMaterial(int index, int shader) const
 	}
 }
 
+void ReadTillEnd(std::ifstream &fin)
+{
+	if (fin.eof())
+		return;
+	char c;
+	while (true)
+	{
+		c = fin.get();
+		if (c == '}')
+			break;
+	}
+}
+
 void Model::Create(std::string const& filename)
 {
-	std::ifstream fin(filename.c_str());
+	std::ifstream fin;
+
+	fin.open(filename.c_str());
+	
+	if (!fin.is_open())
+		THROW_ERROR("Can't find file %s", filename.c_str());
 
 #define INVALID THROW_ERROR("Model %s is invalid.",filename.c_str())
 
@@ -183,7 +201,7 @@ void Model::Create(std::string const& filename)
 
 	fin >> check;
 	if (check != "Meshes")
-		INVALID;
+		THROW_ERROR("Model %s is invalid due to it not having \"Meshes\"", filename.c_str());
 
 	int meshCount;
 	fin >> meshCount;
@@ -201,7 +219,7 @@ void Model::Create(std::string const& filename)
 #pragma region Read vertices
 		fin >> check;
 		if (check != "Vertices")
-			INVALID;
+			THROW_ERROR("Model %s is invalid due to it not having \"Vertices\" in mesh %d", filename.c_str(), i);
 
 		int numVertices;
 		int startVertices = (int)m_vertices.size();
@@ -210,26 +228,26 @@ void Model::Create(std::string const& filename)
 
 		fin >> check;
 		if (check != "UV")
-			INVALID;
+			THROW_ERROR("Model %s is invalid due to it not having \"UV\" in mesh %d", filename.c_str(), i);
 		bool hasTexture, hasNormals, hasOther;
 		fin >> checkInt;
 		hasTexture = checkInt ? true : false;
 		
 		fin >> check;
 		if (check != "Normals")
-			INVALID;
+			THROW_ERROR("Model %s is invalid due to it not having \"Normals\" in mesh %d", filename.c_str(), i);
 		fin >> checkInt;
 		hasNormals = checkInt ? true : false;
 
 		fin >> check;
 		if (check != "Others")
-			INVALID;
+			THROW_ERROR("Model %s is invalid due to it not having \"Others\" in mesh %d", filename.c_str(), i);
 		fin >> checkInt;
 		hasOther = checkInt ? true : false;
 		
 		getline(fin, check);
 
-		for (int i = 0; i < numVertices; ++i)
+		for (int j = 0; j < numVertices; ++j)
 		{
 			m_vertices.emplace_back();
 			float x, y, z;
@@ -253,8 +271,7 @@ void Model::Create(std::string const& filename)
 				m_vertices.back().Binormal = { x,y,z };
 			}
 		}
-		getline(fin, check);
-		getline(fin, check);
+		ReadTillEnd(fin);
 
 		m_verticesRange.push_back(AddVertices(m_vertices, startVertices, (int)m_vertices.size()));
 
@@ -263,7 +280,7 @@ void Model::Create(std::string const& filename)
 #pragma region Read Indices and Material
 		fin >> check;
 		if (check != "Indices")
-			INVALID;
+			THROW_ERROR("Model %s is invalid due to it not having \"Indices\" in mesh %d", filename.c_str(), i);
 		int numIndices;
 		fin >> numIndices;
 		std::getline(fin, check);
@@ -280,26 +297,24 @@ void Model::Create(std::string const& filename)
 		m_startIndices.emplace_back(startIndices, (uint32_t)m_indices.size());
 
 
-		std::getline(fin, check);
-		std::getline(fin, check);
+		ReadTillEnd(fin);
 
 		fin >> check;
 		if (check != "Material")
-			INVALID;
+			THROW_ERROR("Model %s is invalid due to it not having \"Material\" in mesh %d", filename.c_str(), i);
 
 		fin >> m_materialIndices[i];
 
-		std::getline(fin, check);
-		std::getline(fin, check);
+		ReadTillEnd(fin);
 #pragma endregion
 
 	}
 
-	std::getline(fin, check);
+	ReadTillEnd(fin);
 
 	fin >> check;
 	if (check != "Materials")
-		INVALID;
+		THROW_ERROR("Model %s is invalid due to it not having \"Materials\"", filename.c_str());
 
 	int materialCount;
 	fin >> materialCount;
@@ -325,7 +340,7 @@ void Model::Create(std::string const& filename)
 					path.erase(0, 1);
 				AppendPathToRelative(path, filename);
 				m_materials[i].diffuseTexture = std::make_unique<Texture>(
-					(LPSTR) path.c_str(), m_d3d11Device.Get(), m_d3d11Context.Get()
+					(LPSTR)path.c_str(), m_d3d11Device.Get(), m_d3d11Context.Get()
 					);
 				m_materials[i].hasTexture = true;
 			}
@@ -374,12 +389,12 @@ void Model::Create(std::string const& filename)
 			else if (check == "}")
 				break;
 			else
-				INVALID;
+				THROW_ERROR("Model %s is invalid due to it having %s, which is not a known property", filename.c_str(), check.c_str());
 		}
 
 	}
 
-	std::getline(fin, check);
+	ReadTillEnd(fin);
 
 #pragma endregion
 

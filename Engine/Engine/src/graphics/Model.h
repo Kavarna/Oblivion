@@ -88,3 +88,5 @@ void Model::Render(ICamera * cam) const
 	}
 	DrawIndexedInstanced();
 }
+
+void ReadTillEnd(std::ifstream &fin);

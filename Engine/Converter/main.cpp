@@ -1,13 +1,12 @@
 
-#ifdef _WIN32//32 bit windows
+#ifdef _WIN32 //32 bit windows
 #define ENVIRONMENT32
-#endif
-#ifdef _WIN64//64 bit windows
+#elif defined _WIN64 //64 bit windows
 #define ENVIRONMENT64
 #endif
 
 
-#if defined ENVIRONEMNT32
+#if defined ENVIRONMENT32
 
 // C / C++
 #include <iostream>
@@ -308,7 +307,8 @@ void ConvertFile(std::string const& from, std::string const& to, unsigned int fl
 	Assimp::Importer importer;
 	
 	const aiScene * pScene = importer.ReadFile(from.c_str(), flags);
-	//InitFromScene(pScene, from, to);
+	if (!pScene)
+		std::cout << "Can't convert that file";
 	PrintFromScene(pScene, to);
 }
 

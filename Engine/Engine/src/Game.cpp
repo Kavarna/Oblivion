@@ -110,13 +110,22 @@ void Game::Init3D()
 	// auto renderer = Direct3D11::Get();
 	m_sphereModel = std::make_unique<Model>();
 	m_sphereModel->Create(EDefaultObject::Sphere);
-	m_sphereModel->AddInstance();
-	m_sphereModel->Translate(0.0f, 1.0f, 0.0f);
+	//m_sphereModel->AddInstance();
+	//m_sphereModel->Translate(0.0f, 1.0f, 0.0f);
 
 	m_groundModel = std::make_unique<Model>();
 	m_groundModel->Create(EDefaultObject::Grid);
 	m_groundModel->AddInstance();
 	m_groundModel->Translate(0.0f, -0.01f, 0.0f);
+
+	m_treeModel = std::make_unique<Model>();
+	m_treeModel->Create("Resources\\tree.obl");
+	m_treeModel->AddInstance();
+	m_treeModel->Scale(0.5f);
+	m_treeModel->Translate(0.0f, 0.0f, 20.0f);
+	m_treeModel->AddInstance();
+	m_treeModel->Scale(0.5f, 1);
+	m_treeModel->Translate(25.0f, 0.0f, 25.0f, 1);
 
 	m_spaceCompound = std::make_unique<Model>();
 	m_spaceCompound->Create("Resources\\spaceCompound.obl");
@@ -267,6 +276,7 @@ void Game::Render()
 
 	m_sphereModel->Render<TextureLightShader>(m_camera.get());
 	m_groundModel->Render<TextureLightShader>(m_camera.get());
+	m_treeModel->Render<TextureLightShader>(m_camera.get());
 	m_spaceCompound->Render<TextureLightShader>(m_camera.get());
 
 	End();
