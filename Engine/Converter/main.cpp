@@ -1,4 +1,14 @@
 
+#ifdef _WIN32//32 bit windows
+#define ENVIRONMENT32
+#endif
+#ifdef _WIN64//64 bit windows
+#define ENVIRONMENT64
+#endif
+
+
+#if defined ENVIRONEMNT32
+
 // C / C++
 #include <iostream>
 #include <cstdlib>
@@ -344,3 +354,13 @@ int main(int argc, char* argv[])
 	}
 	ConvertFile(inputFile, outputFile, flags);
 }
+
+#elif defined ENVIRONMENT64
+
+
+int main()
+{
+
+}
+
+#endif

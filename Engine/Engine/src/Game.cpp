@@ -116,7 +116,7 @@ void Game::Init3D()
 	m_groundModel = std::make_unique<Model>();
 	m_groundModel->Create(EDefaultObject::Grid);
 	m_groundModel->AddInstance();
-	m_groundModel->Translate(0.0f, -0.1f, 0.0f);
+	m_groundModel->Translate(0.0f, -0.01f, 0.0f);
 
 	m_spaceCompound = std::make_unique<Model>();
 	m_spaceCompound->Create("Resources\\spaceCompound.obl");

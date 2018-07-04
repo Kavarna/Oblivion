@@ -204,7 +204,7 @@ void Model::Create(std::string const& filename)
 			INVALID;
 
 		int numVertices;
-		int startVertices = m_vertices.size();
+		int startVertices = (int)m_vertices.size();
 		fin >> numVertices;
 		m_vertices.reserve(m_vertices.size() + numVertices);
 
@@ -256,7 +256,7 @@ void Model::Create(std::string const& filename)
 		getline(fin, check);
 		getline(fin, check);
 
-		m_verticesRange.push_back(AddVertices(m_vertices, startVertices, m_vertices.size()));
+		m_verticesRange.push_back(AddVertices(m_vertices, startVertices, (int)m_vertices.size()));
 
 #pragma endregion
 
@@ -268,7 +268,7 @@ void Model::Create(std::string const& filename)
 		fin >> numIndices;
 		std::getline(fin, check);
 
-		int startIndices = m_indices.size();
+		int startIndices = (int)m_indices.size();
 		m_indices.reserve(m_indices.size() + numIndices);
 		for (int i = 0; i < numIndices; ++i)
 		{
@@ -277,7 +277,7 @@ void Model::Create(std::string const& filename)
 			m_indices.push_back(index);
 		}
 
-		m_startIndices.emplace_back(startIndices, m_indices.size());
+		m_startIndices.emplace_back(startIndices, (uint32_t)m_indices.size());
 
 
 		std::getline(fin, check);
