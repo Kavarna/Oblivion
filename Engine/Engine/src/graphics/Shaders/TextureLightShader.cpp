@@ -1,15 +1,10 @@
 #include "TextureLightShader.h"
 #include "../Direct3D11.h"
 
-std::once_flag						TextureLightShader::m_shaderFlags;
-std::unique_ptr<TextureLightShader>	TextureLightShader::m_shaderInstance;
+DECLARE_SINGLETONE(TextureLightShader);
 
 TextureLightShader::TextureLightShader()
-{
-	auto renderer = Direct3D11::Get();
-	m_d3d11Device = renderer->getDevice();
-	m_d3d11Context = renderer->getContext();
-}
+{ };
 
 TextureLightShader::~TextureLightShader()
 { };
@@ -135,10 +130,4 @@ void TextureLightShader::SetCameraInformations(SCameraInfo const & camInfo)
 	ShaderHelper::MapBuffer(m_d3d11Context.Get(), m_cameraBuffer.Get(),
 		(void*)&camInfo, sizeof(SCameraInfo));
 	m_d3d11Context->VSSetConstantBuffers(0, 1, m_cameraBuffer.GetAddressOf());
-}
-
-TextureLightShader* TextureLightShader::Get()
-{
-	std::call_once(m_shaderFlags, [&] { m_shaderInstance = std::make_unique<TextureLightShader>(); m_shaderInstance->Create(); });
-	return m_shaderInstance.get();
 }

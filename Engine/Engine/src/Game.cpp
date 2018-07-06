@@ -127,12 +127,16 @@ void Game::Init3D()
 	m_treeModel->Scale(0.5f, 1);
 	m_treeModel->Translate(25.0f, 0.0f, 25.0f, 1);
 
+	m_woodCabinModel = std::make_unique<Model>();
+	m_woodCabinModel->Create("Resources\\WoodenCabin.obl");
+	m_woodCabinModel->AddInstance();
+	m_woodCabinModel->Scale(0.1f);
+	m_woodCabinModel->Translate(-25.0f, 0.0f, 25.0f);
+
 	m_spaceCompound = std::make_unique<Model>();
 	m_spaceCompound->Create("Resources\\spaceCompound.obl");
 	m_spaceCompound->AddInstance();
 
-	TextureLightShader::Get()->bind(); // TODO: REMOVE THIS WHEN THERE ARE MULTIPLE SHADERS IN RUNTIME
-	IGameObject::BindStaticVertexBuffer(); // TODO: REMOVE THIS WHEN THERE ARE MUTLIPLA KIND OF OBJECTS IN RUNTIME
 }
 
 void Game::InitSizeDependent()
@@ -274,10 +278,22 @@ void Game::Render()
 		return;
 	Begin();
 
+	TextureLightShader::Get()->bind();
+	IGameObject::BindStaticVertexBuffer();
 	m_sphereModel->Render<TextureLightShader>(m_camera.get());
 	m_groundModel->Render<TextureLightShader>(m_camera.get());
 	m_treeModel->Render<TextureLightShader>(m_camera.get());
+	m_woodCabinModel->Render<TextureLightShader>(m_camera.get());
 	m_spaceCompound->Render<TextureLightShader>(m_camera.get());
+
+	auto batch = BatchRenderer::Get();
+	batch->Begin(m_camera.get());
+
+	batch->Vertex(DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f),  DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	batch->Vertex(DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f),  DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f));
+	batch->Vertex(DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f), DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
+
+	batch->End();
 
 	End();
 }

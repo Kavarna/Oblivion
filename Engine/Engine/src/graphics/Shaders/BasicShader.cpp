@@ -1,15 +1,10 @@
 #include "BasicShader.h"
 #include "../Direct3D11.h"
 
-std::once_flag					BasicShader::m_shaderFlags;
-std::unique_ptr<BasicShader>	BasicShader::m_shaderInstance;
+DECLARE_SINGLETONE(BasicShader);
 
 BasicShader::BasicShader()
-{
-	auto renderer = Direct3D11::Get();
-	m_d3d11Device = renderer->getDevice();
-	m_d3d11Context = renderer->getContext();
-}
+{ };
 
 BasicShader::~BasicShader()
 { };
@@ -103,10 +98,4 @@ void BasicShader::SetCameraInformations(SCameraInfo const & info) const
 	ShaderHelper::MapBuffer(m_d3d11Context.Get(), m_cameraBuffer.Get(),
 		(void*)&info, sizeof(SCameraInfo));
 	m_d3d11Context->VSSetConstantBuffers(0, 1, m_cameraBuffer.GetAddressOf());
-}
-
-BasicShader* BasicShader::Get()
-{
-	std::call_once(m_shaderFlags, [&] { m_shaderInstance = std::make_unique<BasicShader>(); m_shaderInstance->Create(); });
-	return m_shaderInstance.get();
 }

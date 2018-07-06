@@ -13,9 +13,7 @@ public:
 	TextureLightShader();
 	~TextureLightShader();
 
-private:
-	static std::once_flag						m_shaderFlags;
-	static std::unique_ptr<TextureLightShader>	m_shaderInstance;
+	MAKE_SINGLETONE(TextureLightShader);
 
 public:
 	struct SCameraInfo
@@ -30,8 +28,6 @@ public:
 	
 	void SetLightInformations(Sun const& sun);
 	void SetCameraInformations(SCameraInfo const& camInfo);
-public:
-	static TextureLightShader* Get();
 
 private:
 	MicrosoftPointer<ID3D11VertexShader>		m_vertexShader;

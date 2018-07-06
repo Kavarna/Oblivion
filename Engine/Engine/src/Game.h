@@ -1,6 +1,7 @@
 #pragma once
 
 #include "OblivionInclude.h"
+#include "graphics/BatchRenderer.h"
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -56,6 +57,7 @@ private:
 	std::unique_ptr<Model>						m_groundModel;
 	std::unique_ptr<Model>						m_spaceCompound;
 	std::unique_ptr<Model>						m_treeModel;
+	std::unique_ptr<Model>						m_woodCabinModel;
 private:
 	std::unique_ptr<DirectX::Mouse>				m_mouse;
 	std::unique_ptr<DirectX::Keyboard>			m_keyboard;

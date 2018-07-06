@@ -15,6 +15,20 @@ sprintf_s(message,sizeof(message),__VA_ARGS__);\
 std::exception error(message);\
 throw error;}\
 
+#define MAKE_SINGLETONE(singletoneName) private:\
+static std::once_flag						m_singletoneFlag;\
+static std::unique_ptr<singletoneName>		m_singletoneInstance;\
+public:\
+static singletoneName* Get();
+#define DECLARE_SINGLETONE(singletoneName) std::once_flag	singletoneName::m_singletoneFlag;\
+std::unique_ptr<singletoneName>	singletoneName::m_singletoneInstance;\
+singletoneName * singletoneName::Get()\
+{\
+std::call_once(m_singletoneFlag, [&] { m_singletoneInstance = std::make_unique<singletoneName>(); m_singletoneInstance->Create(); });\
+return m_singletoneInstance.get();\
+}
+
+
 
 namespace Oblivion
 {

@@ -92,7 +92,8 @@
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)SharedTypes</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_NO_VA_START_VALIDATION ;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>
@@ -151,6 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\graphics\BatchRenderer.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\common\common.cpp" />
     <ClCompile Include="src\graphics\interfaces\GameObject.cpp" />
@@ -160,6 +162,7 @@
     <ClCompile Include="src\graphics\Helpers\GeometryGenerator.cpp" />
     <ClCompile Include="src\graphics\interfaces\Shader.cpp" />
     <ClCompile Include="src\graphics\Model.cpp" />
+    <ClCompile Include="src\graphics\Shaders\BatchShader.cpp" />
     <ClCompile Include="src\graphics\Shaders\TextureLightShader.cpp" />
     <ClCompile Include="src\graphics\Texture.cpp" />
     <ClCompile Include="src\graphics\WICTextureLoader.cpp" />
@@ -172,6 +175,9 @@
     <ClCompile Include="src\winmain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\graphics\BatchRenderer.h" />
+    <ClInclude Include="src\graphics\interfaces\Object.h" />
+    <ClInclude Include="src\graphics\Shaders\BatchShader.h" />
     <ClInclude Include="src\common\commontypes.h" />
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\common\common.h" />
@@ -223,6 +229,26 @@
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(LocalDebuggerWorkingDirectory)Shaders\%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)Shaders\%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(LocalDebuggerWorkingDirectory)Shaders\%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)Shaders\%(Filename).cso</ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="src\shaders\BatchPixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(LocalDebuggerWorkingDirectory)Shaders\%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(LocalDebuggerWorkingDirectory)Shaders\%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)Shaders\%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)Shaders\%(Filename).cso</ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="src\shaders\BatchVertexShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(LocalDebuggerWorkingDirectory)Shaders\%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(LocalDebuggerWorkingDirectory)Shaders\%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)Shaders\%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)Shaders\%(Filename).cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="src\shaders\TextureLightPixelShader.hlsl">

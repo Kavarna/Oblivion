@@ -19,10 +19,6 @@ static inline void AppendPathToRelative(std::string& relative, std::string const
 
 Model::Model()
 {
-	auto renderer = Direct3D11::Get();
-	m_d3d11Device = renderer->getDevice();
-	m_d3d11Context = renderer->getContext();
-
 	ShaderHelper::CreateBuffer(m_d3d11Device.Get(), &m_materialBuffer,
 		D3D11_USAGE::D3D11_USAGE_DYNAMIC, D3D11_BIND_FLAG::D3D11_BIND_CONSTANT_BUFFER,
 		sizeof(Shader::material_t), D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE);

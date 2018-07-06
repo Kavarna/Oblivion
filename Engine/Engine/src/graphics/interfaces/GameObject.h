@@ -7,6 +7,7 @@
 #include "Camera.h"
 #include "AlignedObject.h"
 #include "Shader.h"
+#include "Object.h"
 
 #include <OblivionObjects.h>
 
@@ -31,16 +32,13 @@ namespace Rendering
 	} SMaterial, Material;
 }
 
-class IGameObject : public AlignedObject
+class IGameObject : public AlignedObject, public IObject
 {
 	friend class Direct3D11;
 public:
 	IGameObject() = default;
 	virtual ~IGameObject() 
-	{
-		m_d3d11Device.Reset();
-		m_d3d11Context.Reset();
-	};
+	{ };
 
 public:
 	virtual void Create(std::string const&) = 0;
@@ -84,8 +82,6 @@ protected:
 	static MicrosoftPointer<ID3D11Buffer>	m_staticVerticesBuffer;
 
 protected:
-	MicrosoftPointer<ID3D11Device>			m_d3d11Device;
-	MicrosoftPointer<ID3D11DeviceContext>	m_d3d11Context;
 	MicrosoftPointer<ID3D11Buffer>			m_instanceBuffer;
 	std::vector<DirectX::XMMATRIX>			m_objectWorld;
 };

@@ -2,8 +2,7 @@
 
 #include "../../common/common.h"
 #include "../Helpers/ShaderHelper.h"
-
-class Direct3D11;
+#include "../Direct3D11.h"
 
 namespace Shader
 {
@@ -32,7 +31,12 @@ class IShader
 public:
 	struct SVertex; // For consistency
 protected:
-	IShader() {};
+	IShader()
+	{
+		auto renderer = Direct3D11::Get();
+		m_d3d11Device = renderer->getDevice();
+		m_d3d11Context = renderer->getContext();
+	};
 	virtual ~IShader()
 	{
 		m_d3d11Device.Reset();

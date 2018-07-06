@@ -268,10 +268,10 @@ void PrintFromScene(const aiScene * pScene, std::string const& to)
 				color.g << ' ' << color.b << ' ' << color.a << '\n';
 		}
 
-		if (material->GetTextureCount(aiTextureType::aiTextureType_NORMALS) > 0)
+		if (material->GetTextureCount(aiTextureType::aiTextureType_HEIGHT) > 0)
 		{
 			aiString path;
-			material->GetTexture(aiTextureType::aiTextureType_NORMALS, 0, &path);
+			material->GetTexture(aiTextureType::aiTextureType_HEIGHT, 0, &path);
 			cout << "\t\t\tBump " << path.data << "\n";
 		}
 
