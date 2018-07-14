@@ -14,4 +14,25 @@ public:
 	virtual DirectX::XMMATRIX& GetView() = 0;
 	virtual DirectX::XMMATRIX& GetProjection() = 0;
 
+	inline	DirectX::BoundingFrustum& GetFrustum()
+	{
+		return m_viewFrustum;
+	}
+
+protected:
+	void BuildViewFrustum()
+	{
+		using namespace DirectX;
+		
+		m_viewFrustum = BoundingFrustum(GetProjection());
+
+		auto view = GetView();
+		DirectX::XMVECTOR determinant = DirectX::XMMatrixDeterminant(view);
+		auto invView = DirectX::XMMatrixInverse(&determinant, view);
+
+		m_viewFrustum.Transform(m_viewFrustum, invView);
+	}
+
+protected:
+	DirectX::BoundingFrustum m_viewFrustum;
 };

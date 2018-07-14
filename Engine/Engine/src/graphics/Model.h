@@ -33,23 +33,32 @@ public:
 	inline	uint32_t						GetIndexCount(int subObject = 0) const;
 	inline	uint32_t						GetVertexCount() const;
 
-protected:
-	virtual bool							ShouldRenderInstance() const;
-
 private:
 			void							RenderBasicShader(ICamera * cam) const;
 			void							RenderTextureLightShader(ICamera * cam) const;
 
 private:
-			void							DrawIndexedInstanced() const;
+			void							DrawIndexedInstanced(ICamera * cam) const;
 			void							BindMaterial(int index, int shader) const;
+
+private:
+	virtual	bool							ShouldRenderInstance(ICamera * cam, uint32_t id) const;
+
+private:
+	struct Mesh
+	{
+		CommonTypes::Range					m_vertexRange;
+		CommonTypes::Range					m_indexRange;
+		int									m_materialIndex;
+		// DirectX::BoundingBox				m_boundingBox; /// kinda useless
+	};
 private:
 	MicrosoftPointer<ID3D11Buffer>			m_indexBuffer;
 	MicrosoftPointer<ID3D11Buffer>			m_materialBuffer;
 	
-	std::vector<CommonTypes::Range>			m_verticesRange;
-	std::vector<CommonTypes::Range>			m_startIndices;
-	std::vector<int>						m_materialIndices;
+	DirectX::BoundingBox					m_boundingBox;
+
+	std::vector<Mesh>						m_meshes;
 	std::vector<Rendering::Material>		m_materials;
 	std::vector<Oblivion::SVertex>			m_vertices;
 	std::vector<uint32_t>					m_indices;
@@ -86,7 +95,5 @@ void Model::Render(ICamera * cam) const
 	{
 		Shader::Get()->bind();
 	}
-	DrawIndexedInstanced();
+	DrawIndexedInstanced(cam);
 }
-
-void ReadTillEnd(std::ifstream &fin);

@@ -23,8 +23,6 @@ Game::~Game()
 
 void Game::Destroy()
 {
-	m_sphereModel.reset();
-
 	ImGui_ImplDX11_Shutdown();
 	ImGui::DestroyContext();
 
@@ -108,10 +106,10 @@ void Game::InitImGui()
 void Game::Init3D()
 {
 	// auto renderer = Direct3D11::Get();
-	m_sphereModel = std::make_unique<Model>();
-	m_sphereModel->Create(EDefaultObject::Sphere);
-	//m_sphereModel->AddInstance();
-	//m_sphereModel->Translate(0.0f, 1.0f, 0.0f);
+	m_testModel = std::make_unique<Model>();
+	m_testModel->Create(EDefaultObject::Geosphere);
+	m_testModel->AddInstance();
+	m_testModel->Translate(0.0f, 1.5f, 0.0f);
 
 	m_groundModel = std::make_unique<Model>();
 	m_groundModel->Create(EDefaultObject::Grid);
@@ -278,22 +276,23 @@ void Game::Render()
 		return;
 	Begin();
 
+	auto batch = BatchRenderer::Get();
+
 	TextureLightShader::Get()->bind();
 	IGameObject::BindStaticVertexBuffer();
-	m_sphereModel->Render<TextureLightShader>(m_camera.get());
+	
+	batch->Begin();
+	
+	m_testModel->Render<TextureLightShader>(m_camera.get());
 	m_groundModel->Render<TextureLightShader>(m_camera.get());
 	m_treeModel->Render<TextureLightShader>(m_camera.get());
 	m_woodCabinModel->Render<TextureLightShader>(m_camera.get());
 	m_spaceCompound->Render<TextureLightShader>(m_camera.get());
 
-	auto batch = BatchRenderer::Get();
-	batch->Begin(m_camera.get());
+	batch->End(m_camera.get(), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
-	batch->Vertex(DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f),  DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-	batch->Vertex(DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f),  DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f));
-	batch->Vertex(DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f), DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
 
-	batch->End();
+
 
 	End();
 }

@@ -48,6 +48,8 @@ void Camera::Construct()
 	mPosition = DirectX::XMVectorAdd(mPosition, DirectX::XMVectorScale(mRight, mRightAcceleration));
 
 	mView = DirectX::XMMatrixLookToLH(mPosition, mDirection, mUp);
+
+	BuildViewFrustum();
 }
 
 void Camera::WalkForward(float frameTime)

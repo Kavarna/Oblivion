@@ -24,15 +24,10 @@ void BatchRenderer::Reconstruct(uint32_t newSize)
 		sizeof(BatchShader::SVertex) * m_numMaxVertices, D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE);
 }
 
-void BatchRenderer::Begin(ICamera * cam)
+void BatchRenderer::Begin()
 {
 	m_bufferData = (BatchShader::SVertex*) ShaderHelper::MapBuffer(m_d3d11Context.Get(), m_vertexBuffer.Get());
 	m_currentIndex = 0;
-
-	auto shader = BatchShader::Get();
-	DirectX::XMMATRIX VP = cam->GetView() * cam->GetProjection();
-	VP = DirectX::XMMatrixTranspose(VP);
-	shader->SetCamera(VP);
 }
 
 void BatchRenderer::Vertex(BatchShader::SVertex const & vertex)
@@ -48,11 +43,19 @@ void BatchRenderer::Vertex(DirectX::XMFLOAT3 const & pos, DirectX::XMFLOAT4 cons
 	assert(m_currentIndex < m_numMaxVertices);
 }
 
-void BatchRenderer::End(D3D11_PRIMITIVE_TOPOLOGY topology)
+void BatchRenderer::End(ICamera * cam, D3D11_PRIMITIVE_TOPOLOGY topology)
 {
-	ShaderHelper::UnmapBuffer(m_d3d11Context.Get(), m_vertexBuffer.Get());
 	auto shader = BatchShader::Get();
+
 	shader->bind();
+
+	DirectX::XMMATRIX VP = cam->GetView() * cam->GetProjection();
+	VP = DirectX::XMMatrixTranspose(VP);
+	shader->SetCamera(VP);
+
+	ShaderHelper::UnmapBuffer(m_d3d11Context.Get(), m_vertexBuffer.Get());
+
+
 	m_d3d11Context->IASetPrimitiveTopology(topology);
 	UINT stride = sizeof(BatchShader::SVertex);
 	UINT offset = 0;

@@ -1,6 +1,6 @@
 #include "Model.h"
 #include "Helpers/GeometryGenerator.h"
-
+#include "Helpers/RenderHelper.h"
 
 /*
 * Appends path (except last directory) to relative
@@ -15,6 +15,19 @@ static inline void AppendPathToRelative(std::string& relative, std::string const
 	strncpy_s(toAppend, sizeof(toAppend), path.c_str(), where);
 
 	relative.insert(0, toAppend);
+}
+
+static void ReadTillEnd(std::ifstream &fin)
+{
+	if (fin.eof())
+		return;
+	char c;
+	while (true)
+	{
+		c = fin.get();
+		if (c == '}')
+			break;
+	}
 }
 
 Model::Model()
@@ -38,17 +51,13 @@ void Model::Destroy()
 
 inline uint32_t Model::GetIndexCount(int subObject) const
 {
-	return uint32_t(m_startIndices[subObject].end - m_startIndices[subObject].begin);
+	//return uint32_t(m_startIndices[subObject].end - m_startIndices[subObject].begin);
+	return m_meshes[subObject].m_indexRange.end - m_meshes[subObject].m_indexRange.begin;
 }
 
 inline uint32_t Model::GetVertexCount() const
 {
 	return (uint32_t)m_vertices.size();
-}
-
-bool Model::ShouldRenderInstance() const
-{
-	return true;
 }
 
 void Model::RenderBasicShader(ICamera* cam) const
@@ -72,13 +81,13 @@ void Model::RenderTextureLightShader(ICamera * cam) const
 	m_d3d11Context->PSSetSamplers(0, 1, renderer->m_linearWrapSamplerState.GetAddressOf());
 }
 
-void Model::DrawIndexedInstanced() const
+void Model::DrawIndexedInstanced(ICamera * cam) const
 {
 	auto data = (DirectX::XMMATRIX*)ShaderHelper::MapBuffer(m_d3d11Context.Get(), m_instanceBuffer.Get());
 	uint32_t renderInstances = 0;
 	for (size_t i = 0; i < m_objectWorld.size(); ++i)
 	{
-		if (ShouldRenderInstance())
+		if (ShouldRenderInstance(cam, i))
 		{
 			data[renderInstances++] = m_objectWorld[i];
 		}
@@ -91,28 +100,43 @@ void Model::DrawIndexedInstanced() const
 	UINT stride = sizeof(DirectX::XMMATRIX);
 	UINT offset = 0;
 	m_d3d11Context->IASetVertexBuffers(1, 1, instances, &stride, &offset);
-	for (size_t i = 0; i < m_startIndices.size(); ++i)
+	if (renderInstances == 0)
+		return;
+
+	for (auto & mesh : m_meshes)
 	{
-		if (m_materials[m_materialIndices[i]].opacity != 1.0f)
+		if (m_materials[mesh.m_materialIndex].opacity != 1.0f)
 			continue;
-		BindMaterial(m_materialIndices[i], (int)Shader::ShaderType::ePixel);
-		m_d3d11Context->DrawIndexedInstanced((UINT)GetIndexCount((int)i),
-			(UINT)renderInstances, (UINT)m_startIndices[i].begin,
-			(UINT)m_verticesRange[i].begin, 0);
+		BindMaterial(mesh.m_materialIndex, (int)Shader::ShaderType::ePixel);
+		m_d3d11Context->DrawIndexedInstanced((UINT)(mesh.m_indexRange.end - mesh.m_indexRange.begin),
+			(UINT)renderInstances, (UINT)mesh.m_indexRange.begin,
+			(UINT)mesh.m_vertexRange.begin, 0);
 	}
 	auto renderer = Direct3D11::Get();
-	for (size_t i = 0; i < m_startIndices.size(); ++i)
+	for (auto & mesh : m_meshes)
 	{
-		float opacity = m_materials[m_materialIndices[i]].opacity;
+		float opacity = m_materials[mesh.m_materialIndex].opacity;
 		if (opacity == 1.0f)
 			continue;
 		renderer->OMTransparency(opacity);
-		BindMaterial(m_materialIndices[i], (int)Shader::ShaderType::ePixel);
-		m_d3d11Context->DrawIndexedInstanced((UINT)GetIndexCount((int)i),
-			(UINT)renderInstances, (UINT)m_startIndices[i].begin,
-			(UINT)m_verticesRange[i].begin, 0);
+		BindMaterial(mesh.m_materialIndex, (int)Shader::ShaderType::ePixel);
+		m_d3d11Context->DrawIndexedInstanced((UINT)(mesh.m_indexRange.end - mesh.m_indexRange.begin),
+			(UINT)renderInstances, (UINT)mesh.m_indexRange.begin,
+			(UINT)mesh.m_vertexRange.begin, 0);
 	}
 	renderer->OMDefault();
+
+#if DEBUG || _DEBUG
+
+	DirectX::BoundingBox toRender;
+	for (uint32_t i = 0; i < m_objectWorld.size(); ++i)
+	{
+		toRender = m_boundingBox;
+		toRender.Transform(toRender, m_objectWorld[i]);
+		RenderHelper::RenderBoundingBox(cam, toRender);
+	}
+
+#endif
 }
 
 void Model::BindMaterial(int index, int shader) const
@@ -165,17 +189,19 @@ void Model::BindMaterial(int index, int shader) const
 	}
 }
 
-void ReadTillEnd(std::ifstream &fin)
+bool Model::ShouldRenderInstance(ICamera * cam, uint32_t id) const
 {
-	if (fin.eof())
-		return;
-	char c;
-	while (true)
-	{
-		c = fin.get();
-		if (c == '}')
-			break;
-	}
+	auto frustum = cam->GetFrustum();
+
+	DirectX::BoundingBox toRender;
+
+	toRender = m_boundingBox;
+	m_boundingBox.Transform(toRender, m_objectWorld[id]);
+
+	if (frustum.Contains(toRender))
+		return true;
+
+	return false;
 }
 
 void Model::Create(std::string const& filename)
@@ -202,9 +228,22 @@ void Model::Create(std::string const& filename)
 	int meshCount;
 	fin >> meshCount;
 	std::getline(fin, check);
-	m_materialIndices.resize(meshCount);
+	m_meshes.emplace_back();
+	m_meshes.resize(meshCount);
 
-	m_vertices;
+	DirectX::XMFLOAT3 globalMin(FLT_MAX, FLT_MAX, FLT_MAX);
+	DirectX::XMFLOAT3 globalMax(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+
+	auto checkAndSwapSmallest = [](float& a, float b)
+	{
+		if (b < a)
+			a = b;
+	};
+	auto checkAndSwapLargest = [](float& a, float b)
+	{
+		if (b > a)
+			a = b;
+	};
 
 	for (int i = 0; i < meshCount; ++i)
 	{
@@ -243,12 +282,25 @@ void Model::Create(std::string const& filename)
 		
 		getline(fin, check);
 
+		// Kinda useless
+		/*DirectX::XMFLOAT3 localMin(FLT_MAX, FLT_MAX, FLT_MAX);
+		DirectX::XMFLOAT3 localMax(-FLT_MAX, -FLT_MAX, -FLT_MAX);*/
+
 		for (int j = 0; j < numVertices; ++j)
 		{
 			m_vertices.emplace_back();
 			float x, y, z;
 			fin >> x >> y >> z;
 			m_vertices.back().Position = { x,y,z };
+			checkAndSwapSmallest(globalMin.x, x); checkAndSwapLargest(globalMax.x, x);
+			checkAndSwapSmallest(globalMin.y, y); checkAndSwapLargest(globalMax.y, y);
+			checkAndSwapSmallest(globalMin.z, z); checkAndSwapLargest(globalMax.z, z);
+
+			// Kinda useless
+			/*checkAndSwapSmallest(localMin.x, x); checkAndSwapLargest(localMax.x, x);
+			checkAndSwapSmallest(localMin.y, y); checkAndSwapLargest(localMax.y, y);
+			checkAndSwapSmallest(localMin.z, z); checkAndSwapLargest(localMax.z, z);*/
+			
 			if (hasTexture)
 			{
 				fin >> x >> y;
@@ -269,7 +321,23 @@ void Model::Create(std::string const& filename)
 		}
 		ReadTillEnd(fin);
 
-		m_verticesRange.push_back(AddVertices(m_vertices, startVertices, (int)m_vertices.size()));
+		m_meshes[i].m_vertexRange = AddVertices(m_vertices, startVertices, (int)m_vertices.size());
+
+		// Kinda useless
+		/*DirectX::XMFLOAT3 center, offset;
+		center = DirectX::XMFLOAT3(
+			(localMax.x + localMin.x) / 2.f,
+			(localMax.y + localMin.y) / 2.f,
+			(localMax.z + localMin.z) / 2.f
+		);
+		offset = DirectX::XMFLOAT3(
+			localMax.x - center.x,
+			localMax.y - center.y,
+			localMax.z - center.z
+		);
+		m_meshes[i].m_boundingBox = DirectX::BoundingBox(
+			center, offset
+		);*/
 
 #pragma endregion
 
@@ -290,7 +358,7 @@ void Model::Create(std::string const& filename)
 			m_indices.push_back(index);
 		}
 
-		m_startIndices.emplace_back(startIndices, (uint32_t)m_indices.size());
+		m_meshes[i].m_indexRange = { (uint32_t)startIndices, (uint32_t)m_indices.size() };
 
 
 		ReadTillEnd(fin);
@@ -299,7 +367,7 @@ void Model::Create(std::string const& filename)
 		if (check != "Material")
 			THROW_ERROR("Model %s is invalid due to it not having \"Material\" in mesh %d", filename.c_str(), i);
 
-		fin >> m_materialIndices[i];
+		fin >> m_meshes[i].m_materialIndex;
 
 		ReadTillEnd(fin);
 #pragma endregion
@@ -400,6 +468,21 @@ void Model::Create(std::string const& filename)
 		D3D11_USAGE::D3D11_USAGE_IMMUTABLE, D3D11_BIND_FLAG::D3D11_BIND_INDEX_BUFFER,
 		sizeof(decltype(m_indices[0])) * m_indices.size(), 0, &m_indices[0]);
 
+	DirectX::XMFLOAT3 center, offset;
+	center = DirectX::XMFLOAT3(
+		(globalMax.x + globalMin.x) / 2.f,
+		(globalMax.y + globalMin.y) / 2.f,
+		(globalMax.z + globalMin.z) / 2.f
+	);
+	offset = DirectX::XMFLOAT3(
+		globalMax.x - center.x,
+		globalMax.y - center.y,
+		globalMax.z - center.z
+	);
+	m_boundingBox = DirectX::BoundingBox(
+		center, offset
+	);
+
 	fin.close();
 }
 
@@ -408,19 +491,38 @@ void Model::Create(EDefaultObject object)
 	GeometryGenerator g;
 	GeometryGenerator::MeshData data;
 	if (object == EDefaultObject::Box)
+	{
 		g.CreateBox(1.0f, 1.0f, 1.0f, data);
+		m_boundingBox = DirectX::BoundingBox(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f));
+	}
 	else if (object == EDefaultObject::Cylinder)
+	{
 		g.CreateCylinder(1.0f, 1.0f, 3.0f, 32, 32, data);
+		m_boundingBox = DirectX::BoundingBox(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(1.0f, 3.0f, 1.0f));
+	}
 	else if (object == EDefaultObject::FullscreenQuad)
+	{
 		g.CreateFullscreenQuad(data);
+		m_boundingBox = DirectX::BoundingBox(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(1.0f, 1.0f, 0.1f));
+	}
 	else if (object == EDefaultObject::Geosphere)
-		g.CreateGeosphere(1.0f, 12, data);
+	{
+		g.CreateGeosphere(1.0f, 1, data);
+		m_boundingBox = DirectX::BoundingBox(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f));
+	}
 	else if (object == EDefaultObject::Grid)
+	{
 		g.CreateGrid(100.0f, 100.0f, 20, 20, data);
+		m_boundingBox = DirectX::BoundingBox(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(50.0f, 0.1f, 50.0f));
+	}
 	else if (object == EDefaultObject::Sphere)
+	{
 		g.CreateSphere(1.0f, 20, 20, data);
+		m_boundingBox = DirectX::BoundingBox(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f));
+	}
 	m_vertices = std::move(data.Vertices);
 	m_indices = std::move(data.Indices);
+	m_meshes.emplace_back();
 	try
 	{
 		if (object != EDefaultObject::Grid)
@@ -433,7 +535,7 @@ void Model::Create(EDefaultObject object)
 			m_materials.back().opacity = 1.0f;
 			m_materials.back().specular = 1000.0f;
 			m_materials.back().diffuseTexture = std::make_unique<Texture>((LPWSTR)L"Resources/Marble.jpg", m_d3d11Device.Get(), m_d3d11Context.Get());
-			m_materialIndices.push_back(0);
+			m_meshes.back().m_materialIndex = 0;
 		}
 		else
 		{
@@ -445,7 +547,7 @@ void Model::Create(EDefaultObject object)
 			m_materials.back().opacity = 1.0f;
 			m_materials.back().specular = 1000.0f;
 			m_materials.back().diffuseTexture = std::make_unique<Texture>((LPWSTR)L"Resources/Grass.jpg", m_d3d11Device.Get(), m_d3d11Context.Get());
-			m_materialIndices.push_back(0);
+			m_meshes.back().m_materialIndex = 0;
 		}
 	}
 	catch (...)
@@ -458,6 +560,6 @@ void Model::Create(EDefaultObject object)
 		D3D11_USAGE::D3D11_USAGE_IMMUTABLE, D3D11_BIND_FLAG::D3D11_BIND_INDEX_BUFFER,
 		sizeof(decltype(m_indices[0])) * m_indices.size(), 0, &m_indices[0]);
 
-	m_verticesRange.push_back(AddVertices(m_vertices));
-	m_startIndices.emplace_back(0, (uint32_t)m_indices.size());
+	m_meshes.back().m_vertexRange = AddVertices(m_vertices);
+	m_meshes.back().m_indexRange = { 0, (uint32_t)m_indices.size() };
 }

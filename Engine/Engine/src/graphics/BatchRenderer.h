@@ -21,10 +21,10 @@ private:
 
 public:
 	void Reconstruct(uint32_t newSize);
-	void Begin(ICamera *);
+	void Begin();
 	void Vertex(BatchShader::SVertex const& vertex);
 	void Vertex(DirectX::XMFLOAT3 const& pos, DirectX::XMFLOAT4 const& color);
-	void End(D3D11_PRIMITIVE_TOPOLOGY = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	void End(ICamera *, D3D11_PRIMITIVE_TOPOLOGY = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
 private:
 	MicrosoftPointer<ID3D11Buffer>	m_vertexBuffer;

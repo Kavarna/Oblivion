@@ -176,6 +176,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\graphics\BatchRenderer.h" />
+    <ClInclude Include="src\graphics\Helpers\RenderHelper.h" />
     <ClInclude Include="src\graphics\interfaces\Object.h" />
     <ClInclude Include="src\graphics\Shaders\BatchShader.h" />
     <ClInclude Include="src\common\commontypes.h" />

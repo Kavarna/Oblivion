@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../common/common.h"
+#include "../interfaces/Object.h"
 #include "../Helpers/ShaderHelper.h"
 #include "../Direct3D11.h"
 
@@ -26,22 +27,13 @@ namespace Shader
 
 }
 
-class IShader
+class IShader : public IObject
 {
 public:
 	struct SVertex; // For consistency
 protected:
-	IShader()
-	{
-		auto renderer = Direct3D11::Get();
-		m_d3d11Device = renderer->getDevice();
-		m_d3d11Context = renderer->getContext();
-	};
-	virtual ~IShader()
-	{
-		m_d3d11Device.Reset();
-		m_d3d11Context.Reset();
-	};
+	IShader() {};
+	virtual ~IShader() {};
 
 private:
 	static std::type_index					m_currentlyBoundShader;
@@ -67,7 +59,4 @@ public:
 		return nullptr;
 	}
 
-protected:
-	MicrosoftPointer<ID3D11Device>			m_d3d11Device;
-	MicrosoftPointer<ID3D11DeviceContext>	m_d3d11Context;
 };

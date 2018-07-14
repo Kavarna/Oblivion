@@ -13,3 +13,5 @@
 #include "graphics/Shaders/TextureLightShader.h"
 #include "graphics/Camera.h"
 #include "graphics/Model.h"
+#include "graphics/BatchRenderer.h"
+#include "graphics/Helpers/RenderHelper.h"
