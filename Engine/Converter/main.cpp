@@ -1,10 +1,11 @@
 
 #ifdef _WIN32 //32 bit windows
 #define ENVIRONMENT32
-#elif defined _WIN64 //64 bit windows
+#if defined _WIN64 //64 bit windows
+#undef ENVIRONMENT32
 #define ENVIRONMENT64
-#endif
-
+#endif // _WIN64
+#endif // _WIN32
 
 #if defined ENVIRONMENT32
 
