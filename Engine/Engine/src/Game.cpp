@@ -45,6 +45,7 @@ void Game::Create(HINSTANCE hInstance, uint32_t width, uint32_t height)
 	InitInput();
 	InitDirect3D();
 	InitImGui();
+	Init2D();
 	Init3D();
 	InitSizeDependent();
 }
@@ -108,6 +109,15 @@ void Game::InitImGui()
 	ImGui::StyleColorsClassic();
 }
 
+void Game::Init2D()
+{
+#if DEBUG || _DEBUG
+	m_debugSquare = std::make_unique<Square>();
+	m_debugSquare->Create("Resources/Grass.jpg");
+	m_debugSquare->AddInstance();
+#endif
+}
+
 void Game::Init3D()
 {
 	// auto renderer = Direct3D11::Get();
@@ -157,10 +167,10 @@ void Game::InitSizeDependent()
 		m_camera = std::make_unique<Camera>(FOV, HByW, nearZ, farZ);
 		m_screen = std::make_unique<Projection>();
 	}
-	m_screen->m_width = m_windowWidth / 4.0f;
-	m_screen->m_height = m_windowHeight / 4.0f;
+	m_screen->m_width = (float) m_windowWidth;
+	m_screen->m_height = (float) m_windowHeight;
 	m_screen->m_nearZ = nearZ;
-	m_screen->m_farZ;
+	m_screen->m_farZ = farZ;
 	m_screen->Construct();
 }
 
@@ -288,17 +298,26 @@ void Game::Render()
 
 	auto batch = BatchRenderer::Get();
 
-	TextureLightShader::Get()->bind();
 	IGameObject::BindStaticVertexBuffer();
 	
+#if defined DRAW_AABB
 	batch->Begin();
+#endif
 	
+#if DEBUG || _DEBUG
+	m_debugSquare->Render<TextureShader, true>(m_screen.get());
+#endif
+
+	TextureLightShader::Get()->bind();
+
 	m_testModel->Render<TextureLightShader>(m_camera.get());
 	m_groundModel->Render<TextureLightShader>(m_camera.get());
 	m_treeModel->Render<TextureLightShader>(m_camera.get());
 	m_woodCabinModel->Render<TextureLightShader>(m_camera.get());
 
+#if defined DRAW_AABB
 	batch->End(m_camera.get(), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+#endif
 
 
 	End();

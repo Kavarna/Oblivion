@@ -7,6 +7,13 @@ using namespace Oblivion;
 std::vector<SVertex>				IGameObject::m_staticVertices;
 MicrosoftPointer<ID3D11Buffer>		IGameObject::m_staticVerticesBuffer;
 
+IGameObject::IGameObject()
+{
+	ShaderHelper::CreateBuffer(m_d3d11Device.Get(), &m_materialBuffer,
+		D3D11_USAGE::D3D11_USAGE_DYNAMIC, D3D11_BIND_FLAG::D3D11_BIND_CONSTANT_BUFFER,
+		sizeof(Shader::material_t), D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE);
+}
+
 DirectX::XMMATRIX& IGameObject::AddInstance(DirectX::FXMMATRIX const& mat)
 {
 	m_objectWorld.emplace_back(mat);
@@ -93,6 +100,53 @@ void IGameObject::RemoveVertices(Range const & range)
 {
 	m_staticVertices.erase(m_staticVertices.begin() + range.begin,
 		m_staticVertices.begin() + range.end);
+}
+
+void IGameObject::BindMaterial(Rendering::material_t const & mat, int shader) const
+{
+	auto data = (Shader::material_t*)ShaderHelper::MapBuffer(m_d3d11Context.Get(), m_materialBuffer.Get());
+
+	data->color = mat.diffuseColor;
+	data->hasTexture = mat.hasTexture;
+	data->hasBump = mat.hasBumpMap;
+	data->hasSpecular = mat.hasSpecularMap;
+	data->specular = mat.specular;
+	data->color = mat.diffuseColor;
+
+	ShaderHelper::UnmapBuffer(m_d3d11Context.Get(), m_materialBuffer.Get());
+
+	ID3D11ShaderResourceView *resources[] =
+	{
+		mat.diffuseTexture ? mat.diffuseTexture->GetTextureSRV() : nullptr,
+		mat.bumpMap ? mat.bumpMap->GetTextureSRV() : nullptr,
+		mat.specularMap ? mat.specularMap->GetTextureSRV() : nullptr,
+	};
+
+	if (shader & (int)Shader::ShaderType::eVertex)
+	{
+		m_d3d11Context->VSSetConstantBuffers(2, 1, m_materialBuffer.GetAddressOf());
+		m_d3d11Context->VSSetShaderResources(0, 3, resources);
+	}
+	if (shader & (int)Shader::ShaderType::eHull)
+	{
+		m_d3d11Context->HSSetConstantBuffers(2, 1, m_materialBuffer.GetAddressOf());
+		m_d3d11Context->HSSetShaderResources(0, 3, resources);
+	}
+	if (shader & (int)Shader::ShaderType::eDomain)
+	{
+		m_d3d11Context->DSSetConstantBuffers(2, 1, m_materialBuffer.GetAddressOf());
+		m_d3d11Context->DSSetShaderResources(0, 3, resources);
+	}
+	if (shader & (int)Shader::ShaderType::eGeometry)
+	{
+		m_d3d11Context->GSSetConstantBuffers(2, 1, m_materialBuffer.GetAddressOf());
+		m_d3d11Context->GSSetShaderResources(0, 3, resources);
+	}
+	if (shader & (int)Shader::ShaderType::ePixel)
+	{
+		m_d3d11Context->PSSetConstantBuffers(2, 1, m_materialBuffer.GetAddressOf());
+		m_d3d11Context->PSSetShaderResources(0, 3, resources);
+	}
 }
 
 void IGameObject::BindStaticVertexBuffer()

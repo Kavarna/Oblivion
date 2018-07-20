@@ -17,3 +17,4 @@
 #include "graphics/BatchRenderer.h"
 #include "graphics/Helpers/RenderHelper.h"
 #include "graphics/RenderTexture.h"
+#include "graphics/Square.h"

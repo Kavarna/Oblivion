@@ -25,6 +25,7 @@
     <ClCompile Include="src\graphics\RenderTexture.cpp" />
     <ClCompile Include="src\common\Globals.cpp" />
     <ClCompile Include="src\graphics\Shaders\TextureShader.cpp" />
+    <ClCompile Include="src\graphics\Square.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\commonmath.h" />
@@ -65,6 +66,7 @@
     <ClInclude Include="src\common\Globals.h" />
     <ClInclude Include="src\graphics\Shaders\TextureShader.h" />
     <ClInclude Include="src\graphics\Projection.h" />
+    <ClInclude Include="src\graphics\Square.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\BasicVertexShader.hlsl" />

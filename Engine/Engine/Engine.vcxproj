@@ -152,6 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\graphics\Square.cpp" />
     <ClCompile Include="src\common\Globals.cpp" />
     <ClCompile Include="src\graphics\RenderTexture.cpp" />
     <ClCompile Include="src\graphics\BatchRenderer.cpp" />
@@ -178,6 +179,7 @@
     <ClCompile Include="src\graphics\Shaders\TextureShader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\graphics\Square.h" />
     <ClInclude Include="src\graphics\Projection.h" />
     <ClInclude Include="src\common\Globals.h" />
     <ClInclude Include="src\graphics\RenderTexture.h" />

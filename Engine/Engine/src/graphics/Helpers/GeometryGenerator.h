@@ -51,6 +51,11 @@ public:
 	///</summary>
 	void CreateFullscreenQuad(MeshData& meshData);
 
+	///<summary>
+	/// Creates a quad. This is useful for simple 2D rendering.
+	///</summary>
+	void CreateQuad(MeshData& meshData, float width, float height);
+
 private:
 	void Subdivide(MeshData& meshData);
 	void BuildCylinderTopCap(float bottomRadius, float topRadius, float height, UINT sliceCount, UINT stackCount, MeshData& meshData);

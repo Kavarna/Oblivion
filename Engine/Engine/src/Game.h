@@ -31,6 +31,7 @@ private:
 	void InitInput();
 	void InitDirect3D();
 	void InitImGui();
+	void Init2D();
 	void Init3D();
 
 	void InitSizeDependent();
@@ -54,6 +55,9 @@ private:
 private:
 	std::unique_ptr<Camera>						m_camera;
 	std::unique_ptr<Projection>					m_screen;
+#if DEBUG || _DEBUG
+	std::unique_ptr<Square>						m_debugSquare;
+#endif
 	std::unique_ptr<Model>						m_groundModel;
 	std::unique_ptr<Model>						m_treeModel;
 	std::unique_ptr<Model>						m_woodCabinModel;

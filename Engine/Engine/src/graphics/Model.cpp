@@ -32,9 +32,9 @@ static void ReadTillEnd(std::ifstream &fin)
 
 Model::Model()
 {
-	ShaderHelper::CreateBuffer(m_d3d11Device.Get(), &m_materialBuffer,
-		D3D11_USAGE::D3D11_USAGE_DYNAMIC, D3D11_BIND_FLAG::D3D11_BIND_CONSTANT_BUFFER,
-		sizeof(Shader::material_t), D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE);
+	//ShaderHelper::CreateBuffer(m_d3d11Device.Get(), &m_materialBuffer,
+	//	D3D11_USAGE::D3D11_USAGE_DYNAMIC, D3D11_BIND_FLAG::D3D11_BIND_CONSTANT_BUFFER,
+	//	sizeof(Shader::material_t), D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE);
 }
 
 Model::~Model()
@@ -123,7 +123,7 @@ void Model::DrawIndexedInstanced(ICamera * cam) const
 	{
 		if (m_materials[mesh.m_materialIndex].opacity != 1.0f)
 			continue;
-		BindMaterial(mesh.m_materialIndex, (int)Shader::ShaderType::ePixel);
+		BindMaterial(m_materials[mesh.m_materialIndex], (int)Shader::ShaderType::ePixel);
 		m_d3d11Context->DrawIndexedInstanced((UINT)(mesh.m_indexRange.end - mesh.m_indexRange.begin),
 			(UINT)renderInstances, (UINT)mesh.m_indexRange.begin,
 			(UINT)mesh.m_vertexRange.begin, 0);
@@ -138,7 +138,7 @@ void Model::DrawIndexedInstanced(ICamera * cam) const
 		if (opacity == 1.0f)
 			continue;
 		renderer->OMTransparency(opacity);
-		BindMaterial(mesh.m_materialIndex, (int)Shader::ShaderType::ePixel);
+		BindMaterial(m_materials[mesh.m_materialIndex], (int)Shader::ShaderType::ePixel);
 		m_d3d11Context->DrawIndexedInstanced((UINT)(mesh.m_indexRange.end - mesh.m_indexRange.begin),
 			(UINT)renderInstances, (UINT)mesh.m_indexRange.begin,
 			(UINT)mesh.m_vertexRange.begin, 0);
@@ -148,7 +148,7 @@ void Model::DrawIndexedInstanced(ICamera * cam) const
 	}
 	renderer->OMDefault();
 
-#if DEBUG || _DEBUG
+#if defined DRAW_AABB
 
 	DirectX::BoundingBox toRender;
 	for (uint32_t i = 0; i < m_objectWorld.size(); ++i)
@@ -159,56 +159,6 @@ void Model::DrawIndexedInstanced(ICamera * cam) const
 	}
 
 #endif
-}
-
-void Model::BindMaterial(int index, int shader) const
-{
-	assert((size_t)index < m_materials.size());
-	
-	auto data = (Shader::material_t*)ShaderHelper::MapBuffer(m_d3d11Context.Get(), m_materialBuffer.Get());
-
-	data->color			= m_materials[index].diffuseColor;
-	data->hasTexture	= m_materials[index].hasTexture;
-	data->hasBump		= m_materials[index].hasBumpMap;
-	data->hasSpecular	= m_materials[index].hasSpecularMap;
-	data->specular		= m_materials[index].specular;
-	data->color			= m_materials[index].diffuseColor;
-
-	ShaderHelper::UnmapBuffer(m_d3d11Context.Get(), m_materialBuffer.Get());
-
-	ID3D11ShaderResourceView *resources[] = 
-	{
-		m_materials[index].diffuseTexture ? m_materials[index].diffuseTexture->GetTextureSRV() : nullptr,
-		m_materials[index].bumpMap ? m_materials[index].bumpMap->GetTextureSRV() : nullptr,
-		m_materials[index].specularMap ? m_materials[index].specularMap->GetTextureSRV() : nullptr,
-	};
-	
-
-	if (shader & (int)Shader::ShaderType::eVertex)
-	{
-		m_d3d11Context->VSSetConstantBuffers(2, 1, m_materialBuffer.GetAddressOf());
-		m_d3d11Context->VSSetShaderResources(0, 3, resources);
-	}
-	if (shader & (int)Shader::ShaderType::eHull)
-	{
-		m_d3d11Context->HSSetConstantBuffers(2, 1, m_materialBuffer.GetAddressOf());
-		m_d3d11Context->HSSetShaderResources(0, 3, resources);
-	}
-	if (shader & (int)Shader::ShaderType::eDomain)
-	{
-		m_d3d11Context->DSSetConstantBuffers(2, 1, m_materialBuffer.GetAddressOf());
-		m_d3d11Context->DSSetShaderResources(0, 3, resources);
-	}
-	if (shader & (int)Shader::ShaderType::eGeometry)
-	{
-		m_d3d11Context->GSSetConstantBuffers(2, 1, m_materialBuffer.GetAddressOf());
-		m_d3d11Context->GSSetShaderResources(0, 3, resources);
-	}
-	if (shader & (int)Shader::ShaderType::ePixel)
-	{
-		m_d3d11Context->PSSetConstantBuffers(2, 1, m_materialBuffer.GetAddressOf());
-		m_d3d11Context->PSSetShaderResources(0, 3, resources);
-	}
 }
 
 bool Model::ShouldRenderInstance(ICamera * cam, uint32_t id) const

@@ -196,6 +196,47 @@ void GeometryGenerator::CreateSphere(float radius, UINT sliceCount, UINT stackCo
 	}
 }
 
+void GeometryGenerator::CreateQuad(MeshData & meshData, float width, float height)
+{
+	float halfWidth = width / 2.0f;
+	float halfHeight = height / 2.0f;
+	meshData.Vertices.resize(4);
+	meshData.Indices.resize(6);
+
+	// Position coordinates specified in NDC space.
+	meshData.Vertices[0] = Vertex(
+		-halfWidth, -halfHeight, 0.1f,
+		0.0f, 0.0f, -1.0f,
+		1.0f, 0.0f, 0.0f,
+		0.0f, 1.0f);
+
+	meshData.Vertices[1] = Vertex(
+		-halfWidth, +halfHeight, 0.1f,
+		0.0f, 0.0f, -1.0f,
+		1.0f, 0.0f, 0.0f,
+		0.0f, 0.0f);
+
+	meshData.Vertices[2] = Vertex(
+		+halfWidth, +halfHeight, 0.1f,
+		0.0f, 0.0f, -1.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f);
+
+	meshData.Vertices[3] = Vertex(
+		+halfWidth, -halfHeight, 0.1f,
+		0.0f, 0.0f, -1.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 1.0f);
+
+	meshData.Indices[0] = 0;
+	meshData.Indices[1] = 1;
+	meshData.Indices[2] = 2;
+
+	meshData.Indices[3] = 0;
+	meshData.Indices[4] = 2;
+	meshData.Indices[5] = 3;
+}
+
 void GeometryGenerator::Subdivide(MeshData& meshData)
 {
 	using namespace DirectX;
@@ -589,25 +630,25 @@ void GeometryGenerator::CreateFullscreenQuad(MeshData& meshData)
 
 	// Position coordinates specified in NDC space.
 	meshData.Vertices[0] = Vertex(
-		-1.0f, -1.0f, 0.0f,
+		-1.0f, -1.0f, 0.1f,
 		0.0f, 0.0f, -1.0f,
 		1.0f, 0.0f, 0.0f,
 		0.0f, 1.0f);
 
 	meshData.Vertices[1] = Vertex(
-		-1.0f, +1.0f, 0.0f,
+		-1.0f, +1.0f, 0.1f,
 		0.0f, 0.0f, -1.0f,
 		1.0f, 0.0f, 0.0f,
 		0.0f, 0.0f);
 
 	meshData.Vertices[2] = Vertex(
-		+1.0f, +1.0f, 0.0f,
+		+1.0f, +1.0f, 0.1f,
 		0.0f, 0.0f, -1.0f,
 		1.0f, 0.0f, 0.0f,
 		1.0f, 0.0f);
 
 	meshData.Vertices[3] = Vertex(
-		+1.0f, -1.0f, 0.0f,
+		+1.0f, -1.0f, 0.1f,
 		0.0f, 0.0f, -1.0f,
 		1.0f, 0.0f, 0.0f,
 		1.0f, 1.0f);

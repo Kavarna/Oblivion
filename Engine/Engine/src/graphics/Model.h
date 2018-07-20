@@ -41,7 +41,7 @@ private:
 
 private:
 			void							DrawIndexedInstanced(ICamera * cam) const;
-			void							BindMaterial(int index, int shader) const;
+			//void							BindMaterial(int index, int shader) const;
 
 private:
 	virtual	bool							ShouldRenderInstance(ICamera * cam, uint32_t id) const;
@@ -56,7 +56,6 @@ private:
 	};
 private:
 	MicrosoftPointer<ID3D11Buffer>			m_indexBuffer;
-	MicrosoftPointer<ID3D11Buffer>			m_materialBuffer;
 	
 	DirectX::BoundingBox					m_boundingBox;
 
