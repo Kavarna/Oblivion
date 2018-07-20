@@ -3,6 +3,11 @@
 std::once_flag			Game::m_gameFlag;
 std::unique_ptr<Game>	Game::m_gameInstance = nullptr;
 
+#if DEBUG || _DEBUG
+#define INCREASE_DEBUG_VAR(var, value) var += value;
+#else
+#define INCREASE_DEBU_VAR(var, value)
+#endif
 
 Game* Game::GetInstance()
 {
@@ -107,9 +112,9 @@ void Game::Init3D()
 {
 	// auto renderer = Direct3D11::Get();
 	m_testModel = std::make_unique<Model>();
-	m_testModel->Create(EDefaultObject::Geosphere);
+	m_testModel->Create(EDefaultObject::Sphere);
 	m_testModel->AddInstance();
-	m_testModel->Translate(0.0f, 1.5f, 0.0f);
+	m_testModel->Translate(3.0f, 3.7f, 0.0f);
 
 	m_groundModel = std::make_unique<Model>();
 	m_groundModel->Create(EDefaultObject::Grid);
@@ -119,32 +124,25 @@ void Game::Init3D()
 	m_treeModel = std::make_unique<Model>();
 	m_treeModel->Create("Resources\\tree.obl");
 	m_treeModel->AddInstance();
-	m_treeModel->Scale(0.5f);
-	m_treeModel->Translate(0.0f, 0.0f, 20.0f);
+	m_treeModel->RotateY(DirectX::XM_PIDIV4);
+	m_treeModel->Translate(-25.0f, 0.0f, 30.0f);
 	m_treeModel->AddInstance();
-	m_treeModel->Scale(0.5f, 1);
-	m_treeModel->Translate(25.0f, 0.0f, 25.0f, 1);
+	m_treeModel->RotateY(DirectX::XM_PIDIV2, 1);
+	m_treeModel->Translate(25.0f, 0.0f, 30.0f, 1);
 
 	m_woodCabinModel = std::make_unique<Model>();
 	m_woodCabinModel->Create("Resources\\WoodenCabin.obl");
 	m_woodCabinModel->AddInstance();
-	m_woodCabinModel->Scale(0.1f);
-	m_woodCabinModel->Translate(-25.0f, 0.0f, 25.0f);
-
-	m_spaceCompound = std::make_unique<Model>();
-	m_spaceCompound->Create("Resources\\spaceCompound.obl");
-	m_spaceCompound->AddInstance();
+	m_woodCabinModel->Scale(0.5f);
 
 }
 
 void Game::InitSizeDependent()
 {
-	//float FOV, float HByW, float NearZ, float FarZ
 	float FOV = DirectX::XM_PI / 4;
 	float HByW = (float)m_windowWidth / (float)m_windowHeight;
 	float nearZ = 1.0f;
 	float farZ = 1000.0f;
-	//m_camera = std::make_unique<Camera>(FOV, HByW, nearZ, farZ);
 	if (m_camera)
 	{
 		Camera * cam = new Camera(FOV, HByW, nearZ, farZ);
@@ -155,7 +153,15 @@ void Game::InitSizeDependent()
 		m_camera.reset(cam);
 	}
 	else
+	{
 		m_camera = std::make_unique<Camera>(FOV, HByW, nearZ, farZ);
+		m_screen = std::make_unique<Projection>();
+	}
+	m_screen->m_width = m_windowWidth / 4.0f;
+	m_screen->m_height = m_windowHeight / 4.0f;
+	m_screen->m_nearZ = nearZ;
+	m_screen->m_farZ;
+	m_screen->Construct();
 }
 
 void Game::Run()
@@ -244,6 +250,7 @@ void Game::End()
 		ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 	
 	ImGui::Text("Application average %.5f s/frame (%.1f FPS)", 1.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+	ImGui::Text("Draw calls: %d", g_drawCalls);
 
 	ImGui::End();
 #endif
@@ -271,6 +278,9 @@ void Game::End()
 
 void Game::Render()
 {
+#if DEBUG || _DEBUG
+	g_drawCalls = 0;
+#endif
 	auto renderer = Direct3D11::Get();
 	if (!renderer->Available())
 		return;
@@ -287,11 +297,8 @@ void Game::Render()
 	m_groundModel->Render<TextureLightShader>(m_camera.get());
 	m_treeModel->Render<TextureLightShader>(m_camera.get());
 	m_woodCabinModel->Render<TextureLightShader>(m_camera.get());
-	m_spaceCompound->Render<TextureLightShader>(m_camera.get());
 
 	batch->End(m_camera.get(), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-
-
 
 
 	End();

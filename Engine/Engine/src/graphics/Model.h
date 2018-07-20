@@ -3,12 +3,10 @@
 
 #include "interfaces/GameObject.h"
 #include "Direct3D11.h"
-#include "Shaders/BasicShader.h"
-#include "Shaders/TextureLightShader.h"
 
 enum class EDefaultObject
 {
-	Box, Sphere, Geosphere, Cylinder, Grid, FullscreenQuad
+	Box, Sphere, Geosphere, Cylinder, Grid
 };
 
 class Model : public IGameObject
@@ -31,11 +29,15 @@ public:
 
 public:
 	inline	uint32_t						GetIndexCount(int subObject = 0) const;
-	inline	uint32_t						GetVertexCount() const;
+	inline	uint32_t						GetVertexCount(int subObject = 0) const;
+
+public:
+			void							SetMaterial(Rendering::Material && mat, int materialIndex = 0);
 
 private:
 			void							RenderBasicShader(ICamera * cam) const;
 			void							RenderTextureLightShader(ICamera * cam) const;
+			void							RenderTexture(ICamera * cam) const;
 
 private:
 			void							DrawIndexedInstanced(ICamera * cam) const;
@@ -60,7 +62,6 @@ private:
 
 	std::vector<Mesh>						m_meshes;
 	std::vector<Rendering::Material>		m_materials;
-	std::vector<Oblivion::SVertex>			m_vertices;
 	std::vector<uint32_t>					m_indices;
 };
 
@@ -84,6 +85,10 @@ void Model::Render(ICamera * cam) const
 	else if constexpr (std::is_same<Shader, TextureLightShader>::value)
 	{
 		RenderTextureLightShader(cam);
+	}
+	else if constexpr (std::is_same<Shader, TextureShader>::value)
+	{
+		RenderTexture(cam);
 	}
 	else
 	{

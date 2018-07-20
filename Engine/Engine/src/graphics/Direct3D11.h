@@ -33,8 +33,12 @@ public:
 	void										RSWireframeRender();
 	void										RSSolidRender();
 	void										RSCullNone();
+	void										DepthEnableLess();
+	void										DepthDisable();
 	void										OMTransparency(float blendFactor);
 	void										OMDefault();
+
+	void										DefaultStates();
 
 private:
 	void										CreateDepthStencilView(uint32_t width, uint32_t height);
@@ -51,11 +55,17 @@ private: // Attributes
 	UINT										m_maxMSAAQualityLevel		= 0;
 
 public: // States
+	// Rasterizer
 	MicrosoftPointer<ID3D11RasterizerState>		m_wireFrameNoCulling		= nullptr;
 	MicrosoftPointer<ID3D11RasterizerState>		m_solidBackfaceCulling		= nullptr;
 	MicrosoftPointer<ID3D11RasterizerState>		m_solidNoCulling			= nullptr;
+	// Samplers
 	MicrosoftPointer<ID3D11SamplerState>		m_linearWrapSamplerState	= nullptr;
+	// Blend
 	MicrosoftPointer<ID3D11BlendState>			m_transparencyBlendState	= nullptr;
+	// Depth
+	MicrosoftPointer<ID3D11DepthStencilState>	m_depthEnabledLess			= nullptr;
+	MicrosoftPointer<ID3D11DepthStencilState>	m_depthDisabled				= nullptr;
 
 private:
 	D3D11_VIEWPORT								m_viewPort;

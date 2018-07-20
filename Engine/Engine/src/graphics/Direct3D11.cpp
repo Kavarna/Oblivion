@@ -67,6 +67,14 @@ void Direct3D11::Create(HWND window)
 #endif
 
 	InitializeStates();
+	DefaultStates();
+}
+
+void Direct3D11::DefaultStates()
+{
+	RSSolidRender();
+	DepthEnableLess();
+	OMDefault();
 }
 
 void Direct3D11::OnResize(HWND hWnd, uint32_t width, uint32_t height)
@@ -158,7 +166,6 @@ void Direct3D11::OnResize(HWND hWnd, uint32_t width, uint32_t height)
 			}
 		}
 	}
-	RSSolidRender();
 }
 
 void Direct3D11::CreateDepthStencilView(uint32_t width, uint32_t height)
@@ -258,6 +265,21 @@ void Direct3D11::InitializeStates()
 		m_d3d11Device->CreateBlendState(&blendDesc, &m_transparencyBlendState)
 	);
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~DEPTH STATES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	ZeroMemoryAndDeclare(D3D11_DEPTH_STENCIL_DESC, depthDesc);
+	depthDesc.StencilEnable = FALSE;
+	depthDesc.DepthEnable = TRUE;
+	depthDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK::D3D11_DEPTH_WRITE_MASK_ALL;
+	depthDesc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS;
+	ThrowIfFailed(
+		m_d3d11Device->CreateDepthStencilState(&depthDesc, &m_depthEnabledLess)
+	);
+	depthDesc.DepthEnable = FALSE;
+	depthDesc.StencilEnable = FALSE;
+	ThrowIfFailed(
+		m_d3d11Device->CreateDepthStencilState(&depthDesc, &m_depthDisabled)
+	);
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }
 
 void Direct3D11::Begin()
@@ -290,6 +312,16 @@ void Direct3D11::RSSolidRender()
 void Direct3D11::RSCullNone()
 {
 	m_d3d11Context->RSSetState(m_solidNoCulling.Get());
+}
+
+void Direct3D11::DepthEnableLess()
+{
+	m_d3d11Context->OMSetDepthStencilState(m_depthEnabledLess.Get(), 0);
+}
+
+void Direct3D11::DepthDisable()
+{
+	m_d3d11Context->OMSetDepthStencilState(m_depthDisabled.Get(), 0);
 }
 
 void Direct3D11::OMTransparency(float blendFactor)

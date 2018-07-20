@@ -35,10 +35,17 @@ public:
 		return mTextureUAV.Get();
 
 	}
-	void SetTexture(ID3D11ShaderResourceView * newSRV)
+	void SetTexture(ID3D11ShaderResourceView * newSRV, ID3D11UnorderedAccessView * newUAV = nullptr)
 	{
+		mHasUAV = false;
 		mTextureSRV.Reset();
 		mTextureSRV = Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>(newSRV);
+		if (newUAV)
+		{
+			mHasUAV = true;
+			mTextureUAV.Reset();
+			mTextureUAV = Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView>(newUAV);
+		}
 	}
 private:
 	void CreateUAV();

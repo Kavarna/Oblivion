@@ -51,13 +51,17 @@ void Model::Destroy()
 
 inline uint32_t Model::GetIndexCount(int subObject) const
 {
-	//return uint32_t(m_startIndices[subObject].end - m_startIndices[subObject].begin);
 	return m_meshes[subObject].m_indexRange.end - m_meshes[subObject].m_indexRange.begin;
 }
 
-inline uint32_t Model::GetVertexCount() const
+inline uint32_t Model::GetVertexCount(int subObject) const
 {
-	return (uint32_t)m_vertices.size();
+	return m_meshes[subObject].m_vertexRange.end - m_meshes[subObject].m_vertexRange.begin;
+}
+
+void Model::SetMaterial(Rendering::Material && mat, int materialIndex)
+{
+	m_materials[materialIndex] = std::move(mat);
 }
 
 void Model::RenderBasicShader(ICamera* cam) const
@@ -73,6 +77,18 @@ void Model::RenderTextureLightShader(ICamera * cam) const
 {
 	static auto renderer = Direct3D11::Get();
 	static TextureLightShader * shader = TextureLightShader::Get();
+	shader->SetCameraInformations({
+		DirectX::XMMatrixTranspose(cam->GetView()),
+		DirectX::XMMatrixTranspose(cam->GetProjection())
+		});
+
+	m_d3d11Context->PSSetSamplers(0, 1, renderer->m_linearWrapSamplerState.GetAddressOf());
+}
+
+void Model::RenderTexture(ICamera * cam) const
+{
+	static auto renderer = Direct3D11::Get();
+	static TextureShader * shader = TextureShader::Get();
 	shader->SetCameraInformations({
 		DirectX::XMMatrixTranspose(cam->GetView()),
 		DirectX::XMMatrixTranspose(cam->GetProjection())
@@ -102,7 +118,7 @@ void Model::DrawIndexedInstanced(ICamera * cam) const
 	m_d3d11Context->IASetVertexBuffers(1, 1, instances, &stride, &offset);
 	if (renderInstances == 0)
 		return;
-
+	
 	for (auto & mesh : m_meshes)
 	{
 		if (m_materials[mesh.m_materialIndex].opacity != 1.0f)
@@ -111,6 +127,9 @@ void Model::DrawIndexedInstanced(ICamera * cam) const
 		m_d3d11Context->DrawIndexedInstanced((UINT)(mesh.m_indexRange.end - mesh.m_indexRange.begin),
 			(UINT)renderInstances, (UINT)mesh.m_indexRange.begin,
 			(UINT)mesh.m_vertexRange.begin, 0);
+#if DEBUG || _DEBUG
+		g_drawCalls++;
+#endif
 	}
 	auto renderer = Direct3D11::Get();
 	for (auto & mesh : m_meshes)
@@ -123,6 +142,9 @@ void Model::DrawIndexedInstanced(ICamera * cam) const
 		m_d3d11Context->DrawIndexedInstanced((UINT)(mesh.m_indexRange.end - mesh.m_indexRange.begin),
 			(UINT)renderInstances, (UINT)mesh.m_indexRange.begin,
 			(UINT)mesh.m_vertexRange.begin, 0);
+#if DEBUG || _DEBUG
+		g_drawCalls++;
+#endif
 	}
 	renderer->OMDefault();
 
@@ -245,6 +267,8 @@ void Model::Create(std::string const& filename)
 			a = b;
 	};
 
+	std::vector<Oblivion::SVertex> vertices;
+
 	for (int i = 0; i < meshCount; ++i)
 	{
 		std::string meshName;
@@ -257,9 +281,9 @@ void Model::Create(std::string const& filename)
 			THROW_ERROR("Model %s is invalid due to it not having \"Vertices\" in mesh %d", filename.c_str(), i);
 
 		int numVertices;
-		int startVertices = (int)m_vertices.size();
+		int startVertices = (int)vertices.size();
 		fin >> numVertices;
-		m_vertices.reserve(m_vertices.size() + numVertices);
+		vertices.reserve(vertices.size() + numVertices);
 
 		fin >> check;
 		if (check != "UV")
@@ -288,10 +312,10 @@ void Model::Create(std::string const& filename)
 
 		for (int j = 0; j < numVertices; ++j)
 		{
-			m_vertices.emplace_back();
+			vertices.emplace_back();
 			float x, y, z;
 			fin >> x >> y >> z;
-			m_vertices.back().Position = { x,y,z };
+			vertices.back().Position = { x,y,z };
 			checkAndSwapSmallest(globalMin.x, x); checkAndSwapLargest(globalMax.x, x);
 			checkAndSwapSmallest(globalMin.y, y); checkAndSwapLargest(globalMax.y, y);
 			checkAndSwapSmallest(globalMin.z, z); checkAndSwapLargest(globalMax.z, z);
@@ -304,24 +328,24 @@ void Model::Create(std::string const& filename)
 			if (hasTexture)
 			{
 				fin >> x >> y;
-				m_vertices.back().TexC = { x,y };
+				vertices.back().TexC = { x,y };
 			}
 			if (hasNormals)
 			{
 				fin >> x >> y >> z;
-				m_vertices.back().Normal = { x,y,z };
+				vertices.back().Normal = { x,y,z };
 			}
 			if (hasOther)
 			{
 				fin >> x >> y >> z;
-				m_vertices.back().TangentU = { x,y,z };
+				vertices.back().TangentU = { x,y,z };
 				fin >> x >> y >> z;
-				m_vertices.back().Binormal = { x,y,z };
+				vertices.back().Binormal = { x,y,z };
 			}
 		}
 		ReadTillEnd(fin);
 
-		m_meshes[i].m_vertexRange = AddVertices(m_vertices, startVertices, (int)m_vertices.size());
+		m_meshes[i].m_vertexRange = AddVertices(vertices, startVertices, (int)vertices.size());
 
 		// Kinda useless
 		/*DirectX::XMFLOAT3 center, offset;
@@ -500,11 +524,6 @@ void Model::Create(EDefaultObject object)
 		g.CreateCylinder(1.0f, 1.0f, 3.0f, 32, 32, data);
 		m_boundingBox = DirectX::BoundingBox(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(1.0f, 3.0f, 1.0f));
 	}
-	else if (object == EDefaultObject::FullscreenQuad)
-	{
-		g.CreateFullscreenQuad(data);
-		m_boundingBox = DirectX::BoundingBox(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(1.0f, 1.0f, 0.1f));
-	}
 	else if (object == EDefaultObject::Geosphere)
 	{
 		g.CreateGeosphere(1.0f, 1, data);
@@ -513,14 +532,15 @@ void Model::Create(EDefaultObject object)
 	else if (object == EDefaultObject::Grid)
 	{
 		g.CreateGrid(100.0f, 100.0f, 20, 20, data);
-		m_boundingBox = DirectX::BoundingBox(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(50.0f, 0.1f, 50.0f));
+		m_boundingBox = DirectX::BoundingBox(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(50.0f, 0.01f, 50.0f));
 	}
 	else if (object == EDefaultObject::Sphere)
 	{
 		g.CreateSphere(1.0f, 20, 20, data);
 		m_boundingBox = DirectX::BoundingBox(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f));
 	}
-	m_vertices = std::move(data.Vertices);
+	std::vector<Oblivion::SVertex> vertices;
+	vertices = std::move(data.Vertices);
 	m_indices = std::move(data.Indices);
 	m_meshes.emplace_back();
 	try
@@ -560,6 +580,6 @@ void Model::Create(EDefaultObject object)
 		D3D11_USAGE::D3D11_USAGE_IMMUTABLE, D3D11_BIND_FLAG::D3D11_BIND_INDEX_BUFFER,
 		sizeof(decltype(m_indices[0])) * m_indices.size(), 0, &m_indices[0]);
 
-	m_meshes.back().m_vertexRange = AddVertices(m_vertices);
+	m_meshes.back().m_vertexRange = AddVertices(vertices);
 	m_meshes.back().m_indexRange = { 0, (uint32_t)m_indices.size() };
 }

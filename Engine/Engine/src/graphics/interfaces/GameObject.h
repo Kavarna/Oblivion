@@ -9,6 +9,10 @@
 #include "Shader.h"
 #include "Object.h"
 
+#include "../Shaders/BasicShader.h"
+#include "../Shaders/TextureLightShader.h"
+#include "../Shaders/TextureShader.h"
+
 #include <OblivionObjects.h>
 
 namespace Rendering
@@ -34,7 +38,6 @@ namespace Rendering
 
 class IGameObject : public AlignedObject, public IObject
 {
-	friend class Direct3D11;
 public:
 	IGameObject() = default;
 	virtual ~IGameObject() 
@@ -48,6 +51,7 @@ public:
 public:
 	inline void Identity(int instanceID = 0) { m_objectWorld[instanceID] = DirectX::XMMatrixIdentity(); };
 	inline void Scale(float S, int instanceID = 0) { m_objectWorld[instanceID] *= DirectX::XMMatrixScaling(S, S, S); };
+	inline void Scale(float Sx, float Sy, float Sz, int instanceID = 0) { m_objectWorld[instanceID] *= DirectX::XMMatrixScaling(Sx, Sy, Sz); };
 	inline void Translate(float x, float y, float z, int instanceID = 0) { m_objectWorld[instanceID] *= DirectX::XMMatrixTranslation(x, y, z); };
 	inline void RotateX(float Theta, int instanceID = 0) { m_objectWorld[instanceID] *= DirectX::XMMatrixRotationX(Theta); };
 	inline void RotateY(float Theta, int instanceID = 0) { m_objectWorld[instanceID] *= DirectX::XMMatrixRotationY(Theta); };
@@ -55,12 +59,9 @@ public:
 
 protected:
 	virtual uint32_t GetIndexCount(int subObject = 0) const = 0;
-	virtual uint32_t GetVertexCount() const = 0;
+	virtual uint32_t GetVertexCount(int subObject = 0) const = 0;
 
 public:
-	/*
-	* returns the index of the new added instance
-	*/
 	virtual DirectX::XMMATRIX&				AddInstance(DirectX::FXMMATRIX const& mat = DirectX::XMMatrixIdentity());
 	virtual DirectX::XMMATRIX*				AddInstance(uint32_t number);
 	virtual void							RemoveInstance(int ID);

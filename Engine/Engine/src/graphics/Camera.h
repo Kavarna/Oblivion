@@ -13,8 +13,8 @@ class Camera : public ICamera
 	static const DirectX::XMVECTOR DefaultPosition;
 	static const DirectX::XMMATRIX DefaultView;
 	static constexpr const float Friction = 0.2f;
-	static constexpr const float CamSpeed = 0.2f;
-	static constexpr const float MaxCamSpeed = 10;
+	static constexpr const float CamSpeed = 5.f;
+	static constexpr const float MaxCamSpeed = 50.f;
 	static constexpr const float RotationFriction = 0.2f;
 public:
 	Camera() = default;

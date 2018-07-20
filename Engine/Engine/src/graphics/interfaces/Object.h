@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Direct3D11.h"
+#include "../../common/Globals.h"
 
 class IObject
 {
