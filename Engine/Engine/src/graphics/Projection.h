@@ -21,7 +21,7 @@ public:
 public:
 	void Construct() override
 	{
-		m_projectionMatrix = DirectX::XMMatrixPerspectiveLH(m_width, m_height, m_nearZ, m_farZ);
+		m_projectionMatrix = DirectX::XMMatrixOrthographicLH(m_width, m_height, m_nearZ, m_farZ);
 		m_viewMatrix = DirectX::XMMatrixIdentity();
 	}
 

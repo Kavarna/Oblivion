@@ -29,6 +29,8 @@ float4 main(PSIn input) : SV_TARGET
 	input.NormalW = normalize(input.NormalW);
 	float4 matColor = g_material.GetColor(ObjTexture, ObjWrapSampler, input.TexCoord);
 	
+	clip(matColor.a - 0.15f);
+
 	float4 color = g_sunLight.Ambient;
 
 	color += g_sunLight.GetAmountOfLight(input.NormalW);

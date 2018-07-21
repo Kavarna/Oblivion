@@ -22,6 +22,11 @@ public:
 	template <class Shader, bool bindShader = false>
 			void						Render(ICamera * cam) const;
 
+			void						SetWindowInfo(float windowWidth, float windowHeight);
+	inline	void						Scale(float Sx, float Sy, float Sz = 1.0f, int instanceID = 0) override;
+
+			void						TranslateTo(float X, float Y, int InstanceID = 0);
+
 
 private:
 			void						RenderTexture(ICamera * cam) const;
@@ -29,6 +34,11 @@ private:
 private:
 			void						DrawIndexed(ICamera * cam) const;
 private:
+	float								m_width;
+	float								m_height;
+	float								m_windowWidth;
+	float								m_windowHeight;
+
 	MicrosoftPointer<ID3D11Buffer>		m_indexBuffer;
 	CommonTypes::Range					m_vertexRange;
 	std::vector<uint32_t>				m_indices;

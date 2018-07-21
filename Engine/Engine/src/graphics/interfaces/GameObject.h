@@ -44,50 +44,50 @@ public:
 	{ };
 
 public:
-	virtual void Create(std::string const&) = 0;
-	virtual void Create() {};
-	virtual void Update(float frameTime) = 0;
-	virtual void Destroy() = 0;
+	virtual			void Create(std::string const&) = 0;
+	virtual			void Create() {};
+	virtual			void Update(float frameTime) = 0;
+	virtual			void Destroy() = 0;
 
 public:
-	inline	void Identity(int instanceID = 0) { m_objectWorld[instanceID] = DirectX::XMMatrixIdentity(); };
-	inline	void Scale(float S, int instanceID = 0) { m_objectWorld[instanceID] *= DirectX::XMMatrixScaling(S, S, S); };
-	inline	void Scale(float Sx, float Sy, float Sz, int instanceID = 0) { m_objectWorld[instanceID] *= DirectX::XMMatrixScaling(Sx, Sy, Sz); };
-	inline	void Translate(float x, float y, float z, int instanceID = 0) { m_objectWorld[instanceID] *= DirectX::XMMatrixTranslation(x, y, z); };
-	inline	void RotateX(float Theta, int instanceID = 0) { m_objectWorld[instanceID] *= DirectX::XMMatrixRotationX(Theta); };
-	inline	void RotateY(float Theta, int instanceID = 0) { m_objectWorld[instanceID] *= DirectX::XMMatrixRotationY(Theta); };
-	inline	void RotateZ(float Theta, int instanceID = 0) { m_objectWorld[instanceID] *= DirectX::XMMatrixRotationZ(Theta); };
+	virtual inline	void Identity(int instanceID = 0) { m_objectWorld[instanceID] = DirectX::XMMatrixIdentity(); };
+	virtual inline	void Scale(float S, int instanceID = 0) { m_objectWorld[instanceID] *= DirectX::XMMatrixScaling(S, S, S); };
+	virtual inline	void Scale(float Sx, float Sy, float Sz, int instanceID = 0) { m_objectWorld[instanceID] *= DirectX::XMMatrixScaling(Sx, Sy, Sz); };
+	virtual inline	void Translate(float x, float y, float z, int instanceID = 0) { m_objectWorld[instanceID] *= DirectX::XMMatrixTranslation(x, y, z); };
+	virtual inline	void RotateX(float Theta, int instanceID = 0) { m_objectWorld[instanceID] *= DirectX::XMMatrixRotationX(Theta); };
+	virtual inline	void RotateY(float Theta, int instanceID = 0) { m_objectWorld[instanceID] *= DirectX::XMMatrixRotationY(Theta); };
+	virtual inline	void RotateZ(float Theta, int instanceID = 0) { m_objectWorld[instanceID] *= DirectX::XMMatrixRotationZ(Theta); };
 
 protected:
-	virtual uint32_t GetIndexCount(int subObject = 0) const = 0;
-	virtual uint32_t GetVertexCount(int subObject = 0) const = 0;
+	virtual			uint32_t GetIndexCount(int subObject = 0) const = 0;
+	virtual			uint32_t GetVertexCount(int subObject = 0) const = 0;
 
 public:
-	virtual DirectX::XMMATRIX&				AddInstance(DirectX::FXMMATRIX const& mat = DirectX::XMMatrixIdentity());
-	virtual DirectX::XMMATRIX*				AddInstance(uint32_t number);
-	virtual void							RemoveInstance(int ID);
-	virtual void							RemoveInstance(CommonTypes::Range const& range);
+	virtual			DirectX::XMMATRIX&				AddInstance(DirectX::FXMMATRIX const& mat = DirectX::XMMatrixIdentity());
+	virtual			DirectX::XMMATRIX*				AddInstance(uint32_t number);
+	virtual			void							RemoveInstance(int ID);
+	virtual			void							RemoveInstance(CommonTypes::Range const& range);
 
 protected:
 	/*
 	* Range between start index and end index
 	*/
-	static	CommonTypes::Range				AddVertices(std::vector<Oblivion::SVertex> & vertices);
-	static	CommonTypes::Range				AddVertices(std::vector<Oblivion::SVertex> & vertices, int start, int end);
-	static	void							RemoveVertices(CommonTypes::Range const&);
+	static			CommonTypes::Range				AddVertices(std::vector<Oblivion::SVertex> & vertices);
+	static			CommonTypes::Range				AddVertices(std::vector<Oblivion::SVertex> & vertices, int start, int end);
+	static			void							RemoveVertices(CommonTypes::Range const&);
 
 protected:
-			void							BindMaterial(Rendering::material_t const& mat, int shader) const;
+					void							BindMaterial(Rendering::material_t const& mat, int shader) const;
 	
 public:
-	static	void							BindStaticVertexBuffer();
+	static			void							BindStaticVertexBuffer();
 
 protected:
-	static std::vector<Oblivion::SVertex>	m_staticVertices;
-	static MicrosoftPointer<ID3D11Buffer>	m_staticVerticesBuffer;
+	static std::vector<Oblivion::SVertex>			m_staticVertices;
+	static MicrosoftPointer<ID3D11Buffer>			m_staticVerticesBuffer;
 
 protected:
-	MicrosoftPointer<ID3D11Buffer>			m_instanceBuffer;
-	std::vector<DirectX::XMMATRIX>			m_objectWorld;
-	MicrosoftPointer<ID3D11Buffer>			m_materialBuffer;
+			MicrosoftPointer<ID3D11Buffer>			m_instanceBuffer;
+			std::vector<DirectX::XMMATRIX>			m_objectWorld;
+			MicrosoftPointer<ID3D11Buffer>			m_materialBuffer;
 };

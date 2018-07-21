@@ -18,5 +18,6 @@ struct PSIn
 float4 main(PSIn input) : SV_TARGET
 {
 	float4 matColor = g_material.GetColor(ObjTexture, ObjWrapSampler, input.TexCoord);
+	clip(matColor.a - 0.15f);
 	return matColor;
 }
