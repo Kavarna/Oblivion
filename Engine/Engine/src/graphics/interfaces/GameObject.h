@@ -67,6 +67,7 @@ public:
 	virtual			DirectX::XMMATRIX*				AddInstance(uint32_t number);
 	virtual			void							RemoveInstance(int ID);
 	virtual			void							RemoveInstance(CommonTypes::Range const& range);
+	virtual			int								PrepareInstances(std::function<bool(uint32_t)> & func) const;
 
 protected:
 	/*

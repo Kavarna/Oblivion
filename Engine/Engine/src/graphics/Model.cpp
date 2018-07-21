@@ -99,16 +99,8 @@ void Model::RenderTexture(ICamera * cam) const
 
 void Model::DrawIndexedInstanced(ICamera * cam) const
 {
-	auto data = (DirectX::XMMATRIX*)ShaderHelper::MapBuffer(m_d3d11Context.Get(), m_instanceBuffer.Get());
-	uint32_t renderInstances = 0;
-	for (size_t i = 0; i < m_objectWorld.size(); ++i)
-	{
-		if (ShouldRenderInstance(cam, (uint32_t)i))
-		{
-			data[renderInstances++] = m_objectWorld[i];
-		}
-	}
-	ShaderHelper::UnmapBuffer(m_d3d11Context.Get(), m_instanceBuffer.Get());
+	std::function<bool(uint32_t)> func = std::bind(&Model::ShouldRenderInstance, this, cam, std::placeholders::_1);
+	uint32_t renderInstances = PrepareInstances(func);
 	ID3D11Buffer * instances[] =
 	{
 		m_instanceBuffer.Get()
