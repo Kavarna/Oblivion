@@ -44,7 +44,7 @@ void Square::Destroy()
 
 uint32_t Square::GetIndexCount(int subObject) const
 {
-	return m_indices.size();
+	return (uint32_t)m_indices.size();
 }
 
 uint32_t Square::GetVertexCount(int subObject) const
@@ -109,5 +109,7 @@ void Square::DrawIndexed(ICamera * cam) const
 	BindMaterial(m_material, (int)Shader::ShaderType::ePixel);
 	m_d3d11Context->DrawIndexedInstanced(GetIndexCount(),
 		renderInstances, 0, m_vertexRange.begin, 0);
+#if DEBUG || _DEBUG
 	g_drawCalls++;
+#endif
 }

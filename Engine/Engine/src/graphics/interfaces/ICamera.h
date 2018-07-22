@@ -2,6 +2,7 @@
 
 #include "AlignedObject.h"
 
+
 class ICamera : public AlignedObject
 {
 public:
@@ -18,6 +19,10 @@ public:
 	{
 		return m_viewFrustum;
 	}
+
+#if DEBUG || _DEBUG
+	inline void RenderDebug() const;
+#endif
 
 protected:
 	void BuildViewFrustum()

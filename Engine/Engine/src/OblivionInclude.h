@@ -14,7 +14,5 @@
 #include "graphics/Camera.h"
 #include "graphics/Projection.h"
 #include "graphics/Model.h"
-#include "graphics/BatchRenderer.h"
-#include "graphics/Helpers/RenderHelper.h"
 #include "graphics/RenderTexture.h"
 #include "graphics/Square.h"

@@ -1,6 +1,5 @@
 #include "BatchRenderer.h"
 
-DECLARE_SINGLETONE(BatchRenderer);
 
 BatchRenderer::BatchRenderer()
 {

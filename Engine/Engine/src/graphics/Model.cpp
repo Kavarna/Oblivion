@@ -140,14 +140,15 @@ void Model::DrawIndexedInstanced(ICamera * cam) const
 	}
 	renderer->OMDefault();
 
-#if defined DRAW_AABB
+#if DEBUG || _DEBUG
 
 	DirectX::BoundingBox toRender;
+	auto debugDrawer = DebugDraw::Get();
 	for (uint32_t i = 0; i < m_objectWorld.size(); ++i)
 	{
 		toRender = m_boundingBox;
 		toRender.Transform(toRender, m_objectWorld[i]);
-		RenderHelper::RenderBoundingBox(cam, toRender);
+		debugDrawer->RenderBoundingBox(toRender);
 	}
 
 #endif

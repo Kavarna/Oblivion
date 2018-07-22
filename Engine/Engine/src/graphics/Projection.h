@@ -2,7 +2,7 @@
 
 #include "../input/Mouse.h"
 #include "../input/Keyboard.h"
-#include "interfaces/Camera.h"
+#include "interfaces/ICamera.h"
 
 
 class Projection :

@@ -20,12 +20,14 @@
     <ClCompile Include="src\graphics\Shaders\BasicShader.cpp" />
     <ClCompile Include="src\graphics\Shaders\TextureLightShader.cpp" />
     <ClCompile Include="src\graphics\interfaces\GameObject.cpp" />
-    <ClCompile Include="src\graphics\BatchRenderer.cpp" />
     <ClCompile Include="src\graphics\Shaders\BatchShader.cpp" />
     <ClCompile Include="src\graphics\RenderTexture.cpp" />
     <ClCompile Include="src\common\Globals.cpp" />
     <ClCompile Include="src\graphics\Shaders\TextureShader.cpp" />
     <ClCompile Include="src\graphics\Square.cpp" />
+    <ClCompile Include="src\graphics\Helpers\BatchRenderer.cpp" />
+    <ClCompile Include="src\graphics\Helpers\DebugDraw.cpp" />
+    <ClCompile Include="src\graphics\interfaces\ICamera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\commonmath.h" />
@@ -48,7 +50,6 @@
     <ClInclude Include="src\graphics\interfaces\Shader.h" />
     <ClInclude Include="src\graphics\interfaces\GameObject.h" />
     <ClInclude Include="src\graphics\interfaces\AlignedObject.h" />
-    <ClInclude Include="src\graphics\interfaces\Camera.h" />
     <ClInclude Include="src\graphics\Camera.h" />
     <ClInclude Include="src\graphics\Model.h" />
     <ClInclude Include="src\graphics\Helpers\ShaderHelper.h" />
@@ -59,7 +60,6 @@
     <ClInclude Include="src\graphics\Helpers\Lights.h" />
     <ClInclude Include="src\common\commontypes.h" />
     <ClInclude Include="src\graphics\Shaders\BatchShader.h" />
-    <ClInclude Include="src\graphics\BatchRenderer.h" />
     <ClInclude Include="src\graphics\interfaces\Object.h" />
     <ClInclude Include="src\graphics\Helpers\RenderHelper.h" />
     <ClInclude Include="src\graphics\RenderTexture.h" />
@@ -67,6 +67,9 @@
     <ClInclude Include="src\graphics\Shaders\TextureShader.h" />
     <ClInclude Include="src\graphics\Projection.h" />
     <ClInclude Include="src\graphics\Square.h" />
+    <ClInclude Include="src\graphics\Helpers\BatchRenderer.h" />
+    <ClInclude Include="src\graphics\Helpers\DebugDraw.h" />
+    <ClInclude Include="src\graphics\interfaces\ICamera.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\BasicVertexShader.hlsl" />

@@ -1,10 +1,10 @@
 #pragma once
 
 
-#include "interfaces/Shader.h"
-#include "interfaces/Object.h"
-#include "interfaces/Camera.h"
-#include "Shaders/BatchShader.h"
+#include "../interfaces/Shader.h"
+#include "../interfaces/Object.h"
+#include "../interfaces/ICamera.h"
+#include "../Shaders/BatchShader.h"
 
 
 class BatchRenderer : public IObject
@@ -13,10 +13,8 @@ public:
 	BatchRenderer();
 	~BatchRenderer();
 
-	MAKE_SINGLETONE(BatchRenderer);
 
-
-private:
+public:
 	void Create();
 
 public:

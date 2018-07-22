@@ -4,7 +4,7 @@
 #include "../../common/common.h"
 #include "../../common/commontypes.h"
 #include "../Texture.h"
-#include "Camera.h"
+#include "ICamera.h"
 #include "AlignedObject.h"
 #include "Shader.h"
 #include "Object.h"
@@ -12,6 +12,8 @@
 #include "../Shaders/BasicShader.h"
 #include "../Shaders/TextureLightShader.h"
 #include "../Shaders/TextureShader.h"
+
+#include "../Helpers/DebugDraw.h"
 
 #include <OblivionObjects.h>
 

@@ -140,6 +140,11 @@ void Game::Init3D()
 	m_woodCabinModel->AddInstance();
 	m_woodCabinModel->Scale(0.5f);
 
+#if DEBUG || _DEBUG
+	DebugDraw::Get()->SetDebugFlags(DBG_DRAW_BOUNDING_BOX |
+		DBG_DRAW_BOUNDING_FRUSTUM);
+#endif
+
 }
 
 void Game::InitSizeDependent()
@@ -304,8 +309,10 @@ void Game::Render()
 	Begin();
 
 
+	auto debugDrawer = DebugDraw::Get();
+	debugDrawer->Begin();
+
 	IGameObject::BindStaticVertexBuffer();
-	
 	
 #if DEBUG || _DEBUG
 	m_debugSquare->Render<TextureShader, true>(m_screen.get());
@@ -318,6 +325,9 @@ void Game::Render()
 	m_treeModel->Render<TextureLightShader>(m_camera.get());
 	m_woodCabinModel->Render<TextureLightShader>(m_camera.get());
 
+#if DEBUG || _DEBUG
+	debugDrawer->End(m_camera.get());
+#endif
 
 	End();
 }
