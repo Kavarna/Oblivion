@@ -11,14 +11,14 @@ DebugDraw * DebugDraw::Get()
 
 void DebugDraw::Begin()
 {
-#if DEBUG || _DEBUG
 	m_batchRenderer->Begin();
-#endif
+	m_insideBeginEnd = true;
 }
 
 void DebugDraw::RenderBoundingBox(DirectX::BoundingBox const & box)
 {
-#if DEBUG || _DEBUG
+	if (!m_insideBeginEnd)
+		return;
 	if (m_debugFlags & DBG_DRAW_BOUNDING_BOX)
 	{
 		DirectX::XMFLOAT3 corners[8];
@@ -54,12 +54,12 @@ void DebugDraw::RenderBoundingBox(DirectX::BoundingBox const & box)
 		vertex(corners[4]);
 		vertex(corners[7]);
 	}
-#endif
 }
 
-void DebugDraw::RenderBoungingFrustum(DirectX::BoundingFrustum const & frustum)
+void DebugDraw::RenderBoundingFrustum(DirectX::BoundingFrustum const & frustum)
 {
-#if DEBUG || _DEBUG
+	if (m_insideBeginEnd)
+		return;
 	if (m_debugFlags & DBG_DRAW_BOUNDING_FRUSTUM)
 	{
 		DirectX::XMFLOAT3 corners[8];
@@ -95,14 +95,12 @@ void DebugDraw::RenderBoungingFrustum(DirectX::BoundingFrustum const & frustum)
 		vertex(corners[4]);
 		vertex(corners[7]);
 	}
-#endif
 }
 
 void DebugDraw::End(ICamera * cam)
 {
-#if DEBUG || _DEBUG
 	m_batchRenderer->End(cam);
-#endif
+	m_insideBeginEnd = false;
 }
 
 void DebugDraw::BuildBatchRenderers()

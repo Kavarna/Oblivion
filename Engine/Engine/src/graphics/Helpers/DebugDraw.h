@@ -8,8 +8,8 @@
 
 enum DebugFlags
 {
-	DBG_DRAW_BOUNDING_BOX = 0b00001,
-	DBG_DRAW_BOUNDING_FRUSTUM = 0b00010
+	DBG_DRAW_BOUNDING_BOX		= 0b00001,
+	DBG_DRAW_BOUNDING_FRUSTUM	= 0b00010
 };
 
 struct SColorScheme
@@ -43,8 +43,21 @@ public:
 public:
 	void							Begin();
 	void							RenderBoundingBox(DirectX::BoundingBox const&);
-	void							RenderBoungingFrustum(DirectX::BoundingFrustum const&);
+	void							RenderBoundingFrustum(DirectX::BoundingFrustum const&);
 	void							End(ICamera * cam);
+
+public:
+	bool							RenderBoundingBox() const { return m_debugFlags & DBG_DRAW_BOUNDING_BOX; };
+	bool							RenderBoundingFrustum() const { return m_debugFlags & DBG_DRAW_BOUNDING_FRUSTUM; };
+
+	void							ToggleFlag(int flag)
+	{
+		m_debugFlags ^= flag;
+	};
+	void							SetFlag(int flag)
+	{
+		m_debugFlags |= flag;
+	}
 
 public:
 	void							SetDebugFlags(unsigned int debugFlags) { m_debugFlags = debugFlags; BuildBatchRenderers(); };
@@ -58,6 +71,7 @@ public:
 private:
 	unsigned int					m_debugFlags;
 	SColorScheme					m_colorScheme;
+	bool							m_insideBeginEnd;
 
 	std::unique_ptr<BatchRenderer>	m_batchRenderer;
 };

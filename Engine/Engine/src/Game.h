@@ -33,12 +33,13 @@ private:
 	void InitImGui();
 	void Init2D();
 	void Init3D();
-
 	void InitSizeDependent();
+	void InitSettings();
 
 	void Begin();
 	void End();
 
+	void WriteSettings();
 private:
 	void Update();
 	void Render();
@@ -51,6 +52,7 @@ private:
 	uint32_t									m_windowHeight;
 	bool										m_menuActive = true;
 	float										m_mouseSensivity = 2.0f;
+	bool										m_showDeveloperConsole = false;
 
 private:
 	std::unique_ptr<Camera>						m_camera;

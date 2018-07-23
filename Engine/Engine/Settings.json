@@ -1,0 +1,14 @@
+{
+    "Graphics": {
+        "VSync": "true",
+        "MSAA": "true"
+    },
+    "Gameplay": {
+        "Mouse sensivity": "2",
+        "Developer": "true"
+    },
+    "Developer": {
+        "Draw AABB": "false",
+        "Draw Frustums": "false"
+    }
+}

@@ -134,24 +134,26 @@ void Model::DrawIndexedInstanced(ICamera * cam) const
 		m_d3d11Context->DrawIndexedInstanced((UINT)(mesh.m_indexRange.end - mesh.m_indexRange.begin),
 			(UINT)renderInstances, (UINT)mesh.m_indexRange.begin,
 			(UINT)mesh.m_vertexRange.begin, 0);
-#if DEBUG || _DEBUG
-		g_drawCalls++;
-#endif
+		if (g_isDeveloper)
+		{
+			g_drawCalls++;
+		}
 	}
 	renderer->OMDefault();
 
-#if DEBUG || _DEBUG
 
-	DirectX::BoundingBox toRender;
-	auto debugDrawer = DebugDraw::Get();
-	for (uint32_t i = 0; i < m_objectWorld.size(); ++i)
+	if (g_isDeveloper)
 	{
-		toRender = m_boundingBox;
-		toRender.Transform(toRender, m_objectWorld[i]);
-		debugDrawer->RenderBoundingBox(toRender);
+		DirectX::BoundingBox toRender;
+		auto debugDrawer = DebugDraw::Get();
+		for (uint32_t i = 0; i < m_objectWorld.size(); ++i)
+		{
+			toRender = m_boundingBox;
+			toRender.Transform(toRender, m_objectWorld[i]);
+			debugDrawer->RenderBoundingBox(toRender);
+		}
 	}
 
-#endif
 }
 
 bool Model::ShouldRenderInstance(ICamera * cam, uint32_t id) const

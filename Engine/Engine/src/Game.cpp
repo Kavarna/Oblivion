@@ -1,4 +1,7 @@
 #include "Game.h"
+#include "boost/property_tree/ptree.hpp"
+#include "boost/property_tree/json_parser.hpp"
+#include "boost/property_tree/ini_parser.hpp"
 
 std::once_flag			Game::m_gameFlag;
 std::unique_ptr<Game>	Game::m_gameInstance = nullptr;
@@ -28,6 +31,8 @@ Game::~Game()
 
 void Game::Destroy()
 {
+	WriteSettings();
+
 	ImGui_ImplDX11_Shutdown();
 	ImGui::DestroyContext();
 
@@ -48,6 +53,47 @@ void Game::Create(HINSTANCE hInstance, uint32_t width, uint32_t height)
 	Init2D();
 	Init3D();
 	InitSizeDependent();
+	InitSettings();
+}
+
+void Game::InitSettings()
+{
+	using boost::property_tree::ptree;
+	ptree pt;
+
+	try
+	{
+		boost::property_tree::json_parser::read_json("Settings.json", pt);
+	}
+	catch (const boost::property_tree::json_parser_error& e)
+	{
+		const char error[] = "cannot open file";
+		if (strncmp(e.what(), error, strlen(error)))
+		{
+			DX::OutputVDebugString(L"[LOG]: Couldn't find file Settings.json, creating it.\n");
+			WriteSettings();
+			boost::property_tree::json_parser::read_json("Settings.json", pt);
+		}
+	}
+
+	auto renderer = Direct3D11::Get();
+
+	renderer->m_hasMSAA = pt.get_child("Graphics.MSAA").get_value<bool>();
+	renderer->m_hasVerticalSync = pt.get_child("Graphics.VSync").get_value<bool>();
+	renderer->resetSwapChain();
+	renderer->OnResize(m_windowHandle, m_windowWidth, m_windowHeight);
+
+	m_mouseSensivity = pt.get_child("Gameplay.Mouse sensivity").get_value<float>();
+	g_isDeveloper = pt.get_child("Gameplay.Developer").get_value<bool>();
+
+	auto debugDrawer = DebugDraw::Get();
+	debugDrawer->BuildBatchRenderers();
+	bool flags;
+	flags = pt.get_child("Developer.Draw AABB").get_value<bool>();
+	if (flags) debugDrawer->SetFlag(DBG_DRAW_BOUNDING_BOX);
+	flags = pt.get_child("Developer.Draw Frustums").get_value<bool>();
+	if (flags) debugDrawer->SetFlag(DBG_DRAW_BOUNDING_FRUSTUM);
+
 }
 
 void Game::InitWindow()
@@ -106,7 +152,7 @@ void Game::InitImGui()
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 	ImGui_ImplDX11_Init(m_windowHandle, d3d->getDevice().Get(), d3d->getContext().Get());
 
-	ImGui::StyleColorsClassic();
+	ImGui::StyleColorsDark();
 }
 
 void Game::Init2D()
@@ -139,11 +185,6 @@ void Game::Init3D()
 	m_woodCabinModel->Create("Resources\\WoodenCabin.obl");
 	m_woodCabinModel->AddInstance();
 	m_woodCabinModel->Scale(0.5f);
-
-#if DEBUG || _DEBUG
-	DebugDraw::Get()->SetDebugFlags(DBG_DRAW_BOUNDING_BOX |
-		DBG_DRAW_BOUNDING_FRUSTUM);
-#endif
 
 }
 
@@ -227,13 +268,21 @@ void Game::Update()
 	if (kb.A)
 		m_camera->StrafeLeft(cameraFrameTime);
 
-	if (kb.U)
+
+	if (g_isDeveloper)
 	{
-		renderer->RSWireframeRender();
-	}
-	if (kb.O)
-	{
-		renderer->RSSolidRender();
+		if (kb.OemTilde)
+		{
+			m_showDeveloperConsole = true;
+		}
+		if (kb.U)
+		{
+			renderer->RSWireframeRender();
+		}
+		if (kb.O)
+		{
+			renderer->RSSolidRender();
+		}
 	}
 
 	if (m_menuActive)
@@ -267,16 +316,6 @@ void Game::End()
 	auto mouse = m_mouse->GetState();
 	auto renderer = Direct3D11::Get();
 
-#if DEBUG || _DEBUG
-	ImGui::Begin("Debug", 0, ImGuiWindowFlags_NoNav |
-		ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-	
-	ImGui::Text("Application average %.5f s/frame (%.1f FPS)", 1.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-	ImGui::Text("Draw calls: %d", g_drawCalls);
-
-	ImGui::End();
-#endif
-
 	bool hasMSAA = renderer->m_hasMSAA;
 
 	ImGui::Begin("Settings", 0, ImGuiWindowFlags_NoNav |
@@ -293,30 +332,80 @@ void Game::End()
 
 	ImGui::End();
 
+	if (m_showDeveloperConsole)
+	{
+		ImGui::Begin("Debug", 0, ImGuiWindowFlags_NoNav |
+			ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+
+		ImGui::Text("Application average %.5f s/frame (%.1f FPS)", 1.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::Text("Draw calls: %d", g_drawCalls);
+
+		ImGui::End();
+
+		ImGui::Begin("Developer");
+
+		auto debugDrawer = DebugDraw::Get();
+		bool bDrawAABB = debugDrawer->RenderBoundingBox();
+		ImGui::Checkbox("Draw Bounding Boxes", &bDrawAABB);
+		bool bDrawFrustum = debugDrawer->RenderBoundingFrustum();
+		ImGui::Checkbox("Draw Bounding Frustums", &bDrawFrustum);
+
+		if (bDrawAABB != debugDrawer->RenderBoundingBox())
+		{
+			debugDrawer->ToggleFlag(DBG_DRAW_BOUNDING_BOX);
+		}
+		if (bDrawFrustum != debugDrawer->RenderBoundingFrustum())
+		{
+			debugDrawer->ToggleFlag(DBG_DRAW_BOUNDING_FRUSTUM);
+		}
+
+		if (ImGui::Button("Close", ImVec2(50, 30)))
+			m_showDeveloperConsole = false;
+
+		ImGui::End();
+	}
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	renderer->End();
 }
 
+void Game::WriteSettings()
+{
+	boost::property_tree::ptree pt;
+
+	pt.put("Graphics.VSync", Direct3D11::Get()->m_hasVerticalSync);
+	pt.put("Graphics.MSAA", Direct3D11::Get()->m_hasMSAA);
+
+	pt.put("Gameplay.Mouse sensivity", m_mouseSensivity);
+	pt.put("Gameplay.Developer", g_isDeveloper);
+
+	auto debugDrawer = DebugDraw::Get();
+	pt.put("Developer.Draw AABB", debugDrawer->RenderBoundingBox());
+	pt.put("Developer.Draw Frustums", debugDrawer->RenderBoundingFrustum());
+
+	boost::property_tree::json_parser::write_json("Settings.json", pt);
+}
+
 void Game::Render()
 {
-#if DEBUG || _DEBUG
-	g_drawCalls = 0;
-#endif
 	auto renderer = Direct3D11::Get();
 	if (!renderer->Available())
 		return;
 	Begin();
 
 
-	auto debugDrawer = DebugDraw::Get();
-	debugDrawer->Begin();
-
 	IGameObject::BindStaticVertexBuffer();
 	
 #if DEBUG || _DEBUG
 	m_debugSquare->Render<TextureShader, true>(m_screen.get());
 #endif
+
+	auto debugDrawer = DebugDraw::Get();
+	if (g_isDeveloper)
+	{
+		g_drawCalls = 0;
+		debugDrawer->Begin();
+	}
 
 	TextureLightShader::Get()->bind();
 
@@ -325,9 +414,11 @@ void Game::Render()
 	m_treeModel->Render<TextureLightShader>(m_camera.get());
 	m_woodCabinModel->Render<TextureLightShader>(m_camera.get());
 
-#if DEBUG || _DEBUG
-	debugDrawer->End(m_camera.get());
-#endif
+	if (g_isDeveloper)
+	{
+		debugDrawer->End(m_camera.get());
+	}
+
 
 	End();
 }

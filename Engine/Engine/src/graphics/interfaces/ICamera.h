@@ -20,9 +20,8 @@ public:
 		return m_viewFrustum;
 	}
 
-#if DEBUG || _DEBUG
 	inline void RenderDebug() const;
-#endif
+
 
 protected:
 	void BuildViewFrustum()
