@@ -89,7 +89,7 @@ void Square::RenderTexture(ICamera * cam) const
 		DirectX::XMMatrixTranspose(projection)
 		});
 
-	m_d3d11Context->PSSetSamplers(0, 1, renderer->m_linearWrapSamplerState.GetAddressOf());
+	m_d3d11Context->PSSetSamplers(0, 1, renderer->m_linearWrapSampler.GetAddressOf());
 }
 
 void Square::DrawIndexed(ICamera * cam) const
