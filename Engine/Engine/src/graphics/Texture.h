@@ -1,6 +1,7 @@
 #pragma once
 
 #include "WICTextureLoader.h"
+#include "DDSTextureLoader.h"
 #include "Helpers/TextureUtilities.h"
 #include "../common/common.h"
 

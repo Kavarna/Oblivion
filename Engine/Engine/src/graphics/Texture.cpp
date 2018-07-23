@@ -23,22 +23,47 @@ Texture::~Texture()
 
 void Texture::Create(LPWSTR lpPath, ID3D11Device * device, ID3D11DeviceContext * context, bool hasUAV)
 {
-	if (hasUAV)
+	auto extension = StrRChrW(lpPath, lpPath + lstrlenW(lpPath), L'.');
+	if (StrCmpW(extension, L".dds") == 0)
 	{
-		ThrowIfFailed(
-			CreateWICTextureFromFile(device, context, lpPath,
-				reinterpret_cast<ID3D11Resource**>(mTexture.GetAddressOf()), &mTextureSRV,
-				D3D11_BIND_FLAG::D3D11_BIND_UNORDERED_ACCESS)
-		);
-		CreateUAV();
-		mHasUAV = true;
+		if (hasUAV)
+		{
+			ThrowIfFailed(
+				DirectX::CreateDDSTextureFromFile(device, context, lpPath,
+					reinterpret_cast<ID3D11Resource**>(mTexture.GetAddressOf()),
+					&mTextureSRV, D3D11_BIND_FLAG::D3D11_BIND_UNORDERED_ACCESS)
+			);
+			CreateUAV();
+			mHasUAV = true;
+		}
+		else
+		{
+			ThrowIfFailed(
+				DirectX::CreateDDSTextureFromFile(device, context, lpPath,
+					reinterpret_cast<ID3D11Resource**>(mTexture.GetAddressOf()),
+					&mTextureSRV)
+			);
+		}
 	}
 	else
 	{
-		ThrowIfFailed(
-			CreateWICTextureFromFile(device, context, lpPath,
-				reinterpret_cast<ID3D11Resource**>(mTexture.GetAddressOf()), &mTextureSRV)
-		);
+		if (hasUAV)
+		{
+			ThrowIfFailed(
+				CreateWICTextureFromFile(device, context, lpPath,
+					reinterpret_cast<ID3D11Resource**>(mTexture.GetAddressOf()), &mTextureSRV,
+					D3D11_BIND_FLAG::D3D11_BIND_UNORDERED_ACCESS)
+			);
+			CreateUAV();
+			mHasUAV = true;
+		}
+		else
+		{
+			ThrowIfFailed(
+				CreateWICTextureFromFile(device, context, lpPath,
+					reinterpret_cast<ID3D11Resource**>(mTexture.GetAddressOf()), &mTextureSRV)
+			);
+		}
 	}
 }
 

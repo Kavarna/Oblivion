@@ -152,6 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\graphics\DDSTextureLoader.cpp" />
     <ClCompile Include="src\graphics\Helpers\DebugDraw.cpp" />
     <ClCompile Include="src\graphics\interfaces\ICamera.cpp" />
     <ClCompile Include="src\graphics\Square.cpp" />
@@ -181,6 +182,7 @@
     <ClCompile Include="src\graphics\Shaders\TextureShader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\graphics\DDSTextureLoader.h" />
     <ClInclude Include="src\graphics\Helpers\DebugDraw.h" />
     <ClInclude Include="src\graphics\Square.h" />
     <ClInclude Include="src\graphics\Projection.h" />

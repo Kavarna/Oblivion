@@ -5,7 +5,7 @@
     },
     "Gameplay": {
         "Mouse sensivity": "2",
-        "Developer": "true"
+        "Developer": "false"
     },
     "Developer": {
         "Draw AABB": "false",

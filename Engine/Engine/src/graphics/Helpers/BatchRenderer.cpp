@@ -54,15 +54,15 @@ void BatchRenderer::End(ICamera * cam, D3D11_PRIMITIVE_TOPOLOGY topology)
 
 	ShaderHelper::UnmapBuffer(m_d3d11Context.Get(), m_vertexBuffer.Get());
 
-
-	m_d3d11Context->IASetPrimitiveTopology(topology);
-	UINT stride = sizeof(BatchShader::SVertex);
-	UINT offset = 0;
-	m_d3d11Context->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), &stride, &offset);
-	m_d3d11Context->Draw(m_currentIndex, 0);
-
-#if DEBUG || _DEBUG
-	g_drawCalls++;
-#endif
+	if (m_currentIndex)
+	{
+		m_d3d11Context->IASetPrimitiveTopology(topology);
+		UINT stride = sizeof(BatchShader::SVertex);
+		UINT offset = 0;
+		m_d3d11Context->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), &stride, &offset);
+		m_d3d11Context->Draw(m_currentIndex, 0);
+		if (g_isDeveloper)
+			g_drawCalls++;
+	}
 }
 

@@ -109,7 +109,6 @@ void Square::DrawIndexed(ICamera * cam) const
 	BindMaterial(m_material, (int)Shader::ShaderType::ePixel);
 	m_d3d11Context->DrawIndexedInstanced(GetIndexCount(),
 		renderInstances, 0, m_vertexRange.begin, 0);
-#if DEBUG || _DEBUG
-	g_drawCalls++;
-#endif
+	if (g_isDeveloper)
+		g_drawCalls++;
 }

@@ -119,9 +119,8 @@ void Model::DrawIndexedInstanced(ICamera * cam) const
 		m_d3d11Context->DrawIndexedInstanced((UINT)(mesh.m_indexRange.end - mesh.m_indexRange.begin),
 			(UINT)renderInstances, (UINT)mesh.m_indexRange.begin,
 			(UINT)mesh.m_vertexRange.begin, 0);
-#if DEBUG || _DEBUG
-		g_drawCalls++;
-#endif
+		if (g_isDeveloper)
+			g_drawCalls++;
 	}
 	auto renderer = Direct3D11::Get();
 	for (auto & mesh : m_meshes)
@@ -493,32 +492,33 @@ void Model::Create(EDefaultObject object)
 		if (object != EDefaultObject::Grid)
 		{
 			m_materials.emplace_back();
-			m_materials.back().hasBumpMap = FALSE;
+			m_materials.back().hasBumpMap = TRUE;
 			m_materials.back().hasSpecularMap = FALSE;
 			m_materials.back().hasTexture = TRUE;
 			m_materials.back().name = "Default";
 			m_materials.back().opacity = 1.0f;
 			m_materials.back().specular = 1000.0f;
-			m_materials.back().diffuseTexture = std::make_unique<Texture>((LPWSTR)L"Resources/Marble.jpg", m_d3d11Device.Get(), m_d3d11Context.Get());
+			m_materials.back().diffuseTexture = std::make_unique<Texture>((LPWSTR)L"Resources/Stones.dds", m_d3d11Device.Get(), m_d3d11Context.Get());
+			m_materials.back().bumpMap = std::make_unique<Texture>((LPWSTR)L"Resources/Stones_nmap.dds", m_d3d11Device.Get(), m_d3d11Context.Get());
 			m_meshes.back().m_materialIndex = 0;
 		}
 		else
 		{
 			m_materials.emplace_back();
-			m_materials.back().hasBumpMap = FALSE;
+			m_materials.back().hasBumpMap = TRUE;
 			m_materials.back().hasSpecularMap = FALSE;
 			m_materials.back().hasTexture = TRUE;
 			m_materials.back().name = "Default";
 			m_materials.back().opacity = 1.0f;
 			m_materials.back().specular = 1000.0f;
-			m_materials.back().diffuseTexture = std::make_unique<Texture>((LPWSTR)L"Resources/Grass.jpg", m_d3d11Device.Get(), m_d3d11Context.Get());
+			m_materials.back().diffuseTexture = std::make_unique<Texture>((LPWSTR)L"Resources/floor.dds", m_d3d11Device.Get(), m_d3d11Context.Get());
+			m_materials.back().bumpMap = std::make_unique<Texture>((LPWSTR)L"Resources/floor_nmap.dds", m_d3d11Device.Get(), m_d3d11Context.Get());
 			m_meshes.back().m_materialIndex = 0;
 		}
 	}
 	catch (...)
 	{
-		DX::OutputVDebugString(L"Can't open texture: \"Resources/Marble.jpg\"\n");
-		throw std::exception("Can't find resources");
+		THROW_ERROR("Can't open texture: \"Resources/stones.jpg\"");
 	}
 
 	ShaderHelper::CreateBuffer(m_d3d11Device.Get(), &m_indexBuffer,
