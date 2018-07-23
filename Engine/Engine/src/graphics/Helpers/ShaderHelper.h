@@ -2,6 +2,18 @@
 
 #include "../../common/common.h"
 
+namespace Shader
+{
+	enum class ShaderType
+	{
+		eVertex		= 0b000001,
+		eHull		= 0b000010,
+		eDomain		= 0b000100,
+		eGeometry	= 0b001000,
+		ePixel		= 0b010000,
+		eCompute	= 0b100000
+	};
+}
 
 namespace ShaderHelper
 {
@@ -153,4 +165,63 @@ namespace ShaderHelper
 				);
 		}
 	}
+
+	inline void BindConstantBuffer(ID3D11DeviceContext * context,
+		uint32_t slot, uint32_t num, ID3D11Buffer *const* buffer, uint32_t shader)
+	{
+		if (shader & (uint32_t)Shader::ShaderType::eVertex)
+		{
+			context->VSSetConstantBuffers(slot, num, buffer);
+		}
+		if (shader & (uint32_t)Shader::ShaderType::eHull)
+		{
+			context->HSSetConstantBuffers(slot, num, buffer);
+		}
+		if (shader & (uint32_t)Shader::ShaderType::eDomain)
+		{
+			context->DSSetConstantBuffers(slot, num, buffer);
+		}
+		if (shader & (uint32_t)Shader::ShaderType::eGeometry)
+		{
+			context->GSSetConstantBuffers(slot, num, buffer);
+		}
+		if (shader & (uint32_t)Shader::ShaderType::ePixel)
+		{
+			context->PSSetConstantBuffers(slot, num, buffer);
+		}
+		if (shader & (uint32_t)Shader::ShaderType::eCompute)
+		{
+			context->CSSetConstantBuffers(slot, num, buffer);
+		}
+	}
+
+	inline void BindResources(ID3D11DeviceContext * context,
+		uint32_t slot, uint32_t num, ID3D11ShaderResourceView *const* buffer, uint32_t shader)
+	{
+		if (shader & (uint32_t)Shader::ShaderType::eVertex)
+		{
+			context->VSSetShaderResources(slot, num, buffer);
+		}
+		if (shader & (uint32_t)Shader::ShaderType::eHull)
+		{
+			context->HSSetShaderResources(slot, num, buffer);
+		}
+		if (shader & (uint32_t)Shader::ShaderType::eDomain)
+		{
+			context->DSSetShaderResources(slot, num, buffer);
+		}
+		if (shader & (uint32_t)Shader::ShaderType::eGeometry)
+		{
+			context->GSSetShaderResources(slot, num, buffer);
+		}
+		if (shader & (uint32_t)Shader::ShaderType::ePixel)
+		{
+			context->PSSetShaderResources(slot, num, buffer);
+		}
+		if (shader & (uint32_t)Shader::ShaderType::eCompute)
+		{
+			context->CSSetShaderResources(slot, num, buffer);
+		}
+	}
+		
 }

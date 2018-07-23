@@ -16,15 +16,6 @@ namespace Shader
 		BOOL hasSpecular; // 4
 	} SMaterial, Material;
 
-	enum class ShaderType
-	{
-		eVertex = 0b00001,
-		eHull = 0b00010,
-		eDomain = 0b00100,
-		eGeometry = 0b01000,
-		ePixel = 0b10000
-	};
-
 }
 
 class IShader : public IObject

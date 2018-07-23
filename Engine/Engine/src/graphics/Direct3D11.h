@@ -54,13 +54,17 @@ private: // Attributes
 	bool										m_available					= false;
 	UINT										m_maxMSAAQualityLevel		= 0;
 
-public: // States
+public:
+	// Samplers
+	MicrosoftPointer<ID3D11SamplerState>		m_linearWrapSampler			= nullptr;
+	MicrosoftPointer<ID3D11SamplerState>		m_linearClampSampler		= nullptr;
+	MicrosoftPointer<ID3D11SamplerState>		m_anisotropicWrapSampler	= nullptr;
+
+private: // States
 	// Rasterizer
 	MicrosoftPointer<ID3D11RasterizerState>		m_wireFrameNoCulling		= nullptr;
 	MicrosoftPointer<ID3D11RasterizerState>		m_solidBackfaceCulling		= nullptr;
 	MicrosoftPointer<ID3D11RasterizerState>		m_solidNoCulling			= nullptr;
-	// Samplers
-	MicrosoftPointer<ID3D11SamplerState>		m_linearWrapSamplerState	= nullptr;
 	// Blend
 	MicrosoftPointer<ID3D11BlendState>			m_transparencyBlendState	= nullptr;
 	// Depth

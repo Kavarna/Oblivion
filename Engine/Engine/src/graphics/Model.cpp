@@ -82,7 +82,7 @@ void Model::RenderTextureLightShader(ICamera * cam) const
 		DirectX::XMMatrixTranspose(cam->GetProjection())
 		});
 
-	m_d3d11Context->PSSetSamplers(0, 1, renderer->m_linearWrapSamplerState.GetAddressOf());
+	m_d3d11Context->PSSetSamplers(0, 1, renderer->m_linearWrapSampler.GetAddressOf());
 }
 
 void Model::RenderTexture(ICamera * cam) const
@@ -94,7 +94,7 @@ void Model::RenderTexture(ICamera * cam) const
 		DirectX::XMMatrixTranspose(cam->GetProjection())
 		});
 
-	m_d3d11Context->PSSetSamplers(0, 1, renderer->m_linearWrapSamplerState.GetAddressOf());
+	m_d3d11Context->PSSetSamplers(0, 1, renderer->m_linearWrapSampler.GetAddressOf());
 }
 
 void Model::DrawIndexedInstanced(ICamera * cam) const

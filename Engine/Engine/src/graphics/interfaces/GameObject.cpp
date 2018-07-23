@@ -137,31 +137,9 @@ void IGameObject::BindMaterial(Rendering::material_t const & mat, int shader) co
 		mat.specularMap ? mat.specularMap->GetTextureSRV() : nullptr,
 	};
 
-	if (shader & (int)Shader::ShaderType::eVertex)
-	{
-		m_d3d11Context->VSSetConstantBuffers(2, 1, m_materialBuffer.GetAddressOf());
-		m_d3d11Context->VSSetShaderResources(0, 3, resources);
-	}
-	if (shader & (int)Shader::ShaderType::eHull)
-	{
-		m_d3d11Context->HSSetConstantBuffers(2, 1, m_materialBuffer.GetAddressOf());
-		m_d3d11Context->HSSetShaderResources(0, 3, resources);
-	}
-	if (shader & (int)Shader::ShaderType::eDomain)
-	{
-		m_d3d11Context->DSSetConstantBuffers(2, 1, m_materialBuffer.GetAddressOf());
-		m_d3d11Context->DSSetShaderResources(0, 3, resources);
-	}
-	if (shader & (int)Shader::ShaderType::eGeometry)
-	{
-		m_d3d11Context->GSSetConstantBuffers(2, 1, m_materialBuffer.GetAddressOf());
-		m_d3d11Context->GSSetShaderResources(0, 3, resources);
-	}
-	if (shader & (int)Shader::ShaderType::ePixel)
-	{
-		m_d3d11Context->PSSetConstantBuffers(2, 1, m_materialBuffer.GetAddressOf());
-		m_d3d11Context->PSSetShaderResources(0, 3, resources);
-	}
+
+	ShaderHelper::BindConstantBuffer(m_d3d11Context.Get(), 2, 1, m_materialBuffer.GetAddressOf(), shader);
+	ShaderHelper::BindResources(m_d3d11Context.Get(), 0, 3, resources, shader);
 }
 
 void IGameObject::BindStaticVertexBuffer()

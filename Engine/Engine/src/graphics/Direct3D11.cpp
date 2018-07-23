@@ -246,7 +246,22 @@ void Direct3D11::InitializeStates()
 	sampDesc.MinLOD = 0;
 	sampDesc.MipLODBias = 0;
 	ThrowIfFailed(
-		m_d3d11Device->CreateSamplerState(&sampDesc, &m_linearWrapSamplerState)
+		m_d3d11Device->CreateSamplerState(&sampDesc, &m_linearWrapSampler)
+	);
+	sampDesc.AddressU =
+		sampDesc.AddressV =
+		sampDesc.AddressW =
+		D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP;
+	ThrowIfFailed(
+		m_d3d11Device->CreateSamplerState(&sampDesc, &m_linearClampSampler)
+	);
+	sampDesc.Filter = D3D11_FILTER::D3D11_FILTER_ANISOTROPIC;
+	sampDesc.MaxAnisotropy = 16;
+	sampDesc.MaxLOD = FLT_MAX;
+	sampDesc.MinLOD = FLT_MIN;
+	sampDesc.MipLODBias = 0;
+	ThrowIfFailed(
+		m_d3d11Device->CreateSamplerState(&sampDesc, &m_anisotropicWrapSampler)
 	);
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~BLEND STATES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
