@@ -165,7 +165,8 @@ void Game::Init3D()
 	m_testModel = std::make_unique<Model>();
 	m_testModel->Create(EDefaultObject::Sphere);
 	m_testModel->AddInstance();
-	m_testModel->Translate(3.0f, 3.7f, 0.0f);
+	m_testModel->Scale(10.0f);
+	m_testModel->Translate(30.0f, 10.0f, 0.0f);
 
 	m_groundModel = std::make_unique<Model>();
 	m_groundModel->Create(EDefaultObject::Grid);
@@ -271,9 +272,15 @@ void Game::Update()
 
 	if (g_isDeveloper)
 	{
-		if (kb.OemTilde)
+		static bool bTilde = false;
+		if (kb.OemTilde && !bTilde)
 		{
-			m_showDeveloperConsole = true;
+			bTilde = true;
+			m_showDeveloperConsole = !m_showDeveloperConsole;
+		}
+		if (!kb.OemTilde)
+		{
+			bTilde = false;
 		}
 		if (kb.U)
 		{
