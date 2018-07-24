@@ -67,7 +67,7 @@ void TextureShader::Create()
 		ThrowIfFailed(
 			m_d3d11Device->CreateInputLayout(elementDesc, arraySize,
 				m_shaderBlobs[0]->GetBufferPointer(), m_shaderBlobs[0]->GetBufferSize(),
-				&m_layout)
+				&m_inputLayout)
 		);
 
 		ID3D11PixelShader ** PS = &m_pixelShader;
@@ -86,22 +86,9 @@ void TextureShader::Create()
 	CATCH;
 }
 
-void TextureShader::bind() const
+const Pipeline TextureShader::GetPipelineType() const
 {
-#if DEBUG || _DEBUG
-	if (IShader::shouldBind<TextureShader>())
-#endif
-	{
-		m_d3d11Context->IASetInputLayout(m_layout.Get());
-		m_d3d11Context->VSSetShader(m_vertexShader.Get(), nullptr, 0);
-		m_d3d11Context->PSSetShader(m_pixelShader.Get(), nullptr, 0);
-	}
-#if DEBUG || _DEBUG
-	else
-	{
-		DX::OutputVDebugString(L"[LOG]: Attempting to bind the same shader multiple times. This might be a performance hit.\n");
-	}
-#endif
+	return Pipeline::Texture;
 }
 
 void TextureShader::SetCameraInformations(SCameraInfo const & camInfo)

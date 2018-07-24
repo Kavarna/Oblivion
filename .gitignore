@@ -215,3 +215,8 @@ ModelManifest.xml
 *.opendb
 /Engine/Engine/Shaders
 /Engine/Engine/imgui.ini
+/Engine/Engine/Settings.json
+/Engine/Engine/src/graphics/Shaders/DisplacementShader.h
+/Engine/Engine/src/graphics/Shaders/DisplacementShader.cpp
+/Engine/Engine/src/shaders/DisplacementMappingVertexShader.hlsl
+/Engine/Engine/src/shaders/DisplacementMappingPixelShader.hlsl

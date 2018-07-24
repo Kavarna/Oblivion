@@ -73,6 +73,68 @@ int IGameObject::PrepareInstances(std::function<bool(uint32_t)> & shouldRender) 
 	return renderInstances;
 }
 
+void IGameObject::Render(ICamera * cam, const Pipeline& p) const
+{
+	switch (p)
+	{
+	case Pipeline::Basic:
+		RenderBasic(cam);
+		break;
+	case Pipeline::Texture:
+		RenderTexture(cam);
+		break;
+	case Pipeline::TextureLight:
+		RenderTextureLight(cam);
+		break;
+	default:
+		return;
+		break;
+	}
+	PrepareIA(p);
+	DrawIndexedInstanced(cam, p);
+}
+
+void IGameObject::RenderBasic(ICamera * cam) const
+{
+	static BasicShader * shader = BasicShader::Get();
+	shader->bind();
+	static DirectX::XMMATRIX VP;
+	m_d3d11Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	VP = cam->GetView() * cam->GetProjection();
+	VP = DirectX::XMMatrixTranspose(VP);
+	shader->SetCameraInformations({ VP });
+	m_bindMaterialToShader = (int)Shader::ShaderType::ePixel;
+}
+
+void IGameObject::RenderTexture(ICamera * cam) const
+{
+	static auto renderer = Direct3D11::Get();
+	static TextureShader * shader = TextureShader::Get();
+	shader->bind();
+	m_d3d11Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	shader->SetCameraInformations({
+		DirectX::XMMatrixTranspose(cam->GetView()),
+		DirectX::XMMatrixTranspose(cam->GetProjection())
+		});
+
+	m_d3d11Context->PSSetSamplers(0, 1, renderer->m_linearWrapSampler.GetAddressOf());
+	m_bindMaterialToShader = (int)Shader::ShaderType::ePixel;
+}
+
+void IGameObject::RenderTextureLight(ICamera * cam) const
+{
+	static auto renderer = Direct3D11::Get();
+	static TextureLightShader * shader = TextureLightShader::Get();
+	shader->bind();
+	m_d3d11Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	shader->SetCameraInformations({
+		DirectX::XMMatrixTranspose(cam->GetView()),
+		DirectX::XMMatrixTranspose(cam->GetProjection())
+		});
+
+	m_d3d11Context->PSSetSamplers(0, 1, renderer->m_linearWrapSampler.GetAddressOf());
+	m_bindMaterialToShader = (int)Shader::ShaderType::ePixel;
+}
 
 
 Range IGameObject::AddVertices(std::vector<SVertex> & vertices)

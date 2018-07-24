@@ -20,7 +20,7 @@ public:
 	};
 public:
 	void Create() override;
-	void bind() const override;
+	const Pipeline GetPipelineType() const override;
 
 	void SetCameraInformations(SCameraInfo const& info) const;
 
@@ -28,10 +28,7 @@ public:
 
 
 private:
-	MicrosoftPointer<ID3D11VertexShader>		m_vertexShader;
-	MicrosoftPointer<ID3D11PixelShader>			m_pixelShader;
 	std::array<MicrosoftPointer<ID3DBlob>, 2>	m_shaderBlobs;
-	MicrosoftPointer<ID3D11InputLayout>			m_layout;
 
 	MicrosoftPointer<ID3D11Buffer>				m_cameraBuffer;
 

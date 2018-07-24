@@ -5,6 +5,9 @@ struct Material
 	int hasTexture; // 4
 	int hasBump; // 4
 	int hasSpecular; // 4
+	float minTessFactor; // 4
+	float maxTessFactor; // 4
+	float2 pad; // 8
 
 	float4 GetColor(Texture2D tex, SamplerState sam, float2 texCoords)
 	{

@@ -15,7 +15,6 @@
     <ClCompile Include="src\imgui\imgui_impl_dx11.cpp" />
     <ClCompile Include="src\graphics\Camera.cpp" />
     <ClCompile Include="src\graphics\Model.cpp" />
-    <ClCompile Include="src\graphics\interfaces\Shader.cpp" />
     <ClCompile Include="src\graphics\Helpers\GeometryGenerator.cpp" />
     <ClCompile Include="src\graphics\Shaders\BasicShader.cpp" />
     <ClCompile Include="src\graphics\Shaders\TextureLightShader.cpp" />
@@ -29,6 +28,8 @@
     <ClCompile Include="src\graphics\Helpers\DebugDraw.cpp" />
     <ClCompile Include="src\graphics\interfaces\ICamera.cpp" />
     <ClCompile Include="src\graphics\DDSTextureLoader.cpp" />
+    <ClCompile Include="src\graphics\Shaders\DisplacementShader.cpp" />
+    <ClCompile Include="src\graphics\interfaces\Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\commonmath.h" />
@@ -72,6 +73,7 @@
     <ClInclude Include="src\graphics\Helpers\DebugDraw.h" />
     <ClInclude Include="src\graphics\interfaces\ICamera.h" />
     <ClInclude Include="src\graphics\DDSTextureLoader.h" />
+    <ClInclude Include="src\graphics\Shaders\DisplacementShader.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\BasicVertexShader.hlsl" />
@@ -82,6 +84,8 @@
     <FxCompile Include="src\shaders\BatchPixelShader.hlsl" />
     <FxCompile Include="src\shaders\TextureVertexShader.hlsl" />
     <FxCompile Include="src\shaders\TexturePixelShader.hlsl" />
+    <FxCompile Include="src\shaders\DisplacementMappingVertexShader.hlsl" />
+    <FxCompile Include="src\shaders\DisplacementMappingPixelShader.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\Lights.hlsli" />

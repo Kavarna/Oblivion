@@ -1,3 +1,3 @@
 #include "Shader.h"
 
-std::type_index IShader::m_currentlyBoundShader = std::type_index(typeid(nullptr));
+Pipeline IShader::m_currentlyBoundPipeline = Pipeline::None;

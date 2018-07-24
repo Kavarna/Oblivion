@@ -18,6 +18,13 @@ namespace Shader
 
 }
 
+enum class Pipeline
+{
+	BatchShader, Basic,
+	Texture, TextureLight,
+	None,
+};
+
 class IShader : public IObject
 {
 public:
@@ -27,23 +34,46 @@ protected:
 	virtual ~IShader() {};
 
 private:
-	static std::type_index					m_currentlyBoundShader;
+	static Pipeline							m_currentlyBoundPipeline;
 
 protected:
-	template <class Shader>
-	static bool								shouldBind()
+	static bool								shouldBind(const Pipeline& p)
 	{
-		// Gets the shader type and checks if it's already 
-		std::type_index shaderType(typeid(Shader));
-		if (shaderType == m_currentlyBoundShader)
+		if (p == m_currentlyBoundPipeline)
 			return false;
-		m_currentlyBoundShader = shaderType;
 		return true;
-	};
+	}
+
+protected:
+	MicrosoftPointer<ID3D11VertexShader>	m_vertexShader;
+	MicrosoftPointer<ID3D11HullShader>		m_hullShader;
+	MicrosoftPointer<ID3D11DomainShader>	m_domainShader;
+	MicrosoftPointer<ID3D11GeometryShader>	m_geometryShader;
+	MicrosoftPointer<ID3D11PixelShader>		m_pixelShader;
+	MicrosoftPointer<ID3D11ComputeShader>	m_computeShader;
+	MicrosoftPointer<ID3D11InputLayout>		m_inputLayout;
+
+protected:
+	virtual const Pipeline					GetPipelineType() const = 0;
 
 public:
-	virtual void							bind() const	= 0;
 	virtual void							Create()		= 0;
+	void									bind() const
+	{
+		auto p = GetPipelineType();
+		if (shouldBind(p))
+		{
+			m_currentlyBoundPipeline = p;
+
+			m_d3d11Context->VSSetShader(m_vertexShader.Get(), nullptr, 0);
+			m_d3d11Context->IASetInputLayout(m_inputLayout.Get());
+			m_d3d11Context->HSSetShader(m_hullShader.Get(), nullptr, 0);
+			m_d3d11Context->DSSetShader(m_domainShader.Get(), nullptr, 0);
+			m_d3d11Context->GSSetShader(m_geometryShader.Get(), nullptr, 0);
+			m_d3d11Context->PSSetShader(m_pixelShader.Get(), nullptr, 0);
+			m_d3d11Context->CSSetShader(m_computeShader.Get(), nullptr, 0);
+		}
+	}
 	
 	static IShader*							Get()
 	{

@@ -70,6 +70,14 @@ public:
 	virtual			void							RemoveInstance(int ID);
 	virtual			void							RemoveInstance(CommonTypes::Range const& range);
 	virtual			int								PrepareInstances(std::function<bool(uint32_t)> & func) const;
+	virtual			void							Render(ICamera * cam, const Pipeline& p) const;
+
+protected:
+	virtual			void							RenderBasic(ICamera * cam) const;
+	virtual			void							RenderTexture(ICamera * cam) const;
+	virtual			void							RenderTextureLight(ICamera * cam) const;
+	virtual			void							DrawIndexedInstanced(ICamera * cam, const Pipeline&) const = 0;
+	virtual			void							PrepareIA(const Pipeline&) const = 0;
 
 protected:
 	/*
@@ -93,4 +101,5 @@ protected:
 			MicrosoftPointer<ID3D11Buffer>			m_instanceBuffer;
 			std::vector<DirectX::XMMATRIX>			m_objectWorld;
 			MicrosoftPointer<ID3D11Buffer>			m_materialBuffer;
+	mutable int								m_bindMaterialToShader;
 };

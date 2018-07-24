@@ -76,24 +76,13 @@ void Square::TranslateTo(float X, float Y, int InstanceID)
 	m_objectWorld[InstanceID] *= DirectX::XMMatrixTranslation(NewX, NewY, 0.0f);
 }
 
-void Square::RenderTexture(ICamera * cam) const
+void Square::DrawIndexedInstanced(ICamera * cam, const Pipeline& p) const
 {
-	static auto renderer = Direct3D11::Get();
-	static TextureShader * shader = TextureShader::Get();
-	
-	DirectX::XMMATRIX view = cam->GetView();
-	DirectX::XMMATRIX projection = cam->GetProjection();
-
-	shader->SetCameraInformations({
-		DirectX::XMMatrixTranspose(view),
-		DirectX::XMMatrixTranspose(projection)
-		});
-
-	m_d3d11Context->PSSetSamplers(0, 1, renderer->m_linearWrapSampler.GetAddressOf());
-}
-
-void Square::DrawIndexed(ICamera * cam) const
-{
+	if (p == Pipeline::Basic || p == Pipeline::BatchShader || p == Pipeline::TextureLight)
+	{
+		// LOG Message here
+		return;
+	}
 	std::function<bool(uint32_t)> func = [](int) ->bool { return true; };
 	int renderInstances = PrepareInstances(func);
 	ID3D11Buffer * instances[] =
@@ -111,4 +100,10 @@ void Square::DrawIndexed(ICamera * cam) const
 		renderInstances, 0, m_vertexRange.begin, 0);
 	if (g_isDeveloper)
 		g_drawCalls++;
+}
+
+void Square::PrepareIA(const Pipeline & p) const
+{
+	m_d3d11Context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
+	m_d3d11Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }

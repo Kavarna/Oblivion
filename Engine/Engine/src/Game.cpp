@@ -219,7 +219,7 @@ void Game::InitSizeDependent()
 	{
 #if DEBUG || _DEBUG
 		m_debugSquare = std::make_unique<Square>();
-		m_debugSquare->Create();
+		m_debugSquare->Create("Resources/floor.dds");
 		m_debugSquare->AddInstance();
 		m_debugSquare->SetWindowInfo((float)m_windowWidth, (float)m_windowHeight);
 		m_debugSquare->Scale(100.0f, 100.0f);
@@ -404,7 +404,7 @@ void Game::Render()
 	IGameObject::BindStaticVertexBuffer();
 	
 #if DEBUG || _DEBUG
-	m_debugSquare->Render<TextureShader, true>(m_screen.get());
+	m_debugSquare->Render(m_screen.get(), Pipeline::Texture);
 #endif
 
 	auto debugDrawer = DebugDraw::Get();
@@ -416,10 +416,10 @@ void Game::Render()
 
 	TextureLightShader::Get()->bind();
 
-	m_testModel->Render<TextureLightShader>(m_camera.get());
-	m_groundModel->Render<TextureLightShader>(m_camera.get());
-	m_treeModel->Render<TextureLightShader>(m_camera.get());
-	m_woodCabinModel->Render<TextureLightShader>(m_camera.get());
+	m_testModel->Render(m_camera.get(), Pipeline::TextureLight);
+	m_groundModel->Render(m_camera.get(), Pipeline::TextureLight);
+	m_treeModel->Render(m_camera.get(), Pipeline::TextureLight);
+	m_woodCabinModel->Render(m_camera.get(), Pipeline::TextureLight);
 
 	if (g_isDeveloper)
 	{

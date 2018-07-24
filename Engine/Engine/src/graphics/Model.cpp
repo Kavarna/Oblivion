@@ -64,40 +64,7 @@ void Model::SetMaterial(Rendering::Material && mat, int materialIndex)
 	m_materials[materialIndex] = std::move(mat);
 }
 
-void Model::RenderBasicShader(ICamera* cam) const
-{
-	static BasicShader * shader = BasicShader::Get();
-	static DirectX::XMMATRIX VP;
-	VP = cam->GetView() * cam->GetProjection();
-	VP = DirectX::XMMatrixTranspose(VP);
-	shader->SetCameraInformations({ VP });
-}
-
-void Model::RenderTextureLightShader(ICamera * cam) const
-{
-	static auto renderer = Direct3D11::Get();
-	static TextureLightShader * shader = TextureLightShader::Get();
-	shader->SetCameraInformations({
-		DirectX::XMMatrixTranspose(cam->GetView()),
-		DirectX::XMMatrixTranspose(cam->GetProjection())
-		});
-
-	m_d3d11Context->PSSetSamplers(0, 1, renderer->m_linearWrapSampler.GetAddressOf());
-}
-
-void Model::RenderTexture(ICamera * cam) const
-{
-	static auto renderer = Direct3D11::Get();
-	static TextureShader * shader = TextureShader::Get();
-	shader->SetCameraInformations({
-		DirectX::XMMatrixTranspose(cam->GetView()),
-		DirectX::XMMatrixTranspose(cam->GetProjection())
-		});
-
-	m_d3d11Context->PSSetSamplers(0, 1, renderer->m_linearWrapSampler.GetAddressOf());
-}
-
-void Model::DrawIndexedInstanced(ICamera * cam) const
+void Model::DrawIndexedInstanced(ICamera * cam, const Pipeline& p) const
 {
 	std::function<bool(uint32_t)> func = std::bind(&Model::ShouldRenderInstance, this, cam, std::placeholders::_1);
 	uint32_t renderInstances = PrepareInstances(func);
@@ -105,6 +72,8 @@ void Model::DrawIndexedInstanced(ICamera * cam) const
 	{
 		m_instanceBuffer.Get()
 	};
+	m_d3d11Context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
+	m_d3d11Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	UINT stride = sizeof(DirectX::XMMATRIX);
 	UINT offset = 0;
 	m_d3d11Context->IASetVertexBuffers(1, 1, instances, &stride, &offset);
@@ -115,7 +84,7 @@ void Model::DrawIndexedInstanced(ICamera * cam) const
 	{
 		if (m_materials[mesh.m_materialIndex].opacity != 1.0f)
 			continue;
-		BindMaterial(m_materials[mesh.m_materialIndex], (int)Shader::ShaderType::ePixel);
+		BindMaterial(m_materials[mesh.m_materialIndex], m_bindMaterialToShader);
 		m_d3d11Context->DrawIndexedInstanced((UINT)(mesh.m_indexRange.end - mesh.m_indexRange.begin),
 			(UINT)renderInstances, (UINT)mesh.m_indexRange.begin,
 			(UINT)mesh.m_vertexRange.begin, 0);
@@ -129,7 +98,7 @@ void Model::DrawIndexedInstanced(ICamera * cam) const
 		if (opacity == 1.0f)
 			continue;
 		renderer->OMTransparency(opacity);
-		BindMaterial(m_materials[mesh.m_materialIndex], (int)Shader::ShaderType::ePixel);
+		BindMaterial(m_materials[mesh.m_materialIndex], m_bindMaterialToShader);
 		m_d3d11Context->DrawIndexedInstanced((UINT)(mesh.m_indexRange.end - mesh.m_indexRange.begin),
 			(UINT)renderInstances, (UINT)mesh.m_indexRange.begin,
 			(UINT)mesh.m_vertexRange.begin, 0);
@@ -153,6 +122,12 @@ void Model::DrawIndexedInstanced(ICamera * cam) const
 		}
 	}
 
+}
+
+void Model::PrepareIA(const Pipeline & p) const
+{
+	m_d3d11Context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
+	m_d3d11Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
 bool Model::ShouldRenderInstance(ICamera * cam, uint32_t id) const
