@@ -1,3 +1,6 @@
+#ifndef _LIGHTS_HLSLI_
+#define _LIGHTS_HLSLI_
+
 struct Sun
 {
 	float4 Direction;
@@ -22,12 +25,14 @@ float3 NormalSampleToWorldSpace(float3 Sample,
 	float3 normalT = 2.0f * Sample - 1.0f;
 
 	float3 N = UnitNormalW;
-	float3 T = normalize(T - dot(TangentW, N) * N);
-	float3 B = BinormalW;
+	float3 T = normalize(TangentW - dot(TangentW, N) * N);
+	float3 B = cross(N, T);
 
 	float3x3 TBN = float3x3(T, B, N);
 
-	float3 bumpedNormalW = mul(UnitNormalW, TBN);
+	float3 bumpedNormalW = mul(normalT, TBN);
 
 	return bumpedNormalW;
 }
+
+#endif

@@ -14,6 +14,10 @@ namespace Shader
 		BOOL hasTexture; // 4
 		BOOL hasBump; // 4
 		BOOL hasSpecular; // 4
+		float tessMin; // 4
+		float tessMax; // 4
+		float tessScale;
+		float pad; // 4
 	} SMaterial, Material;
 
 }
@@ -22,6 +26,7 @@ enum class Pipeline
 {
 	BatchShader, Basic,
 	Texture, TextureLight,
+	DisplacementTextureLight,
 	None,
 };
 

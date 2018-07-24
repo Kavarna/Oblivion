@@ -75,6 +75,8 @@ int IGameObject::PrepareInstances(std::function<bool(uint32_t)> & shouldRender) 
 
 void IGameObject::Render(ICamera * cam, const Pipeline& p) const
 {
+	if (!PrepareIA(p))
+		return;
 	switch (p)
 	{
 	case Pipeline::Basic:
@@ -86,11 +88,13 @@ void IGameObject::Render(ICamera * cam, const Pipeline& p) const
 	case Pipeline::TextureLight:
 		RenderTextureLight(cam);
 		break;
+	case Pipeline::DisplacementTextureLight:
+		RenderDisplacementTextureLight(cam);
+		break;
 	default:
 		return;
 		break;
 	}
-	PrepareIA(p);
 	DrawIndexedInstanced(cam, p);
 }
 
@@ -99,7 +103,6 @@ void IGameObject::RenderBasic(ICamera * cam) const
 	static BasicShader * shader = BasicShader::Get();
 	shader->bind();
 	static DirectX::XMMATRIX VP;
-	m_d3d11Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	VP = cam->GetView() * cam->GetProjection();
 	VP = DirectX::XMMatrixTranspose(VP);
 	shader->SetCameraInformations({ VP });
@@ -111,7 +114,6 @@ void IGameObject::RenderTexture(ICamera * cam) const
 	static auto renderer = Direct3D11::Get();
 	static TextureShader * shader = TextureShader::Get();
 	shader->bind();
-	m_d3d11Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	shader->SetCameraInformations({
 		DirectX::XMMatrixTranspose(cam->GetView()),
 		DirectX::XMMatrixTranspose(cam->GetProjection())
@@ -126,7 +128,6 @@ void IGameObject::RenderTextureLight(ICamera * cam) const
 	static auto renderer = Direct3D11::Get();
 	static TextureLightShader * shader = TextureLightShader::Get();
 	shader->bind();
-	m_d3d11Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	shader->SetCameraInformations({
 		DirectX::XMMatrixTranspose(cam->GetView()),
 		DirectX::XMMatrixTranspose(cam->GetProjection())
@@ -136,6 +137,18 @@ void IGameObject::RenderTextureLight(ICamera * cam) const
 	m_bindMaterialToShader = (int)Shader::ShaderType::ePixel;
 }
 
+void IGameObject::RenderDisplacementTextureLight(ICamera * cam) const
+{
+	static auto renderer = Direct3D11::Get();
+	static DisplacementShader * shader = DisplacementShader::Get();
+	shader->bind();
+	shader->SetCameraInfo(cam);
+	m_d3d11Context->PSSetSamplers(0, 1, renderer->m_linearWrapSampler.GetAddressOf());
+	m_d3d11Context->DSSetSamplers(0, 1, renderer->m_linearWrapSampler.GetAddressOf());
+	m_bindMaterialToShader  = (int)Shader::ShaderType::ePixel;
+	m_bindMaterialToShader |= (int)Shader::ShaderType::eVertex;
+	m_bindMaterialToShader |= (int)Shader::ShaderType::eDomain;
+}
 
 Range IGameObject::AddVertices(std::vector<SVertex> & vertices)
 {
@@ -183,12 +196,15 @@ void IGameObject::BindMaterial(Rendering::material_t const & mat, int shader) co
 {
 	auto data = (Shader::material_t*)ShaderHelper::MapBuffer(m_d3d11Context.Get(), m_materialBuffer.Get());
 
-	data->color = mat.diffuseColor;
-	data->hasTexture = mat.hasTexture;
-	data->hasBump = mat.hasBumpMap;
-	data->hasSpecular = mat.hasSpecularMap;
-	data->specular = mat.specular;
-	data->color = mat.diffuseColor;
+	data->color			= mat.diffuseColor;
+	data->hasTexture	= mat.hasTexture;
+	data->hasBump		= mat.hasBumpMap;
+	data->hasSpecular	= mat.hasSpecularMap;
+	data->specular		= mat.specular;
+	data->color			= mat.diffuseColor;
+	data->tessMin		= mat.tessMin;
+	data->tessMax		= mat.tessMax;
+	data->tessScale		= mat.tessScale;
 
 	ShaderHelper::UnmapBuffer(m_d3d11Context.Get(), m_materialBuffer.Get());
 

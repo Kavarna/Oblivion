@@ -63,7 +63,6 @@ private:
 	std::unique_ptr<Model>						m_groundModel;
 	std::unique_ptr<Model>						m_treeModel;
 	std::unique_ptr<Model>						m_woodCabinModel;
-	std::unique_ptr<Model>						m_testModel;
 private:
 	std::unique_ptr<DirectX::Mouse>				m_mouse;
 	std::unique_ptr<DirectX::Keyboard>			m_keyboard;

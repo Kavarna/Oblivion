@@ -45,7 +45,7 @@ void Game::Create(HINSTANCE hInstance, uint32_t width, uint32_t height)
 	m_windowInstance = hInstance;
 	m_windowWidth = width;
 	m_windowHeight = height;
-	
+
 	InitWindow();
 	InitInput();
 	InitDirect3D();
@@ -54,6 +54,7 @@ void Game::Create(HINSTANCE hInstance, uint32_t width, uint32_t height)
 	Init3D();
 	InitSizeDependent();
 	InitSettings();
+	auto shader = DisplacementShader::Get();
 }
 
 void Game::InitSettings()
@@ -162,11 +163,6 @@ void Game::Init2D()
 void Game::Init3D()
 {
 	// auto renderer = Direct3D11::Get();
-	m_testModel = std::make_unique<Model>();
-	m_testModel->Create(EDefaultObject::Sphere);
-	m_testModel->AddInstance();
-	m_testModel->Scale(10.0f);
-	m_testModel->Translate(30.0f, 10.0f, 0.0f);
 
 	m_groundModel = std::make_unique<Model>();
 	m_groundModel->Create(EDefaultObject::Grid);
@@ -186,6 +182,7 @@ void Game::Init3D()
 	m_woodCabinModel->Create("Resources\\WoodenCabin.obl");
 	m_woodCabinModel->AddInstance();
 	m_woodCabinModel->Scale(0.5f);
+	m_woodCabinModel->Translate(0.0f, -0.1f, 0.0f);
 
 }
 
@@ -198,9 +195,9 @@ void Game::InitSizeDependent()
 	if (m_camera)
 	{
 		Camera * cam = new Camera(FOV, HByW, nearZ, farZ);
-		auto camDir = m_camera->GetCamDir();
+		auto camDir = m_camera->GetDirection();
 		cam->SetDirection({ camDir.x,camDir.y,camDir.z,1.0f });
-		auto camPos = m_camera->GetCamPos();
+		auto camPos = m_camera->GetPosition();
 		cam->SetPosition({ camPos.x,camPos.y,camPos.z,1.0f });
 		m_camera.reset(cam);
 	}
@@ -219,7 +216,7 @@ void Game::InitSizeDependent()
 	{
 #if DEBUG || _DEBUG
 		m_debugSquare = std::make_unique<Square>();
-		m_debugSquare->Create("Resources/floor.dds");
+		m_debugSquare->Create();
 		m_debugSquare->AddInstance();
 		m_debugSquare->SetWindowInfo((float)m_windowWidth, (float)m_windowHeight);
 		m_debugSquare->Scale(100.0f, 100.0f);
@@ -297,18 +294,18 @@ void Game::Update()
 	else
 		m_camera->Update(frameTime, mouse.x * m_mouseSensivity, mouse.y * m_mouseSensivity);
 
-	static bool bEscape = false;
-	if (kb.Escape && !bEscape)
+	static bool bClick = false;
+	if (mouse.rightButton && !bClick)
 	{
-		bEscape = true;
+		bClick = true;
 		if (m_menuActive)
 			m_mouse->SetMode(DirectX::Mouse::Mode::MODE_RELATIVE);
 		else
 			m_mouse->SetMode(DirectX::Mouse::Mode::MODE_ABSOLUTE);
 		m_menuActive = !m_menuActive;
 	}
-	else if (!kb.Escape)
-		bEscape = false;
+	else if (!mouse.rightButton)
+		bClick = false;
 }
 
 void Game::Begin()
@@ -400,13 +397,6 @@ void Game::Render()
 		return;
 	Begin();
 
-
-	IGameObject::BindStaticVertexBuffer();
-	
-#if DEBUG || _DEBUG
-	m_debugSquare->Render(m_screen.get(), Pipeline::Texture);
-#endif
-
 	auto debugDrawer = DebugDraw::Get();
 	if (g_isDeveloper)
 	{
@@ -414,12 +404,17 @@ void Game::Render()
 		debugDrawer->Begin();
 	}
 
+	IGameObject::BindStaticVertexBuffer();
+	
+#if DEBUG || _DEBUG
+	m_debugSquare->Render(m_screen.get(), Pipeline::Texture);
+#endif
+
 	TextureLightShader::Get()->bind();
 
-	m_testModel->Render(m_camera.get(), Pipeline::TextureLight);
-	m_groundModel->Render(m_camera.get(), Pipeline::TextureLight);
-	m_treeModel->Render(m_camera.get(), Pipeline::TextureLight);
-	m_woodCabinModel->Render(m_camera.get(), Pipeline::TextureLight);
+	m_groundModel->Render(m_camera.get(), Pipeline::DisplacementTextureLight);
+	m_treeModel->Render(m_camera.get(), Pipeline::DisplacementTextureLight);
+	m_woodCabinModel->Render(m_camera.get(), Pipeline::DisplacementTextureLight);
 
 	if (g_isDeveloper)
 	{

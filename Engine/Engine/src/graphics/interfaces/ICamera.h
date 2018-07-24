@@ -20,6 +20,22 @@ public:
 		return m_viewFrustum;
 	}
 
+	virtual DirectX::XMFLOAT3 GetPosition() const
+	{
+		return DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+	};
+	virtual DirectX::XMFLOAT3 GetDirection() const
+	{
+		return DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+	}
+	virtual float GetNearZ() const
+	{
+		return 0.0f;
+	}
+	virtual float GetFarZ() const
+	{
+		return 0.0f;
+	}
 	inline void RenderDebug() const;
 
 

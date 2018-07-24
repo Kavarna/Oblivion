@@ -72,8 +72,6 @@ void Model::DrawIndexedInstanced(ICamera * cam, const Pipeline& p) const
 	{
 		m_instanceBuffer.Get()
 	};
-	m_d3d11Context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
-	m_d3d11Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	UINT stride = sizeof(DirectX::XMMATRIX);
 	UINT offset = 0;
 	m_d3d11Context->IASetVertexBuffers(1, 1, instances, &stride, &offset);
@@ -124,10 +122,19 @@ void Model::DrawIndexedInstanced(ICamera * cam, const Pipeline& p) const
 
 }
 
-void Model::PrepareIA(const Pipeline & p) const
+bool Model::PrepareIA(const Pipeline & p) const
 {
-	m_d3d11Context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
-	m_d3d11Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	if (p == Pipeline::DisplacementTextureLight)
+	{
+		m_d3d11Context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
+		m_d3d11Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
+	}
+	else
+	{
+		m_d3d11Context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
+		m_d3d11Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	}
+	return true;
 }
 
 bool Model::ShouldRenderInstance(ICamera * cam, uint32_t id) const
@@ -393,6 +400,14 @@ void Model::Create(std::string const& filename)
 				fin >> val;
 				m_materials[i].opacity = val;
 			}
+			else if (check == "Tesselation")
+			{
+				float scale, min, max;
+				fin >> scale >> min >> max;
+				m_materials[i].tessScale = scale;
+				m_materials[i].tessMin = min;
+				m_materials[i].tessMax = max;
+			}
 			else if (check == "}")
 				break;
 			else
@@ -472,6 +487,9 @@ void Model::Create(EDefaultObject object)
 			m_materials.back().hasTexture = TRUE;
 			m_materials.back().name = "Default";
 			m_materials.back().opacity = 1.0f;
+			m_materials.back().tessMin = 1.0f;
+			m_materials.back().tessMax = 3.0f;
+			m_materials.back().tessScale = 2.0f;
 			m_materials.back().specular = 1000.0f;
 			m_materials.back().diffuseTexture = std::make_unique<Texture>((LPWSTR)L"Resources/Stones.dds", m_d3d11Device.Get(), m_d3d11Context.Get());
 			m_materials.back().bumpMap = std::make_unique<Texture>((LPWSTR)L"Resources/Stones_nmap.dds", m_d3d11Device.Get(), m_d3d11Context.Get());
@@ -486,8 +504,11 @@ void Model::Create(EDefaultObject object)
 			m_materials.back().name = "Default";
 			m_materials.back().opacity = 1.0f;
 			m_materials.back().specular = 1000.0f;
-			m_materials.back().diffuseTexture = std::make_unique<Texture>((LPWSTR)L"Resources/floor.dds", m_d3d11Device.Get(), m_d3d11Context.Get());
-			m_materials.back().bumpMap = std::make_unique<Texture>((LPWSTR)L"Resources/floor_nmap.dds", m_d3d11Device.Get(), m_d3d11Context.Get());
+			m_materials.back().tessMin = 1.0f;
+			m_materials.back().tessMax = 32.0f;
+			m_materials.back().tessScale = 0.3f;
+			m_materials.back().diffuseTexture = std::make_unique<Texture>((LPWSTR)L"Resources/Stones.dds", m_d3d11Device.Get(), m_d3d11Context.Get());
+			m_materials.back().bumpMap = std::make_unique<Texture>((LPWSTR)L"Resources/Stones_nmap.dds", m_d3d11Device.Get(), m_d3d11Context.Get());
 			m_meshes.back().m_materialIndex = 0;
 		}
 	}

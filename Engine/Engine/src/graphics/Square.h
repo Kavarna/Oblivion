@@ -28,7 +28,7 @@ public:
 
 private:
 			void						DrawIndexedInstanced(ICamera * cam, const Pipeline& p) const override;
-			void						PrepareIA(const Pipeline& p) const override;
+			bool						PrepareIA(const Pipeline& p) const override;
 private:
 	float								m_width;
 	float								m_height;

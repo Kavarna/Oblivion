@@ -7,10 +7,11 @@ const DirectX::XMVECTOR Camera::Up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f
 const DirectX::XMVECTOR Camera::DefaultPosition = DirectX::XMVectorSet(0.0f, 3.0f, -5.0f, 1.0f);
 const DirectX::XMMATRIX Camera::DefaultView = DirectX::XMMatrixLookToLH(DefaultPosition, Forward, Up);
 
-Camera::Camera(float FOV, float HByW, float NearZ, float FarZ)
+Camera::Camera(float FOV, float HByW, float NearZ, float FarZ) :
+	mNearZ(NearZ),
+	mFarZ(FarZ)
 {
 	mProjection = DirectX::XMMatrixPerspectiveFovLH(FOV, HByW, NearZ, FarZ);
-
 }
 
 Camera::~Camera()

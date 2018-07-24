@@ -4,7 +4,9 @@
 
 inline void ICamera::RenderDebug() const
 {
-	auto debugDrawer = DebugDraw::Get();
-	debugDrawer->RenderBoundingFrustum(m_viewFrustum);
-
+	if (g_isDeveloper)
+	{
+		auto debugDrawer = DebugDraw::Get();
+		debugDrawer->RenderBoundingFrustum(m_viewFrustum);
+	}
 }

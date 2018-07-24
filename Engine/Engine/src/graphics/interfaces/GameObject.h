@@ -12,6 +12,7 @@
 #include "../Shaders/BasicShader.h"
 #include "../Shaders/TextureLightShader.h"
 #include "../Shaders/TextureShader.h"
+#include "../Shaders/DisplacementShader.h"
 
 #include "../Helpers/DebugDraw.h"
 
@@ -28,6 +29,9 @@ namespace Rendering
 		DirectX::XMFLOAT4 diffuseColor;
 		float specular;
 		float opacity;
+		float tessMin = 1.0f;
+		float tessMax = 1.0f;
+		float tessScale = 1.0f;
 		std::unique_ptr<Texture> diffuseTexture;
 		std::unique_ptr<Texture> bumpMap;
 		std::unique_ptr<Texture> specularMap;
@@ -76,8 +80,9 @@ protected:
 	virtual			void							RenderBasic(ICamera * cam) const;
 	virtual			void							RenderTexture(ICamera * cam) const;
 	virtual			void							RenderTextureLight(ICamera * cam) const;
+	virtual			void							RenderDisplacementTextureLight(ICamera * cam) const;
 	virtual			void							DrawIndexedInstanced(ICamera * cam, const Pipeline&) const = 0;
-	virtual			void							PrepareIA(const Pipeline&) const = 0;
+	virtual			bool							PrepareIA(const Pipeline&) const = 0;
 
 protected:
 	/*

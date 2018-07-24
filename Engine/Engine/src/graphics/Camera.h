@@ -31,13 +31,15 @@ public:
 	void StrafeLeft(float frameTime);
 
 public:
-	inline DirectX::XMMATRIX& GetView() { return mView; };
-	inline DirectX::XMMATRIX& GetProjection() { return mProjection; };
-	inline DirectX::XMFLOAT3 GetCamPos()
+	inline DirectX::XMMATRIX& GetView() override { return mView; };
+	inline DirectX::XMMATRIX& GetProjection() override { return mProjection; };
+	inline float GetNearZ() const override { return mNearZ; };
+	inline float GetFarZ() const override { return mFarZ; };
+	inline DirectX::XMFLOAT3 GetPosition() const override
 	{
 		DirectX::XMFLOAT3 Pos; DirectX::XMStoreFloat3(&Pos, mPosition); return Pos;
 	};
-	inline DirectX::XMFLOAT3 GetCamDir()
+	inline DirectX::XMFLOAT3 GetDirection()
 	{
 		DirectX::XMFLOAT3 Dir; DirectX::XMStoreFloat3(&Dir, mDirection); return Dir;
 	};
@@ -68,6 +70,9 @@ private:
 
 	float mYRotationAcceleration = 0.0f;
 	float mZRotationAcceleration = 0.0f;
+
+	float mNearZ = 0.0f;
+	float mFarZ = 0.0f;
 
 	float mYaw = 0;
 	float mPitch = 0;
