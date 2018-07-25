@@ -178,11 +178,11 @@ void Game::Init3D()
 	m_treeModel->RotateY(DirectX::XM_PIDIV2, 1);
 	m_treeModel->Translate(25.0f, 0.0f, 30.0f, 1);
 
-	m_woodCabinModel = std::make_unique<Model>();
-	m_woodCabinModel->Create("Resources\\WoodenCabin.obl");
-	m_woodCabinModel->AddInstance();
-	m_woodCabinModel->Scale(0.5f);
-	m_woodCabinModel->Translate(0.0f, -0.1f, 0.0f);
+	m_offRoadCar = std::make_unique<Model>();
+	m_offRoadCar->Create("Resources\\OffRoadCar.obl");
+	m_offRoadCar->AddInstance();
+	m_offRoadCar->Scale(0.3f);
+	m_offRoadCar->Translate(0.0f, -0.1f, 0.0f);
 
 }
 
@@ -204,6 +204,7 @@ void Game::InitSizeDependent()
 	else
 	{
 		m_camera = std::make_unique<Camera>(FOV, HByW, nearZ, farZ);
+		m_camera->SetPosition(DirectX::XMVectorSet(0.0f, 2.0f, -3.0f, 1.0f));
 		m_screen = std::make_unique<Projection>();
 	}
 	m_screen->m_width = (float) m_windowWidth;
@@ -265,6 +266,7 @@ void Game::Update()
 		m_camera->StrafeRight(cameraFrameTime);
 	if (kb.A)
 		m_camera->StrafeLeft(cameraFrameTime);
+
 
 
 	if (g_isDeveloper)
@@ -363,7 +365,10 @@ void Game::End()
 			debugDrawer->ToggleFlag(DBG_DRAW_BOUNDING_FRUSTUM);
 		}
 
-		if (ImGui::Button("Close", ImVec2(50, 30)))
+		if (ImGui::Button("Change materials"))
+			DX::OutputVDebugString(L"Change materials selected\n");
+
+		if (ImGui::Button("Close"))
 			m_showDeveloperConsole = false;
 
 		ImGui::End();
@@ -413,8 +418,10 @@ void Game::Render()
 	TextureLightShader::Get()->bind();
 
 	m_groundModel->Render(m_camera.get(), Pipeline::DisplacementTextureLight);
-	m_treeModel->Render(m_camera.get(), Pipeline::DisplacementTextureLight);
-	m_woodCabinModel->Render(m_camera.get(), Pipeline::DisplacementTextureLight);
+	m_treeModel->Render(m_camera.get(), Pipeline::TextureLight);
+	m_offRoadCar->Render(m_camera.get(), Pipeline::TextureLight);
+
+	EmptyShader::Get()->bind(); // Clear the pipeline
 
 	if (g_isDeveloper)
 	{

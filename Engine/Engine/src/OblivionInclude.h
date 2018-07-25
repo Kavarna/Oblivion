@@ -11,6 +11,7 @@
 #include "imgui/imgui_impl_dx11.h"
 #include "graphics/Shaders/BasicShader.h"
 #include "graphics/Shaders/TextureLightShader.h"
+#include "graphics/Shaders/EmptyShader.h"
 #include "graphics/Camera.h"
 #include "graphics/Projection.h"
 #include "graphics/Model.h"

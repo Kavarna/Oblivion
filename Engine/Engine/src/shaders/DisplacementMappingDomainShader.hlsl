@@ -63,7 +63,7 @@ DS_OUTPUT main(
 
 	Output.NormalW = normalize(Output.NormalW);
 
-	if (g_material.hasBump)
+	if (!(g_material.minTessFactor == 1 && g_material.minTessFactor == g_material.maxTessFactor))
 	{
 		float h = ObjBumpMap.SampleLevel(ObjWrapSampler, Output.Tex, 0).a;
 

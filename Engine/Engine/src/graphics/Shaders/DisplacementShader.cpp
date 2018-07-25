@@ -127,7 +127,7 @@ void DisplacementShader::SetCameraInfo(ICamera * cam)
 	auto dataVS = (VSCameraBuffer*)ShaderHelper::MapBuffer(m_d3d11Context.Get(), m_cameraBufferVS.Get());
 
 	dataVS->eyePosition			= cam->GetPosition();
-	dataVS->minTessDistance		= cam->GetFarZ() * 0.5f;
+	dataVS->minTessDistance		= cam->GetFarZ();
 	dataVS->maxTessDistance		= cam->GetNearZ();
 
 	ShaderHelper::UnmapBuffer(m_d3d11Context.Get(), m_cameraBufferVS.Get());

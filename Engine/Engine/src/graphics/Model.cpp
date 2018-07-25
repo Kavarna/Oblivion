@@ -259,13 +259,16 @@ void Model::Create(std::string const& filename)
 			if (hasNormals)
 			{
 				fin >> x >> y >> z;
+				assert(!(x == 0 && y == 0 && z == 0));
 				vertices.back().Normal = { x,y,z };
 			}
 			if (hasOther)
-			{
+			{ // TODO: FIX MODELS!
 				fin >> x >> y >> z;
+				//assert(!(x == 0 && y == 0 && z == 0));
 				vertices.back().TangentU = { x,y,z };
 				fin >> x >> y >> z;
+				//assert(!(x == 0 && y == 0 && z == 0));
 				vertices.back().Binormal = { x,y,z };
 			}
 		}
@@ -465,7 +468,7 @@ void Model::Create(EDefaultObject object)
 	}
 	else if (object == EDefaultObject::Grid)
 	{
-		g.CreateGrid(100.0f, 100.0f, 20, 20, data);
+		g.CreateGrid(100.0f, 100.0f, 10, 10, data);
 		m_boundingBox = DirectX::BoundingBox(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(50.0f, 0.01f, 50.0f));
 	}
 	else if (object == EDefaultObject::Sphere)
@@ -507,8 +510,8 @@ void Model::Create(EDefaultObject object)
 			m_materials.back().tessMin = 1.0f;
 			m_materials.back().tessMax = 32.0f;
 			m_materials.back().tessScale = 0.3f;
-			m_materials.back().diffuseTexture = std::make_unique<Texture>((LPWSTR)L"Resources/Stones.dds", m_d3d11Device.Get(), m_d3d11Context.Get());
-			m_materials.back().bumpMap = std::make_unique<Texture>((LPWSTR)L"Resources/Stones_nmap.dds", m_d3d11Device.Get(), m_d3d11Context.Get());
+			m_materials.back().diffuseTexture = std::make_unique<Texture>((LPWSTR)L"Resources/grass.dds", m_d3d11Device.Get(), m_d3d11Context.Get());
+			m_materials.back().bumpMap = std::make_unique<Texture>((LPWSTR)L"Resources/grass_nmap.dds", m_d3d11Device.Get(), m_d3d11Context.Get());
 			m_meshes.back().m_materialIndex = 0;
 		}
 	}

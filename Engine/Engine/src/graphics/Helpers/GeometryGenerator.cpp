@@ -591,6 +591,7 @@ void GeometryGenerator::CreateGrid(float width, float depth, UINT m, UINT n, Mes
 			meshData.Vertices[i*n + j].Position = XMFLOAT3(x, 0.0f, z);
 			meshData.Vertices[i*n + j].Normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
 			meshData.Vertices[i*n + j].TangentU = XMFLOAT3(1.0f, 0.0f, 0.0f);
+			meshData.Vertices[i*n + j].Binormal = XMFLOAT3(0.0f, 0.0f, -1.0f);
 
 			// Stretch texture over grid
 			meshData.Vertices[i*n + j].TexC.x = j * du * width / 4;

@@ -46,7 +46,7 @@ float4 main(PSIn input) : SV_TARGET
 	color += g_sunLight.GetAmountOfLight(normal);
 
 	float4 finalColor = color * matColor;
-	//return float4(input.NormalW, 1.0f) * 0.5f + 0.5f;
+	//return float4(normal, 1.0f) * 0.5f + 0.5f;
 	return finalColor;
 	
 }
