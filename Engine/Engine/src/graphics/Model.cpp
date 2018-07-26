@@ -3,6 +3,8 @@
 #include "Helpers/RenderHelper.h"
 #include "../COM/COMManager.h"
 #include "../imgui/imgui.h"
+#include "boost/property_tree/ptree.hpp"
+#include "boost/property_tree/json_parser.hpp"
 
 /*
 * Appends path (except last directory) to relative
@@ -107,33 +109,24 @@ void Model::ImGuiChangeMaterial()
 	{
 		bool updateMaterial = false;
 		ImGui::Begin(m_selectedMaterial->name.c_str());
-
-		if (ImGui::Checkbox("Has texture ", &m_selectedMaterial->hasTexture))
-			updateMaterial = true;
-		if (ImGui::Checkbox("Has bump map ", &m_selectedMaterial->hasBumpMap))
-			updateMaterial = true;
-		if (ImGui::Checkbox("Has specular map ", &m_selectedMaterial->hasSpecularMap))
-			updateMaterial = true;
 		
-		if (ImGui::SliderFloat("Opacity", &m_selectedMaterial->opacity, 0.01f, 1.0f))
-			updateMaterial = true;
-		if (ImGui::SliderFloat("Specular", &m_selectedMaterial->specular, 1.0f, 100.0f))
-			updateMaterial = true;
+		ImGui::SliderFloat("Opacity", &m_selectedMaterial->opacity, 0.01f, 1.0f);
+		ImGui::SliderFloat("Specular", &m_selectedMaterial->specular, 1.0f, 100.0f);
 
-		if (ImGui::SliderFloat("Minimum tesselation", &m_selectedMaterial->tessMin, 1.0f, 64.0f))
-			updateMaterial = true;
+		ImGui::SliderFloat("Minimum tesselation", &m_selectedMaterial->tessMin, 1.0f, 64.0f);
 		if (m_selectedMaterial->tessMin > m_selectedMaterial->tessMax)
 			m_selectedMaterial->tessMax = m_selectedMaterial->tessMin;
-		if (ImGui::SliderFloat("Maximum tesselaton", &m_selectedMaterial->tessMax, m_selectedMaterial->tessMin, 64.0f))
-			updateMaterial = true;
+		ImGui::SliderFloat("Maximum tesselaton", &m_selectedMaterial->tessMax, m_selectedMaterial->tessMin, 64.0f);
 
-		if (ImGui::SliderFloat("Tesselation scale", &m_selectedMaterial->tessScale, 0.01f, 2.0f))
-			updateMaterial = true;
+		ImGui::SliderFloat("Tesselation scale", &m_selectedMaterial->tessScale, 0.01f, 2.0f);
 
-		if (ImGui::ColorEdit4("Diffuse color ", &m_selectedMaterial->diffuseColor.x))
-			updateMaterial = true;
+		ImGui::ColorEdit4("Diffuse color ", &m_selectedMaterial->diffuseColor.x);
 
 		ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Textures");
+
+		ImGui::Checkbox("Has texture ", &m_selectedMaterial->hasTexture);
+		ImGui::Checkbox("Has bump map ", &m_selectedMaterial->hasBumpMap);
+		ImGui::Checkbox("Has specular map ", &m_selectedMaterial->hasSpecularMap);
 
 		if (m_selectedMaterial->diffuseTexture.get())
 		{
@@ -154,7 +147,6 @@ void Model::ImGuiChangeMaterial()
 					Texture * tex = new Texture((LPSTR)ret.value().c_str(), m_d3d11Device.Get(), m_d3d11Context.Get());
 
 					m_selectedMaterial->diffuseTexture.reset(tex);
-					updateMaterial = true;
 				}
 				catch (...)
 				{
@@ -183,7 +175,6 @@ void Model::ImGuiChangeMaterial()
 					Texture * tex = new Texture((LPSTR)ret.value().c_str(), m_d3d11Device.Get(), m_d3d11Context.Get());
 
 					m_selectedMaterial->bumpMap.reset(tex);
-					updateMaterial = true;
 				}
 				catch (...)
 				{
@@ -212,7 +203,6 @@ void Model::ImGuiChangeMaterial()
 					Texture * tex = new Texture((LPSTR)ret.value().c_str(), m_d3d11Device.Get(), m_d3d11Context.Get());
 
 					m_selectedMaterial->specularMap.reset(tex);
-					updateMaterial = true;
 				}
 				catch (...)
 				{
@@ -221,13 +211,127 @@ void Model::ImGuiChangeMaterial()
 			}
 		}
 
+		if (ImGui::Button("Save"))
+		{
+			WriteMaterials();
+		}
+
 		ImGui::End();
+
+
 	}
 }
 
 void Model::SetMaterial(Rendering::Material && mat, int materialIndex)
 {
 	m_materials[materialIndex] = std::move(mat);
+}
+
+void Model::ReadMaterials(std::string const & filename)
+{
+	typedef boost::property_tree::iptree ptree;
+	ptree materials;
+	boost::property_tree::read_json(filename, materials);
+	
+	m_materialFile = filename;
+
+	for (const std::pair<std::string, ptree>& material : materials)
+	{
+		Rendering::Material resultMaterial;
+		resultMaterial.name = material.first;
+
+		const ptree& materialTree = material.second;
+
+		auto textureChild = materialTree.get_child_optional("texture");
+		if (textureChild.is_initialized())
+		{
+			resultMaterial.hasTexture = true;
+			std::string texturePath = textureChild.value().get_value<std::string>();
+			resultMaterial.diffuseTexture = std::make_unique<Texture>(
+				(LPSTR)texturePath.c_str(), m_d3d11Device.Get(), m_d3d11Context.Get()
+				);
+		}
+		else
+		{
+			std::string values = materialTree.get_child("color").get_value<std::string>();
+			std::stringstream stream(values);
+			stream >> resultMaterial.diffuseColor.x >> resultMaterial.diffuseColor.y
+				>> resultMaterial.diffuseColor.z >> resultMaterial.diffuseColor.w;
+		}
+		
+		auto bumpChild = materialTree.get_child_optional("bump");
+		if (bumpChild.is_initialized())
+		{
+			resultMaterial.hasBumpMap = true;
+			std::string texturePath = textureChild.value().get_value<std::string>();
+			resultMaterial.bumpMap = std::make_unique<Texture>(
+				(LPSTR)texturePath.c_str(), m_d3d11Device.Get(), m_d3d11Context.Get()
+				);
+		}
+
+		auto specularChild = materialTree.get_child_optional("specular map");
+		if (specularChild.is_initialized())
+		{
+			resultMaterial.hasSpecularMap = true;
+			std::string texturePath = textureChild.value().get_value<std::string>();
+			resultMaterial.specularMap = std::make_unique<Texture>(
+				(LPSTR)texturePath.c_str(), m_d3d11Device.Get(), m_d3d11Context.Get()
+				);
+		}
+
+		resultMaterial.specular = materialTree.get_child("shininess").get_value<float>();
+		resultMaterial.opacity = materialTree.get_child("opacity").get_value<float>();
+
+		resultMaterial.tessMin = materialTree.get_child("tesselation.minimum").get_value<float>();
+		resultMaterial.tessMax = materialTree.get_child("tesselation.maximum").get_value<float>();
+		resultMaterial.tessScale = materialTree.get_child("tesselation.scale").get_value<float>();
+
+		m_materials.push_back(std::move(resultMaterial));
+	}
+
+}
+
+void Model::WriteMaterials()
+{
+	using boost::property_tree::ptree;
+	ptree materialsTree;
+
+	for (auto & material : m_materials)
+	{
+		ptree currentMaterialTree;
+
+		if (material.hasTexture)
+		{
+			currentMaterialTree.put("Texture", material.diffuseTexture->GetPath());
+		}
+		else
+		{
+			std::stringstream color;
+			color << material.diffuseColor.x << ' ' << material.diffuseColor.y
+				<< material.diffuseColor.z << ' ' << material.diffuseColor.w;
+			currentMaterialTree.put("Color", color.str());
+		}
+
+		if (material.hasBumpMap)
+		{
+			currentMaterialTree.put("Bump", material.bumpMap->GetPath());
+		}
+
+		if (material.hasSpecularMap)
+		{
+			currentMaterialTree.put("Specular map", material.specularMap->GetPath());
+		}
+
+		currentMaterialTree.put("Shininess", material.specular);
+		currentMaterialTree.put("Opacity", material.opacity);
+		currentMaterialTree.put("Tesselation.Minimum", material.tessMin);
+		currentMaterialTree.put("Tesselation.Maximum", material.tessMax);
+		currentMaterialTree.put("Tesselation.Scale", material.tessScale);
+
+		materialsTree.put_child(material.name, currentMaterialTree);
+	}
+
+	boost::property_tree::write_json(m_materialFile, materialsTree);
 }
 
 void Model::DrawIndexedInstanced(ICamera * cam, const Pipeline& p) const
@@ -336,7 +440,7 @@ void Model::Create(std::string const& filename)
 {
 	std::ifstream fin;
 
-	fin.open(filename.c_str());
+	fin.open((filename + ".obl").c_str());
 	
 	if (!fin.is_open())
 		THROW_ERROR("Can't find file %s", filename.c_str());
@@ -509,7 +613,9 @@ void Model::Create(std::string const& filename)
 
 	ReadTillEnd(fin);
 
-	fin >> check;
+	ReadMaterials(filename + ".material");
+
+	/*fin >> check;
 	if (check != "Materials")
 		THROW_ERROR("Model %s is invalid due to it not having \"Materials\"", filename.c_str());
 
@@ -519,6 +625,9 @@ void Model::Create(std::string const& filename)
 	m_materials.resize(materialCount);
 	std::getline(fin, check);
 
+	
+
+	/*
 #pragma region Read Materials
 	for (int i = 0; i < materialCount; ++i)
 	{
@@ -602,7 +711,7 @@ void Model::Create(std::string const& filename)
 	ReadTillEnd(fin);
 
 #pragma endregion
-
+*/
 #undef INVALID
 
 	ShaderHelper::CreateBuffer(m_d3d11Device.Get(), &m_indexBuffer,

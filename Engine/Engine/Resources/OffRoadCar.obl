@@ -34937,17 +34937,3 @@ Meshes 7 {
 		Material 1
 	}
 }
-Materials 2 { 
-	DefaultMaterial {
-			Color 0.6 0.6 0.6 1
-			Shininess 0
-			Opacity 1
-	}
-	blinn1SG {
-			Color 1 1 0 1
-			Shininess 0
-			Opacity 1
-			Texture truck_color.jpg
-			Bump truck_bump.jpg
-	}
-}

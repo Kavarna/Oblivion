@@ -170,26 +170,22 @@ void Game::Init3D()
 	m_groundModel->Translate(0.0f, -0.01f, 0.0f);
 	m_groundModel->SetName("Ground");
 
-	m_treeModel = std::make_unique<Model>();
-	m_treeModel->Create("Resources\\tree.obl");
-	m_treeModel->AddInstance();
-	m_treeModel->RotateY(DirectX::XM_PIDIV4);
-	m_treeModel->Translate(-25.0f, 0.0f, 30.0f);
-	m_treeModel->AddInstance();
-	m_treeModel->RotateY(DirectX::XM_PIDIV2, 1);
-	m_treeModel->Translate(25.0f, 0.0f, 30.0f, 1);
-	m_treeModel->SetName("Low poly tree");
-
 	m_offRoadCar = std::make_unique<Model>();
-	m_offRoadCar->Create("Resources\\OffRoadCar.obl");
+	m_offRoadCar->Create("Resources\\OffRoadCar");
 	m_offRoadCar->AddInstance();
 	m_offRoadCar->Scale(0.3f);
-	m_offRoadCar->Translate(0.0f, -0.1f, 0.0f);
+	m_offRoadCar->Translate(40.0f, -0.1f, 0.0f);
 	m_offRoadCar->SetName("Offroad car");
 
+	m_woodenCabin = std::make_unique<Model>();
+	m_woodenCabin->Create("Resources\\WoodenCabin");
+	m_woodenCabin->AddInstance();
+	m_woodenCabin->Translate(-20.0f, 0.0f, 0.0f);
+	m_woodenCabin->SetName("Wooden cabin");
+
 	m_models.push_back(m_groundModel.get());
-	m_models.push_back(m_treeModel.get());
 	m_models.push_back(m_offRoadCar.get());
+	m_models.push_back(m_woodenCabin.get());
 
 }
 
@@ -497,8 +493,8 @@ void Game::Render()
 	TextureLightShader::Get()->bind();
 
 	m_groundModel->Render(m_camera.get(), Pipeline::DisplacementTextureLight);
-	m_treeModel->Render(m_camera.get(), Pipeline::TextureLight);
 	m_offRoadCar->Render(m_camera.get(), Pipeline::TextureLight);
+	m_woodenCabin->Render(m_camera.get(), Pipeline::TextureLight);
 
 	EmptyShader::Get()->bind(); // Clear the pipeline
 

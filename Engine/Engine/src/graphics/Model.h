@@ -37,6 +37,10 @@ public:
 public:
 			void							SetMaterial(Rendering::Material && mat, int materialIndex = 0);
 
+private:
+			void							ReadMaterials(std::string const& filename);
+			void							WriteMaterials();
+
 protected:
 			void							DrawIndexedInstanced(ICamera * cam, const Pipeline& p) const override;
 			bool							PrepareIA(const Pipeline& p) const override;
@@ -65,5 +69,6 @@ private:
 	std::vector<uint32_t>					m_indices;
 
 	Rendering::Material*					m_selectedMaterial;
+	std::string								m_materialFile;
 };
 

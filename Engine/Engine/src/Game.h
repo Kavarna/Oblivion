@@ -64,8 +64,8 @@ private:
 	std::unique_ptr<Square>						m_debugSquare;
 #endif
 	std::unique_ptr<Model>						m_groundModel;
-	std::unique_ptr<Model>						m_treeModel;
 	std::unique_ptr<Model>						m_offRoadCar;
+	std::unique_ptr<Model>						m_woodenCabin;
 
 	std::vector<Model*>							m_models;
 	Model*										m_selectedObject;

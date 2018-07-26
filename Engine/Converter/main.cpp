@@ -15,6 +15,8 @@
 #include <fstream>
 #include <vector>
 #include <cstdarg>
+#include <sstream>
+#include <string>
 
 // Assimp
 #include <assimp/Importer.hpp>
@@ -24,6 +26,11 @@
 #include <assimp/scene.h>
 #include <assimp/texture.h>
 #include <assimp/types.h>
+
+// Boost
+#include "boost/property_tree/ptree.hpp"
+#include "boost/property_tree/json_parser.hpp"
+#include "boost/lexical_cast.hpp"
 
 // Oblivion
 #include <OblivionObjects.h>
@@ -144,10 +151,84 @@ void InitFromScene(const aiScene * scene, std::string const& from, std::string c
 
 }
 
-void PrintFromScene(const aiScene * pScene, std::string const& to)
+void WriteMaterial(const aiScene* pScene, std::string& to)
+{
+	using boost::property_tree::ptree;
+	ptree materialTree;
+	for (unsigned int i = 0; i < pScene->mNumMaterials; ++i)
+	{
+		//materials.put(pScene->mMaterials[i].Get,)
+		auto material = pScene->mMaterials[i];
+		aiString name;
+		material->Get(AI_MATKEY_NAME, name);
+		std::string nameStr = name.C_Str();
+
+		ptree currentMaterialTree;
+
+		if (material->GetTextureCount(aiTextureType::aiTextureType_DIFFUSE) > 0)
+		{
+			aiString path;
+			material->GetTexture(aiTextureType::aiTextureType_DIFFUSE, 0, &path);
+			currentMaterialTree.put("Texture", path.C_Str());
+		}
+		else
+		{
+			aiColor4D color;
+			material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+
+			std::string colorString;
+			colorString += boost::lexical_cast<std::string>(color.r); colorString += " ";
+			colorString += boost::lexical_cast<std::string>(color.g); colorString += " ";
+			colorString += boost::lexical_cast<std::string>(color.b); colorString += " ";
+			colorString += boost::lexical_cast<std::string>(color.a);
+
+			currentMaterialTree.put("Color", colorString);
+		}
+
+		if (material->GetTextureCount(aiTextureType::aiTextureType_HEIGHT) > 0)
+		{
+			aiString path;
+			material->GetTexture(aiTextureType::aiTextureType_HEIGHT, 0, &path);
+			std::string bumpPath = path.C_Str();
+			currentMaterialTree.put("Bump", bumpPath);
+		}
+
+		float specPower;
+		if (!material->Get(AI_MATKEY_SHININESS, specPower))
+		{
+			//cout << "\t\t\tShininess " << specPower << "\n";
+			currentMaterialTree.put("Shininess", specPower);
+			if (material->GetTextureCount(aiTextureType::aiTextureType_SPECULAR) > 0)
+			{
+				aiString path;
+				material->GetTexture(aiTextureType::aiTextureType_SPECULAR, 0, &path);
+				//cout << "\t\t\tSpecular " << path.data << "\n";
+				std::string specularMap = path.C_Str();
+				currentMaterialTree.put("Specular map", specularMap);
+			}
+		}
+
+		float opacity;
+		if (!material->Get(AI_MATKEY_OPACITY, opacity))
+		{
+			currentMaterialTree.put("Opacity", opacity);
+		}
+
+		currentMaterialTree.put("Tesselation.Minimum", 1.0f);
+		currentMaterialTree.put("Tesselation.Maximum", 1.0f);
+		currentMaterialTree.put("Tesselation.Scale", 0.1f);
+
+		materialTree.put_child(nameStr, currentMaterialTree);
+	}
+
+
+	boost::property_tree::json_parser::write_json(to, materialTree);
+}
+
+void PrintFromScene(const aiScene * pScene, std::string& to)
 {
 	using namespace std;
-	ofstream file(to.c_str());
+	ofstream file((to + ".obl").c_str());
 	streambuf * coutbuf = std::cout.rdbuf();
 	cout.rdbuf(file.rdbuf());
 
@@ -246,7 +327,11 @@ void PrintFromScene(const aiScene * pScene, std::string const& to)
 
 	cout << "}\n";
 
-	cout << "Materials " << pScene->mNumMaterials << " { " << std::endl;
+	std::string materialFile;
+	materialFile = to + ".material";
+
+	WriteMaterial(pScene, materialFile);
+	/*cout << "Materials " << pScene->mNumMaterials << " { " << std::endl;
 
 	for (unsigned int i = 0; i < pScene->mNumMaterials; ++i)
 	{
@@ -295,15 +380,13 @@ void PrintFromScene(const aiScene * pScene, std::string const& to)
 		}
 
 		cout << "\t}\n";
-	}
-
-	cout << "}\n";
+	}*/
 
 	cout.rdbuf(coutbuf);
 	file.close();
 }
 
-void ConvertFile(std::string const& from, std::string const& to, unsigned int flags)
+void ConvertFile(std::string const& from, std::string & to, unsigned int flags)
 {
 	Assimp::Importer importer;
 	

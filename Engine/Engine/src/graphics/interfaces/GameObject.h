@@ -23,12 +23,12 @@ namespace Rendering
 	typedef struct material_t
 	{
 		std::string name;
-		bool hasTexture;
-		bool hasBumpMap;
-		bool hasSpecularMap;
-		DirectX::XMFLOAT4 diffuseColor;
-		float specular;
-		float opacity;
+		bool hasTexture = false;
+		bool hasBumpMap = false;
+		bool hasSpecularMap = false;
+		DirectX::XMFLOAT4 diffuseColor = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+		float specular = 32.0f;
+		float opacity = 1.0f;
 		float tessMin = 1.0f;
 		float tessMax = 1.0f;
 		float tessScale = 1.0f;
