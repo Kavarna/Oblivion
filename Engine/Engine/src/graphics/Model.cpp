@@ -1,6 +1,8 @@
 #include "Model.h"
 #include "Helpers/GeometryGenerator.h"
 #include "Helpers/RenderHelper.h"
+#include "../COM/COMManager.h"
+#include "../imgui/imgui.h"
 
 /*
 * Appends path (except last directory) to relative
@@ -59,6 +61,170 @@ inline uint32_t Model::GetVertexCount(int subObject) const
 	return m_meshes[subObject].m_vertexRange.end - m_meshes[subObject].m_vertexRange.begin;
 }
 
+CommonTypes::RayHitInfo Model::PickObject(DirectX::FXMVECTOR & rayPos, DirectX::FXMVECTOR & rayDir) const
+{
+	float minDist = FLT_MAX;
+	RayHitInfo ret;
+	ret.dist = -1.0f;
+	ret.instanceID = -1;
+	for (auto & instanceID : m_drawnInstances)
+	{
+		DirectX::BoundingBox boundingBox = m_boundingBox;
+		m_boundingBox.Transform(boundingBox, m_objectWorld[instanceID]);
+
+		float dist;
+		if (boundingBox.Intersects(rayPos, rayDir, dist))
+		{
+			if (dist < minDist)
+			{
+				minDist = dist;
+				ret.dist = minDist;
+				ret.instanceID = instanceID;
+			}
+		}
+	}
+	return ret;
+}
+
+void Model::ImGuiChangeMaterial()
+{
+	ImGui::Begin(GetName().c_str());
+
+	for (auto & material : m_materials)
+	{
+		if (ImGui::Button(material.name.c_str()))
+		{
+			if (m_selectedMaterial == &material)
+				m_selectedMaterial = nullptr;
+			else
+				m_selectedMaterial = &material;
+		}
+	}
+
+	ImGui::End();
+
+	if (m_selectedMaterial)
+	{
+		bool updateMaterial = false;
+		ImGui::Begin(m_selectedMaterial->name.c_str());
+
+		if (ImGui::Checkbox("Has texture ", &m_selectedMaterial->hasTexture))
+			updateMaterial = true;
+		if (ImGui::Checkbox("Has bump map ", &m_selectedMaterial->hasBumpMap))
+			updateMaterial = true;
+		if (ImGui::Checkbox("Has specular map ", &m_selectedMaterial->hasSpecularMap))
+			updateMaterial = true;
+		
+		if (ImGui::SliderFloat("Opacity", &m_selectedMaterial->opacity, 0.01f, 1.0f))
+			updateMaterial = true;
+		if (ImGui::SliderFloat("Specular", &m_selectedMaterial->specular, 1.0f, 100.0f))
+			updateMaterial = true;
+
+		if (ImGui::SliderFloat("Minimum tesselation", &m_selectedMaterial->tessMin, 1.0f, 64.0f))
+			updateMaterial = true;
+		if (m_selectedMaterial->tessMin > m_selectedMaterial->tessMax)
+			m_selectedMaterial->tessMax = m_selectedMaterial->tessMin;
+		if (ImGui::SliderFloat("Maximum tesselaton", &m_selectedMaterial->tessMax, m_selectedMaterial->tessMin, 64.0f))
+			updateMaterial = true;
+
+		if (ImGui::SliderFloat("Tesselation scale", &m_selectedMaterial->tessScale, 0.01f, 2.0f))
+			updateMaterial = true;
+
+		if (ImGui::ColorEdit4("Diffuse color ", &m_selectedMaterial->diffuseColor.x))
+			updateMaterial = true;
+
+		ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Textures");
+
+		if (m_selectedMaterial->diffuseTexture.get())
+		{
+			std::string path = "Diffuse texture: " + m_selectedMaterial->diffuseTexture->GetPath();
+			ImGui::Text(path.c_str());
+		}
+		else
+		{
+			ImGui::Text("Diffuse texture: None");
+		}
+
+		if (ImGui::Button("Select diffuse texture"))
+		{
+			if (auto ret = COM::GetOpenFileDialog(L"Select diffuse texture", L"Select"); ret)
+			{
+				try
+				{
+					Texture * tex = new Texture((LPSTR)ret.value().c_str(), m_d3d11Device.Get(), m_d3d11Context.Get());
+
+					m_selectedMaterial->diffuseTexture.reset(tex);
+					updateMaterial = true;
+				}
+				catch (...)
+				{
+					DX::OutputVDebugString(L"Couldn't open file %s.\n", ret.value());
+				}
+			}
+		}
+
+		if (m_selectedMaterial->bumpMap.get())
+		{
+			std::string path = "Bump texture: " + m_selectedMaterial->bumpMap->GetPath();
+			ImGui::Text(path.c_str());
+		}
+		else
+		{
+			ImGui::Text("Bump texture: None");
+		}
+
+
+		if (ImGui::Button("Select bump texture"))
+		{
+			if (auto ret = COM::GetOpenFileDialog(L"Select bump texture", L"Select"); ret)
+			{
+				try
+				{
+					Texture * tex = new Texture((LPSTR)ret.value().c_str(), m_d3d11Device.Get(), m_d3d11Context.Get());
+
+					m_selectedMaterial->bumpMap.reset(tex);
+					updateMaterial = true;
+				}
+				catch (...)
+				{
+					DX::OutputVDebugString(L"Couldn't open file %s.\n", ret.value());
+				}
+			}
+		}
+
+		if (m_selectedMaterial->specularMap.get())
+		{
+			std::string path = "Specular texture: " + m_selectedMaterial->specularMap->GetPath();
+			ImGui::Text(path.c_str());
+		}
+		else
+		{
+			ImGui::Text("Specular texture: None");
+		}
+
+
+		if (ImGui::Button("Select specular texture"))
+		{
+			if (auto ret = COM::GetOpenFileDialog(L"Select specular texture", L"Select"); ret)
+			{
+				try
+				{
+					Texture * tex = new Texture((LPSTR)ret.value().c_str(), m_d3d11Device.Get(), m_d3d11Context.Get());
+
+					m_selectedMaterial->specularMap.reset(tex);
+					updateMaterial = true;
+				}
+				catch (...)
+				{
+					DX::OutputVDebugString(L"Couldn't open file %s.\n", ret.value());
+				}
+			}
+		}
+
+		ImGui::End();
+	}
+}
+
 void Model::SetMaterial(Rendering::Material && mat, int materialIndex)
 {
 	m_materials[materialIndex] = std::move(mat);
@@ -66,8 +232,22 @@ void Model::SetMaterial(Rendering::Material && mat, int materialIndex)
 
 void Model::DrawIndexedInstanced(ICamera * cam, const Pipeline& p) const
 {
-	std::function<bool(uint32_t)> func = std::bind(&Model::ShouldRenderInstance, this, cam, std::placeholders::_1);
-	uint32_t renderInstances = PrepareInstances(func);
+	//std::function<bool(uint32_t)> func = std::bind(&Model::ShouldRenderInstance, this, cam, std::placeholders::_1);
+	m_drawnInstances.clear();
+	std::function<bool(uint32_t) > f1 = [&](uint32_t instanceID)->bool const
+	{
+		if (ShouldRenderInstance(cam, instanceID))
+		{
+			m_drawnInstances.push_back(instanceID);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+		
+	};
+	uint32_t renderInstances = PrepareInstances(f1);
 	ID3D11Buffer * instances[] =
 	{
 		m_instanceBuffer.Get()
@@ -114,8 +294,8 @@ void Model::DrawIndexedInstanced(ICamera * cam, const Pipeline& p) const
 		auto debugDrawer = DebugDraw::Get();
 		for (uint32_t i = 0; i < m_objectWorld.size(); ++i)
 		{
-			toRender = m_boundingBox;
-			toRender.Transform(toRender, m_objectWorld[i]);
+			//toRender = m_boundingBox;
+			m_boundingBox.Transform(toRender, m_objectWorld[i]);
 			debugDrawer->RenderBoundingBox(toRender);
 		}
 	}

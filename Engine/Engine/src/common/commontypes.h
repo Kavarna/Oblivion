@@ -1,5 +1,6 @@
 #pragma once
 
+#include "boost/operators.hpp"
 
 namespace CommonTypes
 {
@@ -16,5 +17,15 @@ namespace CommonTypes
 	};
 
 	using Range = range_t<uint32_t>;
+
+	struct RayHitInfo : public boost::less_than_comparable<RayHitInfo>
+	{
+		float dist;
+		int32_t instanceID;
+		bool operator < (const RayHitInfo & rhs) const
+		{
+			return dist < rhs.dist;
+		}
+	};
 
 }

@@ -249,3 +249,19 @@ namespace DX
 	{
 	}
 }
+
+namespace COM
+{
+	MicrosoftPointer<IFileOpenDialog> g_openFileDialog;
+	void InitializeComObjects()
+	{
+		HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL,
+			IID_IFileOpenDialog, reinterpret_cast<LPVOID*>(g_openFileDialog.ReleaseAndGetAddressOf()));
+		if (FAILED(hr))
+			throw std::exception("Can't initialze COM");
+	}
+	void UninitializeComObjects()
+	{
+		g_openFileDialog.Reset();
+	}
+}

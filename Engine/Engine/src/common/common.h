@@ -59,6 +59,7 @@ MessageBoxA(NULL,"Unexpected error occured", "Error", MB_ICONERROR| MB_OK); exit
 #include <wrl.h>
 #include <comdecl.h>
 #include <comdef.h>
+#include <ShObjIdl.h>
 
 #include <cstdio>
 #include <cstdlib>
@@ -82,6 +83,7 @@ MessageBoxA(NULL,"Unexpected error occured", "Error", MB_ICONERROR| MB_OK); exit
 #include <type_traits>
 #include <typeinfo>
 #include <typeindex>
+#include <optional>
 
 #include <OblivionObjects.h>
 
@@ -165,4 +167,13 @@ namespace DX
 	int GetComponentCountFromFormat(DXGI_FORMAT format);
 	/// <summary>Initializes Direct3D states</summary>
 	void InitStates(ID3D11Device*);
+}
+
+namespace COM
+{
+	extern MicrosoftPointer<IFileOpenDialog> g_openFileDialog;
+	/// <summary>Initializes COM objects</summary>
+	void InitializeComObjects();
+	/// <summary>Uniintializes safely COM objects</summary>
+	void UninitializeComObjects();
 }

@@ -31,6 +31,7 @@
     <ClCompile Include="src\graphics\Shaders\DisplacementShader.cpp" />
     <ClCompile Include="src\graphics\interfaces\Shader.cpp" />
     <ClCompile Include="src\graphics\Shaders\EmptyShader.cpp" />
+    <ClCompile Include="src\COM\COMManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\commonmath.h" />
@@ -76,6 +77,7 @@
     <ClInclude Include="src\graphics\DDSTextureLoader.h" />
     <ClInclude Include="src\graphics\Shaders\DisplacementShader.h" />
     <ClInclude Include="src\graphics\Shaders\EmptyShader.h" />
+    <ClInclude Include="src\COM\COMManager.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\BasicVertexShader.hlsl" />

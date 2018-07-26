@@ -11,6 +11,7 @@ enum class EDefaultObject
 
 class Model : public IGameObject
 {
+	typedef CommonTypes::RayHitInfo RayHitInfo;
 public:
 	Model();
 	~Model();
@@ -30,11 +31,16 @@ public:
 	inline	uint32_t						GetVertexCount(int subObject = 0) const;
 
 public:
+			RayHitInfo	__vectorcall		PickObject(DirectX::FXMVECTOR& rayPos, DirectX::FXMVECTOR& rayDir) const;
+			void							ImGuiChangeMaterial();
+
+public:
 			void							SetMaterial(Rendering::Material && mat, int materialIndex = 0);
 
 protected:
 			void							DrawIndexedInstanced(ICamera * cam, const Pipeline& p) const override;
 			bool							PrepareIA(const Pipeline& p) const override;
+
 
 private:
 	virtual	bool							ShouldRenderInstance(ICamera * cam, uint32_t id) const;
@@ -52,8 +58,12 @@ private:
 	
 	DirectX::BoundingBox					m_boundingBox;
 
+	mutable std::vector<uint32_t>			m_drawnInstances;
+
 	std::vector<Mesh>						m_meshes;
 	std::vector<Rendering::Material>		m_materials;
 	std::vector<uint32_t>					m_indices;
+
+	Rendering::Material*					m_selectedMaterial;
 };
 

@@ -40,6 +40,8 @@ private:
 	void End();
 
 	void WriteSettings();
+	
+	bool PickObject();
 private:
 	void Update();
 	void Render();
@@ -53,6 +55,7 @@ private:
 	bool										m_menuActive = true;
 	float										m_mouseSensivity = 2.0f;
 	bool										m_showDeveloperConsole = false;
+	bool										m_selectObjects = false;
 
 private:
 	std::unique_ptr<Camera>						m_camera;
@@ -63,6 +66,9 @@ private:
 	std::unique_ptr<Model>						m_groundModel;
 	std::unique_ptr<Model>						m_treeModel;
 	std::unique_ptr<Model>						m_offRoadCar;
+
+	std::vector<Model*>							m_models;
+	Model*										m_selectedObject;
 private:
 	std::unique_ptr<DirectX::Mouse>				m_mouse;
 	std::unique_ptr<DirectX::Keyboard>			m_keyboard;

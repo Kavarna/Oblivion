@@ -168,6 +168,7 @@ void Game::Init3D()
 	m_groundModel->Create(EDefaultObject::Grid);
 	m_groundModel->AddInstance();
 	m_groundModel->Translate(0.0f, -0.01f, 0.0f);
+	m_groundModel->SetName("Ground");
 
 	m_treeModel = std::make_unique<Model>();
 	m_treeModel->Create("Resources\\tree.obl");
@@ -177,12 +178,18 @@ void Game::Init3D()
 	m_treeModel->AddInstance();
 	m_treeModel->RotateY(DirectX::XM_PIDIV2, 1);
 	m_treeModel->Translate(25.0f, 0.0f, 30.0f, 1);
+	m_treeModel->SetName("Low poly tree");
 
 	m_offRoadCar = std::make_unique<Model>();
 	m_offRoadCar->Create("Resources\\OffRoadCar.obl");
 	m_offRoadCar->AddInstance();
 	m_offRoadCar->Scale(0.3f);
 	m_offRoadCar->Translate(0.0f, -0.1f, 0.0f);
+	m_offRoadCar->SetName("Offroad car");
+
+	m_models.push_back(m_groundModel.get());
+	m_models.push_back(m_treeModel.get());
+	m_models.push_back(m_offRoadCar.get());
 
 }
 
@@ -222,6 +229,7 @@ void Game::InitSizeDependent()
 		m_debugSquare->SetWindowInfo((float)m_windowWidth, (float)m_windowHeight);
 		m_debugSquare->Scale(100.0f, 100.0f);
 		m_debugSquare->TranslateTo(m_windowWidth - 76.0f, m_windowHeight - 76.0f);
+		m_debugSquare->SetName("Debug square");
 #endif
 	}
 }
@@ -289,6 +297,24 @@ void Game::Update()
 		{
 			renderer->RSSolidRender();
 		}
+
+		if (m_selectObjects)
+		{
+			static bool bLeftClick = false;
+			if (mouse.leftButton && !bLeftClick)
+			{
+				bLeftClick = true;
+				if (PickObject())
+				{
+					m_selectObjects = false;
+				}
+				else
+					m_selectedObject = nullptr;
+			}
+			else if (!mouse.leftButton)
+				bLeftClick = false;
+		}
+
 	}
 
 	if (m_menuActive)
@@ -296,10 +322,10 @@ void Game::Update()
 	else
 		m_camera->Update(frameTime, mouse.x * m_mouseSensivity, mouse.y * m_mouseSensivity);
 
-	static bool bClick = false;
-	if (mouse.rightButton && !bClick)
+	static bool bRightClick = false;
+	if (mouse.rightButton && !bRightClick)
 	{
-		bClick = true;
+		bRightClick = true;
 		if (m_menuActive)
 			m_mouse->SetMode(DirectX::Mouse::Mode::MODE_RELATIVE);
 		else
@@ -307,7 +333,7 @@ void Game::Update()
 		m_menuActive = !m_menuActive;
 	}
 	else if (!mouse.rightButton)
-		bClick = false;
+		bRightClick = false;
 }
 
 void Game::Begin()
@@ -345,6 +371,8 @@ void Game::End()
 
 		ImGui::Text("Application average %.5f s/frame (%.1f FPS)", 1.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::Text("Draw calls: %d", g_drawCalls);
+		if (m_selectObjects)
+			ImGui::Text("Picking object");
 
 		ImGui::End();
 
@@ -366,12 +394,20 @@ void Game::End()
 		}
 
 		if (ImGui::Button("Change materials"))
-			DX::OutputVDebugString(L"Change materials selected\n");
+		{
+			m_selectObjects = !m_selectObjects;
+			m_selectedObject = nullptr;
+		}
 
 		if (ImGui::Button("Close"))
 			m_showDeveloperConsole = false;
 
 		ImGui::End();
+
+		if (m_selectedObject)
+		{
+			m_selectedObject->ImGuiChangeMaterial();
+		}
 	}
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
@@ -393,6 +429,49 @@ void Game::WriteSettings()
 	pt.put("Developer.Draw Frustums", debugDrawer->RenderBoundingFrustum());
 
 	boost::property_tree::json_parser::write_json("Settings.json", pt);
+}
+
+bool Game::PickObject()
+{
+	using namespace DirectX;
+	POINT mouse;
+	GetCursorPos(&mouse);
+	ScreenToClient(m_windowHandle, &mouse);
+
+	auto projection = m_camera->GetProjection();
+
+	float pickedXinViewSpace, pickedYinViewSpace, pickedZinViewSpace;
+	pickedXinViewSpace = ((2.0f * mouse.x) / m_windowWidth - 1.0f) / XMVectorGetX(projection.r[0]);
+	pickedYinViewSpace = -((2.0f * mouse.y) / m_windowHeight - 1.0f) / XMVectorGetY(projection.r[1]);
+	pickedZinViewSpace = 1.0f;
+
+	XMVECTOR pickedRayInViewSpace = XMVectorSet(pickedXinViewSpace, pickedYinViewSpace, pickedZinViewSpace, 0.0f);
+	pickedRayInViewSpace = XMVector3Normalize(pickedRayInViewSpace);
+
+	XMMATRIX invView;
+	XMVECTOR det;
+	invView = XMMatrixInverse(&det, m_camera->GetView());
+
+	XMVECTOR pickRayPos = XMVector3TransformCoord(pickedRayInViewSpace, invView);
+	XMVECTOR pickRayDir = XMVector3TransformNormal(pickedRayInViewSpace, invView);
+
+	CommonTypes::RayHitInfo min;
+	min.dist = FLT_MAX;
+	min.instanceID = -1;
+
+	m_selectedObject = nullptr;
+
+	for (auto & model : m_models)
+	{
+		CommonTypes::RayHitInfo rayHit = model->PickObject(pickRayPos, pickRayDir);
+		if (rayHit < min && rayHit.instanceID != -1 && rayHit.dist > 0.0f)
+		{
+			min = rayHit;
+			m_selectedObject = model;
+		}
+	}
+	
+	return m_selectedObject != 0;
 }
 
 void Game::Render()

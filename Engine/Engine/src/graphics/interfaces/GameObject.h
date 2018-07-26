@@ -64,9 +64,14 @@ public:
 	virtual inline	void RotateY(float Theta, int instanceID = 0) { m_objectWorld[instanceID] *= DirectX::XMMatrixRotationY(Theta); };
 	virtual inline	void RotateZ(float Theta, int instanceID = 0) { m_objectWorld[instanceID] *= DirectX::XMMatrixRotationZ(Theta); };
 
+public:
+public:
+					void							SetName(std::string const& name) { m_objectName = name; };
+					std::string						GetName() const { return m_objectName; };
+
 protected:
-	virtual			uint32_t GetIndexCount(int subObject = 0) const = 0;
-	virtual			uint32_t GetVertexCount(int subObject = 0) const = 0;
+	virtual			uint32_t						GetIndexCount(int subObject = 0) const = 0;
+	virtual			uint32_t						GetVertexCount(int subObject = 0) const = 0;
 
 public:
 	virtual			DirectX::XMMATRIX&				AddInstance(DirectX::FXMMATRIX const& mat = DirectX::XMMatrixIdentity());
@@ -106,5 +111,6 @@ protected:
 			MicrosoftPointer<ID3D11Buffer>			m_instanceBuffer;
 			std::vector<DirectX::XMMATRIX>			m_objectWorld;
 			MicrosoftPointer<ID3D11Buffer>			m_materialBuffer;
-	mutable int								m_bindMaterialToShader;
+	mutable int										m_bindMaterialToShader;
+			std::string								m_objectName;
 };

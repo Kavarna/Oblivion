@@ -6,6 +6,9 @@ Texture::Texture(LPWSTR lpPath, ID3D11Device * device, ID3D11DeviceContext * con
 	mDevice(device)
 {
 	Create(lpPath, device, context, hasUAV);
+	USES_CONVERSION;
+	LPSTR pathA = W2A(lpPath);
+	mPath = std::string(pathA);
 }
 
 Texture::Texture(LPSTR lpPath, ID3D11Device * device, ID3D11DeviceContext * context, bool hasUAV) :
@@ -14,6 +17,7 @@ Texture::Texture(LPSTR lpPath, ID3D11Device * device, ID3D11DeviceContext * cont
 	USES_CONVERSION;
 	LPWSTR lpwPath = A2W(lpPath);
 	Create(lpwPath, device, context, hasUAV);
+	mPath = std::string(lpPath);
 }
 
 Texture::~Texture()

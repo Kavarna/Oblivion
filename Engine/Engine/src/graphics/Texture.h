@@ -16,6 +16,8 @@ class Texture
 	bool mHasUAV;
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> mTextureUAV;
 
+	std::string mPath;
+	
 	ID3D11Device * mDevice;
 public:
 	Texture() = default;
@@ -25,6 +27,10 @@ public:
 private:
 	void Create(LPWSTR lpPath, ID3D11Device *, ID3D11DeviceContext *, bool hasUAV);
 public:
+	std::string GetPath() const
+	{
+		return mPath;
+	}
 	ID3D11ShaderResourceView* GetTextureSRV() const
 	{
 		return mTextureSRV.Get();
