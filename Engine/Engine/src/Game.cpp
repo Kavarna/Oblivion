@@ -316,16 +316,26 @@ void Game::Update()
 	if (m_menuActive)
 		m_camera->Update(frameTime, 0.0f, 0.0f);
 	else
+	{
+		mouse.x = DX::clamp(mouse.x, -25, 25);
+		mouse.y = DX::clamp(mouse.y, -25, 25);
 		m_camera->Update(frameTime, mouse.x * m_mouseSensivity, mouse.y * m_mouseSensivity);
+	}
 
 	static bool bRightClick = false;
 	if (mouse.rightButton && !bRightClick)
 	{
 		bRightClick = true;
 		if (m_menuActive)
+		{
 			m_mouse->SetMode(DirectX::Mouse::Mode::MODE_RELATIVE);
+			ShowCursor(FALSE);
+		}
 		else
+		{
 			m_mouse->SetMode(DirectX::Mouse::Mode::MODE_ABSOLUTE);
+			ShowCursor(TRUE);
+		}
 		m_menuActive = !m_menuActive;
 	}
 	else if (!mouse.rightButton)
