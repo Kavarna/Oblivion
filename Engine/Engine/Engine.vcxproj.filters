@@ -32,6 +32,7 @@
     <ClCompile Include="src\graphics\interfaces\Shader.cpp" />
     <ClCompile Include="src\graphics\Shaders\EmptyShader.cpp" />
     <ClCompile Include="src\COM\COMManager.cpp" />
+    <ClCompile Include="src\scripting\LuaManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\commonmath.h" />
@@ -78,6 +79,7 @@
     <ClInclude Include="src\graphics\Shaders\DisplacementShader.h" />
     <ClInclude Include="src\graphics\Shaders\EmptyShader.h" />
     <ClInclude Include="src\COM\COMManager.h" />
+    <ClInclude Include="src\scripting\LuaManager.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\BasicVertexShader.hlsl" />
@@ -96,5 +98,6 @@
   <ItemGroup>
     <None Include="src\shaders\Lights.hlsli" />
     <None Include="src\shaders\Materials.hlsli" />
+    <None Include="src\scripts\Test.lua" />
   </ItemGroup>
 </Project>

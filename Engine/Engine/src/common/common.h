@@ -99,6 +99,8 @@ MessageBoxA(NULL,"Unexpected error occured", "Error", MB_ICONERROR| MB_OK); exit
 
 template <class type>
 using MicrosoftPointer = Microsoft::WRL::ComPtr<type>;
+template <class type>
+using unique_delete_ptr = std::unique_ptr<type, std::function<void(type*)>>;
 
 namespace DX
 {

@@ -63,7 +63,7 @@ void TextureShader::Create()
 		elementDesc[5].SemanticIndex = 3;
 		elementDesc[5].SemanticName = "WORLDMATRIX";
 
-		UINT arraySize = _countof(elementDesc);
+		UINT arraySize = sizeof(elementDesc) / sizeof(elementDesc[0]);
 		ThrowIfFailed(
 			m_d3d11Device->CreateInputLayout(elementDesc, arraySize,
 				m_shaderBlobs[0]->GetBufferPointer(), m_shaderBlobs[0]->GetBufferSize(),

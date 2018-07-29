@@ -1,5 +1,11 @@
 #include "Game.h"
-#include "COM/COMManager.h"
+#include "scripting/LuaManager.h"
+
+void PrintFromLua(const char * message)
+{
+	OutputDebugStringA(message);
+}
+
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	LPWSTR lpCmdLine, int iShow)
 {
@@ -10,6 +16,16 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		if (FAILED(hr))
 			throw std::exception("Can't initialize COM");
 		COM::InitializeComObjects();
+		LuaManager::InitializeLua();
+	
+		LuaManager::AddFunction("Log", PrintFromLua);
+
+		LuaManager::LoadScript("src/scripts/Test.lua");
+
+		auto test = LuaManager::getGlobal("test");
+		test();
+		
+		
 		Game* joc = Game::GetInstance();
 		joc->Create(hInstance);
 		joc->Run();
