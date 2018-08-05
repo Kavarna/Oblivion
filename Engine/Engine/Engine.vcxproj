@@ -122,6 +122,7 @@
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)External Libraries\Lua\LuaBridge;$(SolutionDir)External Libraries\Lua\include;$(SolutionDir)SharedTypes;$(SolutionDir)External Libraries\boost</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -139,6 +140,7 @@
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)External Libraries\Lua\LuaBridge;$(SolutionDir)External Libraries\Lua\include;$(SolutionDir)SharedTypes;$(SolutionDir)External Libraries\boost</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
