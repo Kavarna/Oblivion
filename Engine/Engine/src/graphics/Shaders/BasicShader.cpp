@@ -77,7 +77,7 @@ void BasicShader::Create()
 
 const Pipeline BasicShader::GetPipelineType() const
 {
-	return Pipeline::Basic;
+	return Pipeline::PipelineBasic;
 }
 
 void BasicShader::SetCameraInformations(SCameraInfo const & info) const

@@ -17,3 +17,8 @@
 #include "graphics/Model.h"
 #include "graphics/RenderTexture.h"
 #include "graphics/Square.h"
+
+
+#include "scripting/Script.h"
+#include "scripting/Entity.h"
+#include "scripting/GameScript.h"

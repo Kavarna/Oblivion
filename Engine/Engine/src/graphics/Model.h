@@ -17,9 +17,7 @@ public:
 	~Model();
 
 public:
-	virtual void Update(float frameTime) override
-	{
-	};
+	virtual void Update(float frameTime) override;
 
 public:
 	virtual void							Create(std::string const& filename) override;

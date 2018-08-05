@@ -16,8 +16,6 @@
 
 #include "../Helpers/DebugDraw.h"
 
-#include <OblivionObjects.h>
-
 namespace Rendering
 {
 	typedef struct material_t
@@ -42,8 +40,11 @@ namespace Rendering
 	} SMaterial, Material;
 }
 
+class Entity;
+
 class IGameObject : public AlignedObject, public IObject
 {
+	friend class Entity;
 public:
 	IGameObject();
 	virtual ~IGameObject() 
@@ -52,7 +53,7 @@ public:
 public:
 	virtual			void Create(std::string const&) = 0;
 	virtual			void Create() {};
-	virtual			void Update(float frameTime) = 0;
+	virtual			void Update(float frameTime);
 	virtual			void Destroy() = 0;
 
 public:
@@ -76,6 +77,7 @@ protected:
 public:
 	virtual			DirectX::XMMATRIX&				AddInstance(DirectX::FXMMATRIX const& mat = DirectX::XMMatrixIdentity());
 	virtual			DirectX::XMMATRIX*				AddInstance(uint32_t number);
+	virtual			uint32_t						AddEntity(Entity * e);
 	virtual			void							RemoveInstance(int ID);
 	virtual			void							RemoveInstance(CommonTypes::Range const& range);
 	virtual			int								PrepareInstances(std::function<bool(uint32_t)> & func) const;
@@ -100,12 +102,18 @@ protected:
 protected:
 					void							BindMaterial(Rendering::material_t const& mat, int shader) const;
 	
+private:
+	inline			bool							isInstanceEntity(uint32_t index) const;
+
 public:
 	static			void							BindStaticVertexBuffer();
 
+private:
+			std::unordered_map<uint32_t, Entity*>	m_entities;
+
 protected:
-	static std::vector<Oblivion::SVertex>			m_staticVertices;
-	static MicrosoftPointer<ID3D11Buffer>			m_staticVerticesBuffer;
+	static	std::vector<Oblivion::SVertex>			m_staticVertices;
+	static	MicrosoftPointer<ID3D11Buffer>			m_staticVerticesBuffer;
 
 protected:
 			MicrosoftPointer<ID3D11Buffer>			m_instanceBuffer;

@@ -149,6 +149,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\COM\COMManager.cpp" />
+    <ClCompile Include="src\scripting\Entity.cpp" />
     <ClCompile Include="src\graphics\interfaces\Shader.cpp" />
     <ClCompile Include="src\graphics\Shaders\DisplacementShader.cpp" />
     <ClCompile Include="src\graphics\DDSTextureLoader.cpp" />
@@ -177,12 +178,15 @@
     <ClCompile Include="src\imgui\imgui_impl_dx11.cpp" />
     <ClCompile Include="src\input\Keyboard.cpp" />
     <ClCompile Include="src\input\Mouse.cpp" />
+    <ClCompile Include="src\scripting\GameScript.cpp" />
     <ClCompile Include="src\scripting\LuaManager.cpp" />
+    <ClCompile Include="src\scripting\Script.cpp" />
     <ClCompile Include="src\winmain.cpp" />
     <ClCompile Include="src\graphics\Shaders\TextureShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\COM\COMManager.h" />
+    <ClInclude Include="src\scripting\Entity.h" />
     <ClInclude Include="src\graphics\Shaders\EmptyShader.h" />
     <ClInclude Include="src\graphics\Shaders\DisplacementShader.h" />
     <ClInclude Include="src\graphics\DDSTextureLoader.h" />
@@ -226,7 +230,9 @@
     <ClInclude Include="src\input\PlatformHelpers.h" />
     <ClInclude Include="src\OblivionInclude.h" />
     <ClInclude Include="src\graphics\Shaders\TextureShader.h" />
+    <ClInclude Include="src\scripting\GameScript.h" />
     <ClInclude Include="src\scripting\LuaManager.h" />
+    <ClInclude Include="src\scripting\Script.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\BasicPixelShader.hlsl">
@@ -360,7 +366,9 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\scripts\Test.lua" />
+    <None Include="scripts\Entity.lua" />
+    <None Include="scripts\Lights.lua" />
+    <None Include="scripts\Scripts.list" />
     <None Include="src\shaders\Lights.hlsli" />
     <None Include="src\shaders\Materials.hlsli" />
   </ItemGroup>

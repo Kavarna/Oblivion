@@ -36,6 +36,7 @@ void Square::Create()
 
 void Square::Update(float frameTime)
 {
+	IGameObject::Update(frameTime);
 }
 
 void Square::Destroy()
@@ -99,7 +100,7 @@ void Square::DrawIndexedInstanced(ICamera * cam, const Pipeline& p) const
 
 bool Square::PrepareIA(const Pipeline & p) const
 {
-	if (p == Pipeline::Texture)
+	if (p == Pipeline::PipelineTexture)
 	{
 		m_d3d11Context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
 		m_d3d11Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

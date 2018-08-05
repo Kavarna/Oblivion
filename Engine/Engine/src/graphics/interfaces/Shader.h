@@ -22,12 +22,14 @@ namespace Shader
 
 }
 
-enum class Pipeline
+enum Pipeline
 {
-	BatchShader, Basic,
-	Texture, TextureLight,
-	DisplacementTextureLight,
-	None,
+	PipelineNone = 0,
+	PipelineBatchShader = -1,
+	PipelineBasic = 1,
+	PipelineTexture = 2,
+	PipelineTextureLight = 3,
+	PipelineDisplacementTextureLight = 4,
 };
 
 class IShader : public IObject
@@ -80,6 +82,7 @@ public:
 		}
 	}
 	
+	static void								LuaRegister();
 	static IShader*							Get()
 	{
 		return nullptr;

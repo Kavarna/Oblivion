@@ -88,7 +88,7 @@ void TextureShader::Create()
 
 const Pipeline TextureShader::GetPipelineType() const
 {
-	return Pipeline::Texture;
+	return Pipeline::PipelineTexture;
 }
 
 void TextureShader::SetCameraInformations(SCameraInfo const & camInfo)

@@ -46,6 +46,11 @@ Model::~Model()
 	Destroy();
 }
 
+void Model::Update(float frameTime)
+{
+	IGameObject::Update(frameTime);
+}
+
 
 void Model::Destroy()
 {
@@ -408,7 +413,7 @@ void Model::DrawIndexedInstanced(ICamera * cam, const Pipeline& p) const
 
 bool Model::PrepareIA(const Pipeline & p) const
 {
-	if (p == Pipeline::DisplacementTextureLight)
+	if (p == Pipeline::PipelineDisplacementTextureLight)
 	{
 		m_d3d11Context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
 		m_d3d11Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
@@ -443,7 +448,7 @@ void Model::Create(std::string const& filename)
 	fin.open((filename + ".obl").c_str());
 	
 	if (!fin.is_open())
-		THROW_ERROR("Can't find file %s", filename.c_str());
+		THROW_ERROR("Can't find file %s", (filename + ".obl").c_str());
 
 #define INVALID THROW_ERROR("Model %s is invalid.",filename.c_str())
 

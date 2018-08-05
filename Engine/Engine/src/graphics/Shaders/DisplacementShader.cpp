@@ -119,7 +119,7 @@ void DisplacementShader::Create()
 
 const Pipeline DisplacementShader::GetPipelineType() const
 {
-	return Pipeline::DisplacementTextureLight;
+	return Pipeline::PipelineDisplacementTextureLight;
 }
 
 void DisplacementShader::SetCameraInfo(ICamera * cam)

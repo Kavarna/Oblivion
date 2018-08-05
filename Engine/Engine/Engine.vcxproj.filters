@@ -33,6 +33,9 @@
     <ClCompile Include="src\graphics\Shaders\EmptyShader.cpp" />
     <ClCompile Include="src\COM\COMManager.cpp" />
     <ClCompile Include="src\scripting\LuaManager.cpp" />
+    <ClCompile Include="src\scripting\Script.cpp" />
+    <ClCompile Include="src\scripting\Entity.cpp" />
+    <ClCompile Include="src\scripting\GameScript.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\commonmath.h" />
@@ -80,6 +83,9 @@
     <ClInclude Include="src\graphics\Shaders\EmptyShader.h" />
     <ClInclude Include="src\COM\COMManager.h" />
     <ClInclude Include="src\scripting\LuaManager.h" />
+    <ClInclude Include="src\scripting\Script.h" />
+    <ClInclude Include="src\scripting\Entity.h" />
+    <ClInclude Include="src\scripting\GameScript.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\BasicVertexShader.hlsl" />
@@ -98,6 +104,8 @@
   <ItemGroup>
     <None Include="src\shaders\Lights.hlsli" />
     <None Include="src\shaders\Materials.hlsli" />
-    <None Include="src\scripts\Test.lua" />
+    <None Include="scripts\Entity.lua" />
+    <None Include="scripts\Scripts.list" />
+    <None Include="scripts\Lights.lua" />
   </ItemGroup>
 </Project>

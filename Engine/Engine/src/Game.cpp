@@ -2,6 +2,7 @@
 #include "boost/property_tree/ptree.hpp"
 #include "boost/property_tree/json_parser.hpp"
 #include "boost/property_tree/ini_parser.hpp"
+#include "boost/algorithm/string.hpp"
 
 std::once_flag			Game::m_gameFlag;
 std::unique_ptr<Game>	Game::m_gameInstance = nullptr;
@@ -12,6 +13,7 @@ std::unique_ptr<Game>	Game::m_gameInstance = nullptr;
 #define INCREASE_DEBU_VAR(var, value)
 #endif
 
+
 Game* Game::GetInstance()
 {
 	std::call_once(m_gameFlag, [&] { m_gameInstance = std::make_unique<Game>(); });
@@ -21,7 +23,8 @@ Game* Game::GetInstance()
 
 
 Game::Game()
-{}
+{
+}
 
 
 Game::~Game()
@@ -31,6 +34,7 @@ Game::~Game()
 
 void Game::Destroy()
 {
+
 	WriteSettings();
 
 	ImGui_ImplDX11_Shutdown();
@@ -54,7 +58,9 @@ void Game::Create(HINSTANCE hInstance, uint32_t width, uint32_t height)
 	Init3D();
 	InitSizeDependent();
 	InitSettings();
-	auto shader = DisplacementShader::Get();
+
+	RegisterEngine();
+	OpenScripts();
 }
 
 void Game::InitSettings()
@@ -97,6 +103,25 @@ void Game::InitSettings()
 
 }
 
+void SetSun(Sun& light)
+{
+	TextureLightShader::Get()->SetLightInformations(light);
+}
+
+void Game::RegisterEngine()
+{
+	US_NS_LUA;
+	IShader::LuaRegister();
+	Entity::LuaRegister();
+
+	Lights::LuaRegister();
+
+	getGlobalNamespace(g_luaState.get())
+		.beginNamespace("Oblivion")
+			.addFunction("SetSun", SetSun)
+		.endNamespace();
+}
+
 void Game::InitWindow()
 {
 	WNDCLASSEX wndClass = {};
@@ -137,9 +162,9 @@ void Game::InitDirect3D()
 	d3d->Create(m_windowHandle);
 	d3d->OnResize(m_windowHandle, m_windowWidth, m_windowHeight);
 	Sun sunLight{
-		{0.5f,-0.5f,0.0f,1.0f},
-		{1.0f,1.0f,1.0f,1.0f},
-		{0.2f,0.2f,0.2f,1.0f}
+		{ 0.5f,-0.5f,0.0f,1.0f },
+		{ 1.0f,1.0f,1.0f,1.0f },
+		{ 0.2f,0.2f,0.2f,1.0f }
 	};
 	TextureLightShader::Get()->SetLightInformations(sunLight);
 }
@@ -164,7 +189,7 @@ void Game::Init3D()
 {
 	// auto renderer = Direct3D11::Get();
 
-	m_groundModel = std::make_unique<Model>();
+	/*m_groundModel = std::make_unique<Model>();
 	m_groundModel->Create(EDefaultObject::Grid);
 	m_groundModel->AddInstance();
 	m_groundModel->Translate(0.0f, -0.01f, 0.0f);
@@ -185,7 +210,7 @@ void Game::Init3D()
 
 	m_models.push_back(m_groundModel.get());
 	m_models.push_back(m_offRoadCar.get());
-	m_models.push_back(m_woodenCabin.get());
+	m_models.push_back(m_woodenCabin.get());*/
 
 }
 
@@ -248,6 +273,10 @@ void Game::Run()
 			Update();
 			Render();
 		}
+	}
+	for (auto & entity : m_entities) // Release entities
+	{
+		entity.reset();
 	}
 }
 
@@ -340,6 +369,15 @@ void Game::Update()
 	}
 	else if (!mouse.rightButton)
 		bRightClick = false;
+
+	for (auto & model : m_models)
+	{
+		model.second->Update(frameTime);
+	}
+	for (auto & script : m_gameScripts)
+	{
+		script->OnUpdate(frameTime);
+	}
 }
 
 void Game::Begin()
@@ -469,15 +507,84 @@ bool Game::PickObject()
 
 	for (auto & model : m_models)
 	{
-		CommonTypes::RayHitInfo rayHit = model->PickObject(pickRayPos, pickRayDir);
+		CommonTypes::RayHitInfo rayHit = model.second->PickObject(pickRayPos, pickRayDir);
 		if (rayHit < min && rayHit.instanceID != -1 && rayHit.dist > 0.0f)
 		{
 			min = rayHit;
-			m_selectedObject = model;
+			m_selectedObject = model.second.get();
 		}
 	}
 	
 	return m_selectedObject != 0;
+}
+
+void Game::AddEntityModel(Entity * entity, std::string const& path)
+{
+	auto it = m_models.find(path);
+	if (it == m_models.end())
+	{
+		std::unique_ptr<Model> model = std::make_unique<Model>();
+		model->Create(path);
+		uint32_t instance = model->AddEntity(entity);
+		model->SetName(path);
+		entity->SetGameObject(model.get(), instance);
+		m_models[path] = std::move(model);
+	}
+	else
+	{
+		it->second->AddEntity(entity);
+	}
+}
+
+void Game::OpenScripts()
+{
+	// A script can be a model, animation, window or game script
+	using namespace boost::algorithm;
+	std::ifstream fin("scripts/Scripts.list");
+	auto scriptManager = ScriptManager::Get();
+
+	while (!fin.eof())
+	{
+		std::string skip;
+		std::string scriptPath;
+		std::getline(std::getline(fin, skip, '"'), scriptPath, '"');
+		std::string mainTable;
+		std::getline(std::getline(fin, skip, '"'), mainTable, '"');
+		if (scriptPath == "")
+			break;
+		std::unique_ptr<Script> script = std::make_unique<Script>(std::filesystem::path(scriptPath));
+		auto type = script->GetAttribute<std::string>(mainTable.c_str(), "type");
+		scriptManager->AddScript(std::move(script));
+		if (type.has_value())
+		{
+			if (to_lower_copy(type.value()) == "model")
+			{
+				auto path = script->GetAttribute<std::string>(mainTable.c_str(), "path");
+				if (path.has_value())
+				{
+					m_entities.emplace_back(std::make_unique<Entity>());
+					AddEntityModel(m_entities.back().get(), path.value());
+					m_entities.back()->SetScript(mainTable.c_str());
+				}
+			}
+			else if (to_lower_copy(type.value()) == "animation")
+			{
+				// it's an animation
+			}
+			else if (to_lower_copy(type.value()) == "window")
+			{
+				// it's a window
+			}
+			else if (to_lower_copy(type.value()) == "game script")
+			{
+				m_gameScripts.emplace_back(std::make_unique<GameScript>());
+				m_gameScripts.back()->SetScript(mainTable.c_str());
+			}
+		}
+		else
+			THROW_ERROR("Script \"%s\" doesn't have a type", scriptPath.c_str());
+	}
+
 }
 
 void Game::Render()
@@ -485,6 +592,12 @@ void Game::Render()
 	auto renderer = Direct3D11::Get();
 	if (!renderer->Available())
 		return;
+
+	for (auto & entity : m_entities)
+	{
+		entity->OnRenderCall();
+	}
+
 	Begin();
 
 	auto debugDrawer = DebugDraw::Get();
@@ -497,14 +610,13 @@ void Game::Render()
 	IGameObject::BindStaticVertexBuffer();
 	
 #if DEBUG || _DEBUG
-	m_debugSquare->Render(m_screen.get(), Pipeline::Texture);
+	m_debugSquare->Render(m_screen.get(), Pipeline::PipelineTexture);
 #endif
 
-	TextureLightShader::Get()->bind();
-
-	m_groundModel->Render(m_camera.get(), Pipeline::DisplacementTextureLight);
-	m_offRoadCar->Render(m_camera.get(), Pipeline::TextureLight);
-	m_woodenCabin->Render(m_camera.get(), Pipeline::TextureLight);
+	for (auto & model : m_models)
+	{
+		model.second->Render(m_camera.get(), Pipeline::PipelineTextureLight);
+	}
 
 	EmptyShader::Get()->bind(); // Clear the pipeline
 

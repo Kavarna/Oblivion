@@ -1,4 +1,5 @@
 #include "GameObject.h"
+#include "../../scripting/Entity.h"
 #include "../Direct3D11.h"
 
 using CommonTypes::Range;
@@ -12,6 +13,19 @@ IGameObject::IGameObject()
 	ShaderHelper::CreateBuffer(m_d3d11Device.Get(), &m_materialBuffer,
 		D3D11_USAGE::D3D11_USAGE_DYNAMIC, D3D11_BIND_FLAG::D3D11_BIND_CONSTANT_BUFFER,
 		sizeof(Shader::material_t), D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE);
+}
+
+void IGameObject::Update(float frameTime)
+{
+	for (const auto& entity : m_entities)
+	{
+		entity.second->OnUpdate(frameTime);
+	}
+}
+
+inline bool IGameObject::isInstanceEntity(uint32_t index) const
+{
+	return m_entities.find(index) != m_entities.end();
 }
 
 DirectX::XMMATRIX& IGameObject::AddInstance(DirectX::FXMMATRIX const& mat)
@@ -43,6 +57,13 @@ DirectX::XMMATRIX* IGameObject::AddInstance(uint32_t number)
 	return &m_objectWorld[start];
 }
 
+uint32_t IGameObject::AddEntity(Entity * e)
+{
+	m_entities[(uint32_t)m_objectWorld.size()] = e;
+	AddInstance();
+	return (uint32_t)m_objectWorld.size() - 1;
+}
+
 void IGameObject::RemoveInstance(int index)
 {
 	m_objectWorld.erase(m_objectWorld.begin() + index, m_objectWorld.begin() + index + 1);
@@ -66,7 +87,13 @@ int IGameObject::PrepareInstances(std::function<bool(uint32_t)> & shouldRender) 
 	{
 		if (shouldRender((uint32_t)i))
 		{
-			data[renderInstances++] = m_objectWorld[i];
+			if (isInstanceEntity((uint32_t)i))
+			{ // first = is entity; second = iterator
+				if (this->m_entities.at((uint32_t)i)->OnRender())
+					data[renderInstances++] = m_objectWorld[i];
+			}
+			else
+				data[renderInstances++] = m_objectWorld[i];
 		}
 	}
 	ShaderHelper::UnmapBuffer(m_d3d11Context.Get(), m_instanceBuffer.Get());
@@ -79,21 +106,20 @@ void IGameObject::Render(ICamera * cam, const Pipeline& p) const
 		return;
 	switch (p)
 	{
-	case Pipeline::Basic:
+	case Pipeline::PipelineBasic:
 		RenderBasic(cam);
 		break;
-	case Pipeline::Texture:
+	case Pipeline::PipelineTexture:
 		RenderTexture(cam);
 		break;
-	case Pipeline::TextureLight:
+	case Pipeline::PipelineTextureLight:
 		RenderTextureLight(cam);
 		break;
-	case Pipeline::DisplacementTextureLight:
+	case Pipeline::PipelineDisplacementTextureLight:
 		RenderDisplacementTextureLight(cam);
 		break;
 	default:
 		return;
-		break;
 	}
 	DrawIndexedInstanced(cam, p);
 }

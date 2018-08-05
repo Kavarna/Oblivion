@@ -114,5 +114,5 @@ void TextureLightShader::SetCameraInformations(SCameraInfo const & camInfo)
 
 const Pipeline TextureLightShader::GetPipelineType() const
 {
-	return Pipeline::TextureLight;
+	return Pipeline::PipelineTextureLight;
 }

@@ -35,6 +35,8 @@ private:
 	void Init3D();
 	void InitSizeDependent();
 	void InitSettings();
+	void RegisterEngine();
+	void OpenScripts();
 
 	void Begin();
 	void End();
@@ -42,35 +44,39 @@ private:
 	void WriteSettings();
 	
 	bool PickObject();
+
+private:
+	void AddEntityModel(Entity* entity, std::string const& path);
+
 private:
 	void Update();
 	void Render();
 
 private:
-	HINSTANCE									m_windowInstance;
-	HWND										m_windowHandle;
+	HINSTANCE											m_windowInstance;
+	HWND												m_windowHandle;
 	
-	uint32_t									m_windowWidth;
-	uint32_t									m_windowHeight;
-	bool										m_menuActive = true;
-	float										m_mouseSensivity = 2.0f;
-	bool										m_showDeveloperConsole = false;
-	bool										m_selectObjects = false;
+	uint32_t											m_windowWidth;
+	uint32_t											m_windowHeight;
+	bool												m_menuActive = true;
+	float												m_mouseSensivity = 2.0f;
+	bool												m_showDeveloperConsole = false;
+	bool												m_selectObjects = false;
 
 private:
-	std::unique_ptr<Camera>						m_camera;
-	std::unique_ptr<Projection>					m_screen;
+	std::unique_ptr<Camera>								m_camera;
+	std::unique_ptr<Projection>							m_screen;
 #if DEBUG || _DEBUG
-	std::unique_ptr<Square>						m_debugSquare;
+	std::unique_ptr<Square>								m_debugSquare;
 #endif
-	std::unique_ptr<Model>						m_groundModel;
-	std::unique_ptr<Model>						m_offRoadCar;
-	std::unique_ptr<Model>						m_woodenCabin;
 
-	std::vector<Model*>							m_models;
-	Model*										m_selectedObject;
+	std::vector<std::unique_ptr<GameScript>>			m_gameScripts;
+	std::vector<std::unique_ptr<Entity>>				m_entities;
+	std::map<std::string, std::unique_ptr<Model>>		m_models;
+	Model*												m_selectedObject;
+
 private:
-	std::unique_ptr<DirectX::Mouse>				m_mouse;
-	std::unique_ptr<DirectX::Keyboard>			m_keyboard;
+	std::unique_ptr<DirectX::Mouse>						m_mouse;
+	std::unique_ptr<DirectX::Keyboard>					m_keyboard;
 };
 

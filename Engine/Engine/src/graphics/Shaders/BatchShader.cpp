@@ -56,7 +56,7 @@ void BatchShader::Create()
 
 const Pipeline BatchShader::GetPipelineType() const
 {
-	return Pipeline::BatchShader;
+	return Pipeline::PipelineBatchShader;
 }
 
 void BatchShader::SetCamera(DirectX::FXMMATRIX & mat)

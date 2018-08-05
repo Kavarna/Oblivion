@@ -23,6 +23,6 @@ public:
 	{}
 	const Pipeline GetPipelineType() const	override
 	{
-		return Pipeline::None;
+		return Pipeline::PipelineNone;
 	}
 };
