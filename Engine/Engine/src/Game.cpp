@@ -615,7 +615,7 @@ void Game::Render()
 
 	for (auto & model : m_models)
 	{
-		model.second->Render(m_camera.get(), Pipeline::PipelineTextureLight);
+		model.second->Render(m_camera.get(), Pipeline::PipelineDisplacementTextureLight);
 	}
 
 	EmptyShader::Get()->bind(); // Clear the pipeline

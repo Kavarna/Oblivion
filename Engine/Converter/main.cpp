@@ -37,6 +37,20 @@
 
 using namespace Oblivion;
 
+struct SModel
+{
+	std::vector<SVertex> vertices;
+	std::vector<uint32_t> indices;
+	uint32_t materialIndex;
+	std::string name;
+
+	bool hasTexture;
+	bool hasNormal;
+	bool hasTangent;
+
+	SModel() = default;
+};
+
 void PrintHelp()
 {
 	std::cout << "default args: -tan 1" << std::endl;
@@ -45,110 +59,44 @@ void PrintHelp()
 		"-flags [NUMBER] = flags\n";
 }
 
-void InitMesh(const aiMesh * pMesh, std::vector<aiVector3D>& positions,
-	std::vector<aiVector2D>& texCoords, std::vector<aiVector3D>& normals,
-	std::vector<aiVector3D>& tangents, std::vector<aiVector3D>& bitangents,
-	std::vector<unsigned int>& indices)
+void CalculateTangentAndBinormal(const DirectX::XMFLOAT3& P1, const DirectX::XMFLOAT3& P2,
+	const DirectX::XMFLOAT3& P3, const DirectX::XMFLOAT2& T1, const DirectX::XMFLOAT2& T2,
+	const DirectX::XMFLOAT2& T3, DirectX::XMFLOAT3& tangent, DirectX::XMFLOAT3& binormal)
 {
-	const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
+	DirectX::XMFLOAT3 edge1; DirectX::XMFLOAT2 tex1;
+	DirectX::XMFLOAT3 edge2; DirectX::XMFLOAT2 tex2;
 
-	for (unsigned int i = 0; i < pMesh->mNumVertices; ++i)
-	{
-		const aiVector3D* pTexCoord = pMesh->HasTextureCoords(0) ? &(pMesh->mTextureCoords[0][i]) : &Zero3D;
-		texCoords.emplace_back(pTexCoord->x,pTexCoord->y);
-		
-		positions.push_back(pMesh->mVertices[i]);
-		normals.push_back(pMesh->mNormals[i]);
-		tangents.push_back(pMesh->mTangents[i]);
-		bitangents.push_back(pMesh->mBitangents[i]);
-	}
+	edge1.x = P2.x - P1.x;
+	edge1.y = P2.y - P1.y;
+	edge1.z = P2.z - P2.z;
 
-	for (unsigned int i = 0; i < pMesh->mNumFaces; ++i)
-	{
-		const aiFace& face = pMesh->mFaces[i];
-		assert(face.mNumIndices == 3);
-		indices.push_back(face.mIndices[0]);
-		indices.push_back(face.mIndices[1]);
-		indices.push_back(face.mIndices[2]);
-	}
-}
+	edge2.x = P3.x - P1.x;
+	edge2.y = P3.y - P1.y;
+	edge2.z = P3.z - P1.z;
 
-void InitMaterials(const aiScene * scene, std::vector<material_t>& materials)
-{
-	materials.reserve(scene->mNumMaterials);
+	tex1.x = T2.x - T1.x;
+	tex1.y = T2.y - T1.y;
 
-	for (unsigned int i = 0; i < scene->mNumMaterials; ++i)
-	{
-		const aiMaterial * pMaterial = scene->mMaterials[i];
-		aiColor4D diffuseColor;
-		pMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor);
-		materials[i].diffuseColor.x = diffuseColor.r;
-		materials[i].diffuseColor.y = diffuseColor.g;
-		materials[i].diffuseColor.z = diffuseColor.b;
+	tex2.x = T3.x - T1.x;
+	tex2.y = T3.y - T1.y;
 
-		if (pMaterial->GetTextureCount(aiTextureType::aiTextureType_DIFFUSE) > 0)
-		{
-			aiString path;
-			pMaterial->GetTexture(aiTextureType::aiTextureType_DIFFUSE, 0, &path);
-			materials[i].diffuseMap = std::string(path.data);
-		}
-		if (pMaterial->GetTextureCount(aiTextureType::aiTextureType_NORMALS) > 0)
-		{
-			aiString path;
-			pMaterial->GetTexture(aiTextureType::aiTextureType_NORMALS, 0, &path);
-			materials[i].bumpMap = std::string(path.data);
-		}
-		if (pMaterial->GetTextureCount(aiTextureType::aiTextureType_SPECULAR) > 0)
-		{
-			aiString path;
-			pMaterial->GetTexture(aiTextureType::aiTextureType_SPECULAR, 0, &path);
-			materials[i].specularMap = std::string(path.data);
-		}
-	}
-}
+	float den = 1.0f / (tex1.x * tex2.y - tex1.y * tex2.x);
 
-void InitFromScene(const aiScene * scene, std::string const& from, std::string const& to)
-{
-	std::vector<material_t> materials(scene->mNumMaterials);
-	std::vector<mesh_t> meshes(scene->mNumMeshes);
+	tangent.x = (tex2.y * edge1.x - tex1.y * edge2.x) * den;
+	tangent.y = (tex2.y * edge1.y - tex1.y * edge2.y) * den;
+	tangent.z = (tex2.y * edge1.z - tex1.y * edge2.z) * den;
+	float sum = sqrtf(tangent.x * tangent.x + tangent.y * tangent.y + tangent.z * tangent.z);
+	tangent.x /= sum;
+	tangent.y /= sum;
+	tangent.z /= sum;
 
-	unsigned int numVertices = 0;
-	unsigned int numIndices = 0;
-
-	for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
-	{
-		meshes[i].materialIndex = scene->mMeshes[i]->mMaterialIndex;
-		meshes[i].numIndices = scene->mMeshes[i]->mNumFaces * 3;
-		meshes[i].baseVertex = numVertices;
-		meshes[i].baseIndex = numIndices;
-
-		numVertices += scene->mMeshes[i]->mNumVertices;
-		numIndices += scene->mMeshes[i]->mNumFaces * 3;
-	}
-
-	std::vector<aiVector3D> positions;
-	std::vector<aiVector2D> texCoords;
-	std::vector<aiVector3D> normals;
-	std::vector<aiVector3D> tangents;
-	std::vector<aiVector3D> bitangents;
-	std::vector<uint32_t> indices;
-
-	positions.reserve(numVertices);
-	texCoords.reserve(numVertices);
-	normals.reserve(numVertices);
-	tangents.reserve(numVertices);
-	bitangents.reserve(numVertices);
-	
-	indices.reserve(numIndices);
-
-	for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
-	{
-		const aiMesh* pMesh = scene->mMeshes[i];
-		InitMesh(pMesh, positions, texCoords, normals, tangents, bitangents, indices);
-	}
-
-	InitMaterials(scene, materials);
-
+	binormal.x = (tex1.x * edge2.x - tex2.x * edge1.x) * den;
+	binormal.y = (tex1.x * edge2.y - tex2.x * edge1.y) * den;
+	binormal.z = (tex1.x * edge2.z - tex2.x * edge1.z) * den;
+	sum = sqrtf(binormal.x * binormal.x + binormal.y * binormal.y + binormal.z * binormal.z);
+	binormal.x /= sum;
+	binormal.y /= sum;
+	binormal.z /= sum;
 }
 
 void WriteMaterial(const aiScene* pScene, std::string& to)
@@ -331,59 +279,178 @@ void PrintFromScene(const aiScene * pScene, std::string& to)
 	materialFile = to + ".material";
 
 	WriteMaterial(pScene, materialFile);
-	/*cout << "Materials " << pScene->mNumMaterials << " { " << std::endl;
-
-	for (unsigned int i = 0; i < pScene->mNumMaterials; ++i)
-	{
-		const aiMaterial* material = pScene->mMaterials[i];
-		aiString name;
-		material->Get(AI_MATKEY_NAME, name);
-		cout << "\t" << name.data << " {\n";
-
-		if (material->GetTextureCount(aiTextureType::aiTextureType_DIFFUSE) > 0)
-		{
-			aiString path;
-			material->GetTexture(aiTextureType::aiTextureType_DIFFUSE, 0, &path);
-			cout << "\t\t\tTexture " << path.data << "\n";
-		}
-		else
-		{
-			aiColor4D color;
-			material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
-			cout << "\t\t\tColor " << color.r << ' ' <<
-				color.g << ' ' << color.b << ' ' << color.a << '\n';
-		}
-
-		if (material->GetTextureCount(aiTextureType::aiTextureType_HEIGHT) > 0)
-		{
-			aiString path;
-			material->GetTexture(aiTextureType::aiTextureType_HEIGHT, 0, &path);
-			cout << "\t\t\tBump " << path.data << "\n";
-		}
-
-		float specPower;
-		if (!material->Get(AI_MATKEY_SHININESS, specPower))
-		{
-			cout << "\t\t\tShininess " << specPower << "\n";
-			if (material->GetTextureCount(aiTextureType::aiTextureType_SPECULAR) > 0)
-			{
-				aiString path;
-				material->GetTexture(aiTextureType::aiTextureType_SPECULAR, 0, &path);
-				cout << "\t\t\tSpecular " << path.data << "\n";
-			}
-		}
-
-		float opacity;
-		if (!material->Get(AI_MATKEY_OPACITY, opacity))
-		{
-			cout << "\t\t\tOpacity " << opacity << "\n";
-		}
-
-		cout << "\t}\n";
-	}*/
 
 	cout.rdbuf(coutbuf);
 	file.close();
+}
+
+void CreateModels(const aiScene* pScene, std::vector<SModel>& models)
+{
+	models.clear();
+	models.reserve(pScene->mNumMeshes);
+
+	for (unsigned int i = 0; i < pScene->mNumMeshes; ++i)
+	{
+		models.emplace_back();
+
+		SModel * model = &models.back();
+
+		aiMesh * mesh = pScene->mMeshes[i];
+
+		model->name = std::string(mesh->mName.C_Str());
+
+		model->materialIndex = mesh->mMaterialIndex;
+
+		model->vertices.reserve(mesh->mNumVertices);
+		model->indices.reserve(mesh->mNumFaces * 3);
+
+		for (unsigned int i = 0; i < mesh->mNumVertices; ++i)
+		{
+			mesh->mVertices; mesh->mNormals; mesh->mTextureCoords;
+			if (mesh->HasTextureCoords(0))
+				model->hasTexture = true;
+			if (mesh->HasNormals())
+				model->hasNormal = true;
+			
+			SVertex vertex;
+			vertex.Position.x = mesh->mVertices[i].x;
+			vertex.Position.y = mesh->mVertices[i].y;
+			vertex.Position.z = mesh->mVertices[i].z;
+			
+			if (model->hasTexture)
+			{
+				vertex.TexC.x = mesh->mTextureCoords[0][i].x;
+				vertex.TexC.y = mesh->mTextureCoords[0][i].y;
+			}
+
+			if (model->hasNormal)
+			{
+				vertex.Normal.x = mesh->mNormals[i].x;
+				vertex.Normal.y = mesh->mNormals[i].y;
+				vertex.Normal.z = mesh->mNormals[i].z;
+			}
+
+			model->vertices.push_back(vertex);
+		}
+
+		for (unsigned int i = 0; i < mesh->mNumFaces; ++i)
+		{
+			assert(mesh->mFaces->mNumIndices == 3);
+			model->indices.push_back(mesh->mFaces[i].mIndices[0]);
+			model->indices.push_back(mesh->mFaces[i].mIndices[1]);
+			model->indices.push_back(mesh->mFaces[i].mIndices[2]);
+		}
+
+		if (model->hasNormal && model->hasTexture)
+		{
+			model->hasTangent = true;
+			for (unsigned int i = 0; i < mesh->mNumFaces; ++i)
+			{
+				auto index0 = mesh->mFaces->mIndices[0];
+				auto index1 = mesh->mFaces->mIndices[1];
+				auto index2 = mesh->mFaces->mIndices[2];
+
+				DirectX::XMFLOAT3 tangent, binormal;
+
+				CalculateTangentAndBinormal(model->vertices[index0].Position,
+					model->vertices[index1].Position, model->vertices[index2].Position,
+					model->vertices[index0].TexC, model->vertices[index1].TexC,
+					model->vertices[index2].TexC, tangent, binormal);
+
+				model->vertices[index0].TangentU = tangent;
+				model->vertices[index0].Binormal = binormal;
+
+				model->vertices[index1].TangentU = tangent;
+				model->vertices[index1].Binormal = binormal;
+
+				model->vertices[index2].TangentU = tangent;
+				model->vertices[index2].Binormal = binormal;
+			}
+		}
+	}
+}
+
+void WriteModels(const std::vector<SModel>& models, const aiScene * pScene, const std::string& to)
+{
+	using namespace std;
+	ofstream file((to + ".obl").c_str());
+	streambuf * coutbuf = std::cout.rdbuf();
+	cout.rdbuf(file.rdbuf());
+
+	if (!pScene->HasAnimations())
+		cout << "Static\n";
+	else
+		cout << "Animation\n";
+
+	cout << "Meshes " << pScene->mNumMeshes << " { " << std::endl;
+
+	for (auto & model : models)
+	{
+		cout << "\t" << model.name << " {" << std::endl;
+		cout << "\t\tVertices " << model.vertices.size() << " ";
+		if (model.hasTexture)
+		{
+			cout << "UV 1 ";
+		}
+		else
+		{
+			cout << "UV 0 ";
+		}
+
+		if (model.hasNormal)
+		{
+			cout << "Normals 1 ";
+		}
+		else
+		{
+			cout << "Normals 0 ";
+		}
+
+		if (model.hasTangent)
+		{
+			cout << "Others 1 ";
+		}
+		else
+		{
+			cout << "Others 0 ";
+		}
+
+		cout << "{\n";
+
+		for (unsigned int i = 0; i < model.vertices.size(); ++i)
+		{
+			cout << "\t\t\t" << model.vertices[i].Position.x << ' ' << model.vertices[i].Position.y << ' ' << model.vertices[i].Position.z << ' ';
+			if (model.hasTexture)
+				cout << model.vertices[i].TexC.x << ' ' << model.vertices[i].TexC.y << ' ';
+			if (model.hasNormal)
+				cout << model.vertices[i].Normal.x << ' ' << model.vertices[i].Normal.y << ' ' << model.vertices[i].Normal.z << ' ';
+			if (model.hasTangent)
+			{
+				cout << model.vertices[i].TangentU.x << ' ' << model.vertices[i].TangentU.y << ' ' << model.vertices[i].TangentU.z << ' ';
+				cout << model.vertices[i].Binormal.x << ' ' << model.vertices[i].Binormal.y << ' ' << model.vertices[i].Binormal.z << ' ';
+			}
+			cout << '\n';
+
+		}
+
+		cout << "\t\t}\n";
+
+		cout << "\t\tIndices " << model.indices.size() << " {\n";
+
+		for (unsigned int i = 0; i < model.indices.size() / 3; ++i)
+		{
+			cout << "\t\t\t" << model.indices[(i * 3) + 0] << ' '
+				<< model.indices[(i * 3) + 1] << ' ' << model.indices[(i * 3) + 2] << '\n';
+		}
+
+		cout << "\t\t}\n";
+
+		cout << "Material " << model.materialIndex << '\n';
+
+		cout << "\t}\n";
+	}
+
+	cout << "}\n";
 }
 
 void ConvertFile(std::string const& from, std::string & to, unsigned int flags)
@@ -393,7 +460,15 @@ void ConvertFile(std::string const& from, std::string & to, unsigned int flags)
 	const aiScene * pScene = importer.ReadFile(from.c_str(), flags);
 	if (!pScene)
 		std::cout << "Can't convert that file";
-	PrintFromScene(pScene, to);
+	//PrintFromScene(pScene, to);
+	std::vector<SModel> models;
+	CreateModels(pScene, models);
+
+	WriteModels(models, pScene, to);
+
+	std::string materialFile;
+	materialFile = to + ".material";
+	WriteMaterial(pScene, materialFile);
 }
 
 int main(int argc, char* argv[])

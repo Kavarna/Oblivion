@@ -9,11 +9,11 @@
             "Scale": "0.100000001"
         }
     },
-    "CabinMat": {
-        "Texture": "WoodCabinDif.jpg",
-        "Bump": "WoodCabinNM.jpg",
-        "Shininess": "384.313721",
-        "Specular map": "WoodCabinSM.jpg",
+    "blinn1SG": {
+		"Texture": "Resources\\truck_color.jpg",
+		"Bump": "Resources\\truck_bump.jpg",
+        "Color": "0 0 0 1",
+        "Shininess": "0",
         "Opacity": "1",
         "Tesselation": {
             "Minimum": "1",
