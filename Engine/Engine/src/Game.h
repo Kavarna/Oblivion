@@ -41,12 +41,14 @@ private:
 	void Begin();
 	void End();
 
+	void ReregisterSizeDependent();
+
 	void WriteSettings();
 	
 	bool PickObject();
 
 private:
-	void AddEntityModel(Entity* entity, std::string const& path);
+	void AddEntityModel(Entity* entity, std::string const& path, int numInstances = 1);
 
 private:
 	void Update();

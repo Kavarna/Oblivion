@@ -150,6 +150,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\common\commonmath.cpp" />
     <ClCompile Include="src\COM\COMManager.cpp" />
     <ClCompile Include="src\scripting\Entity.cpp" />
     <ClCompile Include="src\graphics\interfaces\Shader.cpp" />
@@ -368,7 +369,8 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="scripts\Entity.lua" />
+    <None Include="scripts\Car.lua" />
+    <None Include="scripts\ground.lua" />
     <None Include="scripts\Lights.lua" />
     <None Include="scripts\Scripts.list" />
     <None Include="src\shaders\Lights.hlsli" />

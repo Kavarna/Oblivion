@@ -2,6 +2,7 @@
 
 #include <DirectXMath.h>
 #include <DirectXCollision.h>
+#include "common.h"
 
 namespace Math
 {
@@ -91,4 +92,5 @@ namespace Math
 			return true;
 		return false;
 	}
+	void LuaRegister();
 }

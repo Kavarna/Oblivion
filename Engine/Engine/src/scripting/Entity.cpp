@@ -14,6 +14,8 @@ void Entity::LuaRegister()
 			.addFunction("RotateZ", &Entity::RotateZ)
 			.addFunction("Scale1",&Entity::Scale1)
 			.addFunction("Scale3", &Entity::Scale3)
+			.addFunction("setCamera", &Entity::SetCamera)
+			.addFunction("setPipeline", &Entity::SetPipeline)
 		.endClass();
 }
 
@@ -89,44 +91,60 @@ void Entity::OnCleanup()
 		(*m_onCleanupCallback)(this);
 }
 
-void Entity::Identity()
+void Entity::Identity(float instanceID)
 {
-	m_object->m_objectWorld[m_instanceID] = DirectX::XMMatrixIdentity();
+	m_object->m_objectWorld[ClampInstance((uint32_t) instanceID)] = DirectX::XMMatrixIdentity();
 }
 
-void Entity::Translate(float x, float y, float z)
+void Entity::Translate(float instanceID, float x, float y, float z)
 {
-	m_object->m_objectWorld[m_instanceID] = DirectX::XMMatrixTranslation(x, y, z);
+	m_object->m_objectWorld[ClampInstance((uint32_t) instanceID)] *= DirectX::XMMatrixTranslation(x, y, z);
 }
 
-void Entity::RotateX(float theta)
+void Entity::RotateX(float instanceID, float theta)
 {
-	m_object->m_objectWorld[m_instanceID] = DirectX::XMMatrixRotationX(theta);
+	m_object->m_objectWorld[ClampInstance((uint32_t)instanceID)] *= DirectX::XMMatrixRotationX(theta);
 }
 
-void Entity::RotateY(float theta)
+void Entity::RotateY(float instanceID, float theta)
 {
-	m_object->m_objectWorld[m_instanceID] = DirectX::XMMatrixRotationY(theta);
+	m_object->m_objectWorld[ClampInstance((uint32_t)instanceID)] *= DirectX::XMMatrixRotationY(theta);
 }
 
-void Entity::RotateZ(float theta)
+void Entity::RotateZ(float instanceID, float theta)
 {
-	m_object->m_objectWorld[m_instanceID] = DirectX::XMMatrixRotationZ(theta);
+	m_object->m_objectWorld[ClampInstance((uint32_t)instanceID)] *= DirectX::XMMatrixRotationZ(theta);
 }
 
-void Entity::Scale1(float S)
+void Entity::Scale1(float instanceID, float S)
 {
-	m_object->m_objectWorld[m_instanceID] = DirectX::XMMatrixScaling(S, S, S);
+	m_object->m_objectWorld[ClampInstance((uint32_t)instanceID)] *= DirectX::XMMatrixScaling(S, S, S);
 }
 
-void Entity::Scale3(float Sx, float Sy, float Sz)
+void Entity::Scale3(float instanceID, float Sx, float Sy, float Sz)
 {
-	m_object->m_objectWorld[m_instanceID] = DirectX::XMMatrixScaling(Sx, Sy, Sz);
+	m_object->m_objectWorld[ClampInstance((uint32_t)instanceID)] *= DirectX::XMMatrixScaling(Sx, Sy, Sz);
 }
 
-void Entity::SetGameObject(IGameObject * object, uint32_t instanceID)
+void Entity::SetCamera(ICamera * cam)
+{
+	m_cameraToUse = cam;
+}
+
+void Entity::SetPipeline(float pipeline)
+{
+	int pipe = (int)pipeline;
+	m_pipelineToUse = (Pipeline)pipe;
+}
+
+void Entity::SetGameObject(IGameObject * object, const CommonTypes::Range& range)
 {
 	m_object = object;
-	m_instanceID = instanceID;
+	m_instanceRange = range;
+}
+
+uint32_t Entity::ClampInstance(uint32_t instanceID)
+{
+	return instanceID + m_instanceRange.begin;
 }
 

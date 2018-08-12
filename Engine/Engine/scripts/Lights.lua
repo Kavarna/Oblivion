@@ -16,7 +16,7 @@ lights = {
 		Oblivion.SetSun(sun);
 	end,
 
-	onUpdate = function(frameTime)
+	--[[onUpdate = function(frameTime)
 		
 		r = r + deltar * frameTime * 0.2;
 		if r <= 0 or r >= 1 then
@@ -41,5 +41,5 @@ lights = {
 		sun:setDirection(x,y,0.0);
 		sun:setDiffuseColor(r,g,b);
 		Oblivion.SetSun(sun);
-	end
+	end]]
 }

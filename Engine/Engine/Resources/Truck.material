@@ -1,6 +1,6 @@
 {
     "DefaultMaterial": {
-        "Color": "0.600000024 0.600000024 0.600000024 1",
+        "Color": "0.6 0.60.6 1",
         "Shininess": "0",
         "Opacity": "1",
         "Tesselation": {
@@ -10,9 +10,7 @@
         }
     },
     "blinn1SG": {
-		"Texture": "Resources\\truck_color.jpg",
-		"Bump": "Resources\\truck_bump.jpg",
-        "Color": "0 0 0 1",
+        "Texture": "Resources\\truck_color.jpg",
         "Shininess": "0",
         "Opacity": "1",
         "Tesselation": {

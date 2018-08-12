@@ -36,6 +36,7 @@
     <ClCompile Include="src\scripting\Script.cpp" />
     <ClCompile Include="src\scripting\Entity.cpp" />
     <ClCompile Include="src\scripting\GameScript.cpp" />
+    <ClCompile Include="src\common\commonmath.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\commonmath.h" />
@@ -104,8 +105,9 @@
   <ItemGroup>
     <None Include="src\shaders\Lights.hlsli" />
     <None Include="src\shaders\Materials.hlsli" />
-    <None Include="scripts\Entity.lua" />
     <None Include="scripts\Scripts.list" />
     <None Include="scripts\Lights.lua" />
+    <None Include="scripts\ground.lua" />
+    <None Include="scripts\Car.lua" />
   </ItemGroup>
 </Project>

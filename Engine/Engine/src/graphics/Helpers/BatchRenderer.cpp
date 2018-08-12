@@ -1,4 +1,5 @@
 #include "BatchRenderer.h"
+#include "../../scripting/LuaManager.h"
 
 
 BatchRenderer::BatchRenderer()
@@ -8,6 +9,20 @@ BatchRenderer::BatchRenderer()
 
 BatchRenderer::~BatchRenderer()
 {
+}
+
+void BatchRenderer::LuaRegister()
+{
+	US_NS_LUA;
+	getGlobalNamespace(g_luaState.get())
+		.beginNamespace("Oblivion")
+			.beginClass<BatchRenderer>("BatchRenderer")
+				.addFunction("Begin", &BatchRenderer::Begin)
+				.addFunction("End", &BatchRenderer::End)
+				.addFunction("Point", &BatchRenderer::Point)
+				.addFunction("Reconstrunct", &BatchRenderer::Reconstruct)
+			.endClass()
+		.endNamespace();
 }
 
 void BatchRenderer::Create()
@@ -40,6 +55,11 @@ void BatchRenderer::Vertex(DirectX::XMFLOAT3 const & pos, DirectX::XMFLOAT4 cons
 	m_bufferData[m_currentIndex].Color = color;
 	m_currentIndex++;
 	assert(m_currentIndex < m_numMaxVertices);
+}
+
+void BatchRenderer::Point(DirectX::XMFLOAT3 const & pos, DirectX::XMFLOAT4 const & color)
+{
+	Vertex(pos, color);
 }
 
 void BatchRenderer::End(ICamera * cam, D3D11_PRIMITIVE_TOPOLOGY topology)

@@ -3,17 +3,23 @@
 #include "AlignedObject.h"
 
 
-class ICamera : public AlignedObject
+class ICamera
 {
 public:
 	ICamera() = default;
 	virtual ~ICamera() = default;
 
 public:
-	virtual void Construct() = 0;
+	virtual void Construct() {};
 
-	virtual DirectX::XMMATRIX& GetView() = 0;
-	virtual DirectX::XMMATRIX& GetProjection() = 0;
+#pragma warning(push)
+
+#pragma warning(disable : 4172)
+
+	virtual DirectX::XMMATRIX& GetView() { return DirectX::XMMatrixIdentity(); };
+	virtual DirectX::XMMATRIX& GetProjection() { return DirectX::XMMatrixIdentity(); };
+
+#pragma warning(pop)
 
 	inline	DirectX::BoundingFrustum& GetFrustum()
 	{
@@ -38,6 +44,7 @@ public:
 	}
 	inline void RenderDebug() const;
 
+	static void LuaRegister();
 
 protected:
 	void BuildViewFrustum()

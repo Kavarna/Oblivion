@@ -1,2 +1,3 @@
-"scripts/Entity.lua" "defaultscript"
+"scripts/ground.lua" "defaultscript"
 "scripts/Lights.lua" "lights"
+"scripts/Car.lua" "car"

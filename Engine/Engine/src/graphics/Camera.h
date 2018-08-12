@@ -5,7 +5,7 @@
 #include "interfaces/ICamera.h"
 
 
-class Camera : public ICamera
+class Camera : public ICamera, public AlignedObject
 {
 	static const DirectX::XMVECTOR Forward;
 	static const DirectX::XMVECTOR Right;

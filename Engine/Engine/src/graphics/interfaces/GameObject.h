@@ -77,11 +77,13 @@ protected:
 public:
 	virtual			DirectX::XMMATRIX&				AddInstance(DirectX::FXMMATRIX const& mat = DirectX::XMMatrixIdentity());
 	virtual			DirectX::XMMATRIX*				AddInstance(uint32_t number);
-	virtual			uint32_t						AddEntity(Entity * e);
+	virtual			CommonTypes::Range				MakeEntity(Entity * e, int numInstances = 1);
 	virtual			void							RemoveInstance(int ID);
 	virtual			void							RemoveInstance(CommonTypes::Range const& range);
 	virtual			int								PrepareInstances(std::function<bool(uint32_t)> & func) const;
 	virtual			void							Render(ICamera * cam, const Pipeline& p) const;
+	virtual			void							Render() const;
+	virtual			bool							isEntity() const;
 
 protected:
 	virtual			void							RenderBasic(ICamera * cam) const;
@@ -101,15 +103,12 @@ protected:
 
 protected:
 					void							BindMaterial(Rendering::material_t const& mat, int shader) const;
-	
-private:
-	inline			bool							isInstanceEntity(uint32_t index) const;
 
 public:
 	static			void							BindStaticVertexBuffer();
 
 private:
-			std::unordered_map<uint32_t, Entity*>	m_entities;
+			Entity*									m_entity = nullptr;
 
 protected:
 	static	std::vector<Oblivion::SVertex>			m_staticVertices;

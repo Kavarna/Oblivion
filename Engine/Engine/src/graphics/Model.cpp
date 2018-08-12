@@ -5,6 +5,7 @@
 #include "../imgui/imgui.h"
 #include "boost/property_tree/ptree.hpp"
 #include "boost/property_tree/json_parser.hpp"
+#include "boost/algorithm/string.hpp"
 
 /*
 * Appends path (except last directory) to relative
@@ -443,6 +444,22 @@ bool Model::ShouldRenderInstance(ICamera * cam, uint32_t id) const
 
 void Model::Create(std::string const& filename)
 {
+	using boost::algorithm::to_lower_copy;
+	if (to_lower_copy(filename) == "cube")
+	{
+		Model::Create(EDefaultObject::Box);
+		return;
+	}
+	if (to_lower_copy(filename) == "grid")
+	{
+		Model::Create(EDefaultObject::Grid);
+		return;
+	}
+	if (to_lower_copy(filename) == "sphere")
+	{
+		Model::Create(EDefaultObject::Sphere);
+		return;
+	}
 	std::ifstream fin;
 
 	fin.open((filename + ".obl").c_str());
@@ -802,10 +819,10 @@ void Model::Create(EDefaultObject object)
 			m_materials.back().opacity = 1.0f;
 			m_materials.back().specular = 1000.0f;
 			m_materials.back().tessMin = 1.0f;
-			m_materials.back().tessMax = 32.0f;
+			m_materials.back().tessMax = 64.0f;
 			m_materials.back().tessScale = 0.3f;
-			m_materials.back().diffuseTexture = std::make_unique<Texture>((LPWSTR)L"Resources/grass.dds", m_d3d11Device.Get(), m_d3d11Context.Get());
-			m_materials.back().bumpMap = std::make_unique<Texture>((LPWSTR)L"Resources/grass_nmap.dds", m_d3d11Device.Get(), m_d3d11Context.Get());
+			m_materials.back().diffuseTexture = std::make_unique<Texture>((LPWSTR)L"Resources/Stones.dds", m_d3d11Device.Get(), m_d3d11Context.Get());
+			m_materials.back().bumpMap = std::make_unique<Texture>((LPWSTR)L"Resources/Stones_nmap.dds", m_d3d11Device.Get(), m_d3d11Context.Get());
 			m_meshes.back().m_materialIndex = 0;
 		}
 	}

@@ -6,7 +6,7 @@
 
 
 class Projection :
-	public ICamera
+	public ICamera, public AlignedObject
 {
 public:
 	Projection() = default;

@@ -111,10 +111,12 @@ void SetSun(Sun& light)
 void Game::RegisterEngine()
 {
 	US_NS_LUA;
+	Math::LuaRegister();
 	IShader::LuaRegister();
 	Entity::LuaRegister();
-
+	BatchRenderer::LuaRegister();
 	Lights::LuaRegister();
+	ICamera::LuaRegister();
 
 	getGlobalNamespace(g_luaState.get())
 		.beginNamespace("Oblivion")
@@ -253,6 +255,8 @@ void Game::InitSizeDependent()
 		m_debugSquare->SetName("Debug square");
 #endif
 	}
+
+	ReregisterSizeDependent();
 }
 
 void Game::Run()
@@ -458,6 +462,17 @@ void Game::End()
 	renderer->End();
 }
 
+void Game::ReregisterSizeDependent()
+{
+	US_NS_LUA;
+
+	getGlobalNamespace(g_luaState.get())
+		.beginNamespace("Oblivion")
+			.addVariable("Camera", (ICamera*)(m_camera.get()), false)
+			.addVariable("Screen", (ICamera*)(m_screen.get()), false)
+		.endNamespace();
+}
+
 void Game::WriteSettings()
 {
 	boost::property_tree::ptree pt;
@@ -518,21 +533,21 @@ bool Game::PickObject()
 	return m_selectedObject != 0;
 }
 
-void Game::AddEntityModel(Entity * entity, std::string const& path)
+void Game::AddEntityModel(Entity * entity, std::string const& path, int numInstances)
 {
 	auto it = m_models.find(path);
 	if (it == m_models.end())
 	{
 		std::unique_ptr<Model> model = std::make_unique<Model>();
 		model->Create(path);
-		uint32_t instance = model->AddEntity(entity);
+		auto instances = model->MakeEntity(entity, numInstances);
 		model->SetName(path);
-		entity->SetGameObject(model.get(), instance);
+		entity->SetGameObject(model.get(), instances);
 		m_models[path] = std::move(model);
 	}
 	else
 	{
-		it->second->AddEntity(entity);
+		THROW_ERROR("Engine isn't ready for multiple scripts using the same model. Use instances, pretty please! :D")
 	}
 }
 
@@ -562,8 +577,9 @@ void Game::OpenScripts()
 				auto path = script->GetAttribute<std::string>(mainTable.c_str(), "path");
 				if (path.has_value())
 				{
+					auto num = script->GetAttribute<int>(mainTable.c_str(), "instances");
 					m_entities.emplace_back(std::make_unique<Entity>());
-					AddEntityModel(m_entities.back().get(), path.value());
+					AddEntityModel(m_entities.back().get(), path.value(), num.value());
 					m_entities.back()->SetScript(mainTable.c_str());
 				}
 			}
@@ -616,6 +632,7 @@ void Game::Render()
 	for (auto & model : m_models)
 	{
 		model.second->Render(m_camera.get(), Pipeline::PipelineDisplacementTextureLight);
+		//model.second->Render();
 	}
 
 	EmptyShader::Get()->bind(); // Clear the pipeline

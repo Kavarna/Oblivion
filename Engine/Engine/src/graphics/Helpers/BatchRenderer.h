@@ -13,6 +13,8 @@ public:
 	BatchRenderer();
 	~BatchRenderer();
 
+public:
+	static void LuaRegister();
 
 public:
 	void Create();
@@ -22,6 +24,7 @@ public:
 	void Begin();
 	void Vertex(BatchShader::SVertex const& vertex);
 	void Vertex(DirectX::XMFLOAT3 const& pos, DirectX::XMFLOAT4 const& color);
+	void Point(DirectX::XMFLOAT3 const& pos, DirectX::XMFLOAT4 const& color); // For lua register
 	void End(ICamera *, D3D11_PRIMITIVE_TOPOLOGY = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
 private:

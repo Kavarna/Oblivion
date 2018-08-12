@@ -8,6 +8,7 @@
 
 class Entity
 {
+	friend class IGameObject;
 public:
 	Entity();
 	~Entity();
@@ -35,19 +36,28 @@ public: // Callbacks
 	void OnCleanup();
 
 public:
-	void Identity();
-	void Translate(float x, float y, float z);
-	void RotateX(float theta);
-	void RotateY(float theta);
-	void RotateZ(float theta);
-	void Scale1(float S);
-	void Scale3(float Sx, float Sy, float Sz);
+	void Identity(float instanceID);
+	void Translate(float instanceID, float x, float y, float z);
+	void RotateX(float instanceID, float theta);
+	void RotateY(float instanceID, float theta);
+	void RotateZ(float instanceID, float theta);
+	void Scale1(float instanceID, float S);
+	void Scale3(float instanceID, float Sx, float Sy, float Sz);
+	void SetCamera(ICamera * cam);
+	void SetPipeline(float pipeline);
 
 public:
-	void SetGameObject(IGameObject * object, uint32_t instanceID);
+	void SetGameObject(IGameObject * object, const CommonTypes::Range& range);
+
+
+private:
+	uint32_t ClampInstance(uint32_t instanceID);
 
 private:
 	IGameObject * m_object;
-	uint32_t m_instanceID;
+	CommonTypes::Range m_instanceRange;
+
+	ICamera * m_cameraToUse;
+	Pipeline m_pipelineToUse;
 
 };

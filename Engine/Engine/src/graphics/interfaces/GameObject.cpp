@@ -17,15 +17,10 @@ IGameObject::IGameObject()
 
 void IGameObject::Update(float frameTime)
 {
-	for (const auto& entity : m_entities)
+	if (isEntity())
 	{
-		entity.second->OnUpdate(frameTime);
+		m_entity->OnUpdate(frameTime);
 	}
-}
-
-inline bool IGameObject::isInstanceEntity(uint32_t index) const
-{
-	return m_entities.find(index) != m_entities.end();
 }
 
 DirectX::XMMATRIX& IGameObject::AddInstance(DirectX::FXMMATRIX const& mat)
@@ -57,11 +52,15 @@ DirectX::XMMATRIX* IGameObject::AddInstance(uint32_t number)
 	return &m_objectWorld[start];
 }
 
-uint32_t IGameObject::AddEntity(Entity * e)
+CommonTypes::Range IGameObject::MakeEntity(Entity * e, int numInstances)
 {
-	m_entities[(uint32_t)m_objectWorld.size()] = e;
-	AddInstance();
-	return (uint32_t)m_objectWorld.size() - 1;
+	CommonTypes::Range range;
+	range.begin = m_objectWorld.size();
+	m_entity = e;
+	AddInstance(numInstances);
+	range.end = m_objectWorld.size();
+	return range;
+	//return (uint32_t)m_objectWorld.size() - 1;
 }
 
 void IGameObject::RemoveInstance(int index)
@@ -83,19 +82,30 @@ int IGameObject::PrepareInstances(std::function<bool(uint32_t)> & shouldRender) 
 {
 	auto data = (DirectX::XMMATRIX*)ShaderHelper::MapBuffer(m_d3d11Context.Get(), m_instanceBuffer.Get());
 	uint32_t renderInstances = 0;
-	for (size_t i = 0; i < m_objectWorld.size(); ++i)
+	if (isEntity())
 	{
-		if (shouldRender((uint32_t)i))
+		for (size_t i = 0; i < m_objectWorld.size(); ++i)
 		{
-			if (isInstanceEntity((uint32_t)i))
-			{ // first = is entity; second = iterator
-				if (this->m_entities.at((uint32_t)i)->OnRender())
+			if (shouldRender((uint32_t)i))
+			{
+				if (m_entity->OnRender())
+				{
 					data[renderInstances++] = m_objectWorld[i];
+				}
 			}
-			else
-				data[renderInstances++] = m_objectWorld[i];
 		}
 	}
+	else
+	{
+		for (size_t i = 0; i < m_objectWorld.size(); ++i)
+		{
+			if (shouldRender((uint32_t)i))
+			{
+				data[renderInstances++] = m_objectWorld[i];
+			}
+		}
+	}
+	
 	ShaderHelper::UnmapBuffer(m_d3d11Context.Get(), m_instanceBuffer.Get());
 	return renderInstances;
 }
@@ -122,6 +132,19 @@ void IGameObject::Render(ICamera * cam, const Pipeline& p) const
 		return;
 	}
 	DrawIndexedInstanced(cam, p);
+}
+
+void IGameObject::Render() const
+{
+	if (isEntity())
+	{
+		//Render(m_entity->m_cameraToUse, m_entity->m_pipelineToUse);
+	}
+}
+
+bool IGameObject::isEntity() const
+{
+	return (m_entity != nullptr);
 }
 
 void IGameObject::RenderBasic(ICamera * cam) const
