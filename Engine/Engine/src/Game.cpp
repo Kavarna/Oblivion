@@ -108,6 +108,9 @@ void SetSun(Sun& light)
 	TextureLightShader::Get()->SetLightInformations(light);
 }
 
+float kWorldCameraID = CameraType::World;
+float kScreenCameraID = CameraType::Screen;
+
 void Game::RegisterEngine()
 {
 	US_NS_LUA;
@@ -117,9 +120,12 @@ void Game::RegisterEngine()
 	BatchRenderer::LuaRegister();
 	Lights::LuaRegister();
 	ICamera::LuaRegister();
+	Camera::LuaRegister();
 
-	getGlobalNamespace(g_luaState.get())
+	getGlobalNamespace()
 		.beginNamespace("Oblivion")
+			.addVariable("World", &kWorldCameraID, false)
+			.addVariable("Screen", &kScreenCameraID, false)
 			.addFunction("SetSun", SetSun)
 		.endNamespace();
 }
@@ -189,31 +195,6 @@ void Game::Init2D()
 
 void Game::Init3D()
 {
-	// auto renderer = Direct3D11::Get();
-
-	/*m_groundModel = std::make_unique<Model>();
-	m_groundModel->Create(EDefaultObject::Grid);
-	m_groundModel->AddInstance();
-	m_groundModel->Translate(0.0f, -0.01f, 0.0f);
-	m_groundModel->SetName("Ground");
-
-	m_offRoadCar = std::make_unique<Model>();
-	m_offRoadCar->Create("Resources\\OffRoadCar");
-	m_offRoadCar->AddInstance();
-	m_offRoadCar->Scale(0.3f);
-	m_offRoadCar->Translate(40.0f, -0.1f, 0.0f);
-	m_offRoadCar->SetName("Offroad car");
-
-	m_woodenCabin = std::make_unique<Model>();
-	m_woodenCabin->Create("Resources\\WoodenCabin");
-	m_woodenCabin->AddInstance();
-	m_woodenCabin->Translate(-20.0f, 0.0f, 0.0f);
-	m_woodenCabin->SetName("Wooden cabin");
-
-	m_models.push_back(m_groundModel.get());
-	m_models.push_back(m_offRoadCar.get());
-	m_models.push_back(m_woodenCabin.get());*/
-
 }
 
 void Game::InitSizeDependent()
@@ -222,26 +203,26 @@ void Game::InitSizeDependent()
 	float HByW = (float)m_windowWidth / (float)m_windowHeight;
 	float nearZ = 1.0f;
 	float farZ = 1000.0f;
-	if (m_camera)
+	if (g_camera)
 	{
 		Camera * cam = new Camera(FOV, HByW, nearZ, farZ);
-		auto camDir = m_camera->GetDirection();
+		auto camDir = g_camera->GetDirection();
 		cam->SetDirection({ camDir.x,camDir.y,camDir.z,1.0f });
-		auto camPos = m_camera->GetPosition();
+		auto camPos = g_camera->GetPosition();
 		cam->SetPosition({ camPos.x,camPos.y,camPos.z,1.0f });
-		m_camera.reset(cam);
+		g_camera.reset(cam);
 	}
 	else
 	{
-		m_camera = std::make_unique<Camera>(FOV, HByW, nearZ, farZ);
-		m_camera->SetPosition(DirectX::XMVectorSet(0.0f, 2.0f, -3.0f, 1.0f));
-		m_screen = std::make_unique<Projection>();
+		g_camera = std::make_unique<Camera>(FOV, HByW, nearZ, farZ);
+		g_camera->SetPosition(DirectX::XMVectorSet(0.0f, 2.0f, -3.0f, 1.0f));
+		g_screen = std::make_unique<Projection>();
 	}
-	m_screen->m_width = (float) m_windowWidth;
-	m_screen->m_height = (float) m_windowHeight;
-	m_screen->m_nearZ = nearZ;
-	m_screen->m_farZ = farZ;
-	m_screen->Construct();
+	g_screen->m_width = (float) m_windowWidth;
+	g_screen->m_height = (float) m_windowHeight;
+	g_screen->m_nearZ = nearZ;
+	g_screen->m_farZ = farZ;
+	g_screen->Construct();
 	auto renderer = Direct3D11::Get();
 	if (renderer->Available())
 	{
@@ -255,8 +236,6 @@ void Game::InitSizeDependent()
 		m_debugSquare->SetName("Debug square");
 #endif
 	}
-
-	ReregisterSizeDependent();
 }
 
 void Game::Run()
@@ -296,13 +275,13 @@ void Game::Update()
 	if (kb.LeftShift)
 		cameraFrameTime *= 10;
 	if (kb.W)
-		m_camera->WalkForward(cameraFrameTime);
+		g_camera->WalkForward(cameraFrameTime);
 	if (kb.S)
-		m_camera->WalkBackward(cameraFrameTime);
+		g_camera->WalkBackward(cameraFrameTime);
 	if (kb.D)
-		m_camera->StrafeRight(cameraFrameTime);
+		g_camera->StrafeRight(cameraFrameTime);
 	if (kb.A)
-		m_camera->StrafeLeft(cameraFrameTime);
+		g_camera->StrafeLeft(cameraFrameTime);
 
 
 
@@ -347,12 +326,12 @@ void Game::Update()
 	}
 
 	if (m_menuActive)
-		m_camera->Update(frameTime, 0.0f, 0.0f);
+		g_camera->Update(frameTime, 0.0f, 0.0f);
 	else
 	{
 		mouse.x = DX::clamp(mouse.x, -25, 25);
 		mouse.y = DX::clamp(mouse.y, -25, 25);
-		m_camera->Update(frameTime, mouse.x * m_mouseSensivity, mouse.y * m_mouseSensivity);
+		g_camera->Update(frameTime, mouse.x * m_mouseSensivity, mouse.y * m_mouseSensivity);
 	}
 
 	static bool bRightClick = false;
@@ -462,17 +441,6 @@ void Game::End()
 	renderer->End();
 }
 
-void Game::ReregisterSizeDependent()
-{
-	US_NS_LUA;
-
-	getGlobalNamespace(g_luaState.get())
-		.beginNamespace("Oblivion")
-			.addVariable("Camera", (ICamera*)(m_camera.get()), false)
-			.addVariable("Screen", (ICamera*)(m_screen.get()), false)
-		.endNamespace();
-}
-
 void Game::WriteSettings()
 {
 	boost::property_tree::ptree pt;
@@ -497,7 +465,7 @@ bool Game::PickObject()
 	GetCursorPos(&mouse);
 	ScreenToClient(m_windowHandle, &mouse);
 
-	auto projection = m_camera->GetProjection();
+	auto projection = g_camera->GetProjection();
 
 	float pickedXinViewSpace, pickedYinViewSpace, pickedZinViewSpace;
 	pickedXinViewSpace = ((2.0f * mouse.x) / m_windowWidth - 1.0f) / XMVectorGetX(projection.r[0]);
@@ -509,7 +477,7 @@ bool Game::PickObject()
 
 	XMMATRIX invView;
 	XMVECTOR det;
-	invView = XMMatrixInverse(&det, m_camera->GetView());
+	invView = XMMatrixInverse(&det, g_camera->GetView());
 
 	XMVECTOR pickRayPos = XMVector3TransformCoord(pickedRayInViewSpace, invView);
 	XMVECTOR pickRayDir = XMVector3TransformNormal(pickedRayInViewSpace, invView);
@@ -626,20 +594,20 @@ void Game::Render()
 	IGameObject::BindStaticVertexBuffer();
 	
 #if DEBUG || _DEBUG
-	m_debugSquare->Render(m_screen.get(), Pipeline::PipelineTexture);
+	m_debugSquare->Render(g_screen.get(), Pipeline::PipelineTexture);
 #endif
 
 	for (auto & model : m_models)
 	{
-		model.second->Render(m_camera.get(), Pipeline::PipelineDisplacementTextureLight);
-		//model.second->Render();
+		//model.second->Render(g_camera.get(), Pipeline::PipelineDisplacementTextureLight);
+		model.second->Render();
 	}
 
 	EmptyShader::Get()->bind(); // Clear the pipeline
 
 	if (g_isDeveloper)
 	{
-		debugDrawer->End(m_camera.get());
+		debugDrawer->End(g_camera.get());
 	}
 
 

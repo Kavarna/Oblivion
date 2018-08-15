@@ -19,15 +19,15 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		Game* joc = Game::GetInstance();
 		joc->Create(hInstance);
 		joc->Run();
-		joc->Destroy();
+		//joc->Destroy();
 		COM::UninitializeComObjects();
 		CoUninitialize();
 	}
 	catch (std::exception const& e)
 	{
-		wchar_t buffer[500];
+		wchar_t buffer[5000];
 		size_t converted = 0;
-		mbstowcs_s(&converted, buffer, e.what(), 500);
+		mbstowcs_s(&converted, buffer, e.what(), 5000);
 		MessageBox(NULL, buffer, L"Error", MB_ICONERROR | MB_OK);
 		CoUninitialize();
 		return 1;

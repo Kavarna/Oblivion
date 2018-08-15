@@ -126,9 +126,21 @@ void Entity::Scale3(float instanceID, float Sx, float Sy, float Sz)
 	m_object->m_objectWorld[ClampInstance((uint32_t)instanceID)] *= DirectX::XMMatrixScaling(Sx, Sy, Sz);
 }
 
-void Entity::SetCamera(ICamera * cam)
+void Entity::SetCamera(float cam)
 {
-	m_cameraToUse = cam;
+	int iCam = (int)cam;
+	CameraType camType = static_cast<CameraType>(iCam);
+	switch (camType)
+	{
+	case World:
+		m_cameraToUse = g_camera.get();
+		break;
+	case Screen:
+		m_cameraToUse = g_screen.get();
+		break;
+	default:
+		break;
+	}
 }
 
 void Entity::SetPipeline(float pipeline)

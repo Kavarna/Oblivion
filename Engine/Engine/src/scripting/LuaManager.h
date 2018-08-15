@@ -15,6 +15,7 @@ namespace LuaManager
 
 	void LoadScriptFromFile(std::string const& file);
 	void LoadScriptFromMemory(std::string const& script);
+	luabridge::Namespace getGlobalNamespace();
 	luabridge::LuaRef getGlobal(const char* name);
 
 	void PrintFromLua(const char*);

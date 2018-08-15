@@ -16,8 +16,8 @@ public:
 
 #pragma warning(disable : 4172)
 
-	virtual DirectX::XMMATRIX& GetView() { return DirectX::XMMatrixIdentity(); };
-	virtual DirectX::XMMATRIX& GetProjection() { return DirectX::XMMatrixIdentity(); };
+	virtual DirectX::XMMATRIX& GetView() = 0;
+	virtual DirectX::XMMATRIX& GetProjection() = 0;
 
 #pragma warning(pop)
 

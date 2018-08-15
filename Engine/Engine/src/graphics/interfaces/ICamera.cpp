@@ -16,13 +16,15 @@ void ICamera::LuaRegister()
 	US_NS_LUA;
 
 	getGlobalNamespace(g_luaState.get())
-		.beginClass<ICamera>("ICamera")
-			.addFunction("RenderDebug",&ICamera::RenderDebug)
-			.addFunction("GetNearZ",&ICamera::GetNearZ)
-			.addFunction("GetFarZ", &ICamera::GetFarZ)
-			.addFunction("GetDirection", &ICamera::GetDirection)
-			.addFunction("GetPosition", &ICamera::GetPosition)
-			.addFunction("GetView", &ICamera::GetView)
-			.addFunction("GetProjection", &ICamera::GetProjection)
-		.endClass();
+		.beginNamespace("Oblivion")
+			.beginClass<ICamera>("ICamera")
+				.addFunction("RenderDebug",&ICamera::RenderDebug)
+				.addFunction("GetNearZ",&ICamera::GetNearZ)
+				.addFunction("GetFarZ", &ICamera::GetFarZ)
+				.addFunction("GetDirection", &ICamera::GetDirection)
+				.addFunction("GetPosition", &ICamera::GetPosition)
+				.addFunction("GetView", &ICamera::GetView)
+				.addFunction("GetProjection", &ICamera::GetProjection)
+			.endClass()
+		.endNamespace();
 }

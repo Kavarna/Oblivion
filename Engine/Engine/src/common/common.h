@@ -88,6 +88,7 @@ MessageBoxA(NULL,"Unexpected error occured", "Error", MB_ICONERROR| MB_OK); exit
 #include <OblivionObjects.h>
 
 #include "commonmath.h"
+#include "globals.h"
 
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "d3d10.lib")

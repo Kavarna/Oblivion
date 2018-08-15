@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include "../scripting/LuaManager.h"
 
 
 const DirectX::XMVECTOR Camera::Forward = DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
@@ -16,6 +17,26 @@ Camera::Camera(float FOV, float HByW, float NearZ, float FarZ) :
 
 Camera::~Camera()
 {}
+
+void Camera::LuaRegister()
+{
+	US_NS_LUA;
+
+	getGlobalNamespace()
+		.beginNamespace("Oblivion")
+			.deriveClass<Camera, ICamera>("Camera")
+				//.addConstructor<void(*)()>()
+				//.addConstructor<void(*)(float, float, float, float)>()
+				.addFunction("RenderDebug", &Camera::RenderDebug)
+				.addFunction("GetNearZ", &Camera::GetNearZ)
+				.addFunction("GetFarZ", &Camera::GetFarZ)
+				.addFunction("GetDirection", &Camera::GetDirection)
+				.addFunction("GetPosition", &Camera::GetPosition)
+				.addFunction("GetView", &Camera::GetView)
+				.addFunction("GetProjection", &Camera::GetProjection)
+			.endClass()
+		.endNamespace();
+}
 
 void Camera::Update(float frameTime, float horizontalMouseMove, float verticalMouseMove)
 {

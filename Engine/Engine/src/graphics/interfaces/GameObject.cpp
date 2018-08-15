@@ -138,7 +138,7 @@ void IGameObject::Render() const
 {
 	if (isEntity())
 	{
-		//Render(m_entity->m_cameraToUse, m_entity->m_pipelineToUse);
+		Render(m_entity->m_cameraToUse, m_entity->m_pipelineToUse);
 	}
 }
 

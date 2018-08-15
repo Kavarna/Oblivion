@@ -152,6 +152,7 @@
   <ItemGroup>
     <ClCompile Include="src\common\commonmath.cpp" />
     <ClCompile Include="src\COM\COMManager.cpp" />
+    <ClCompile Include="src\graphics\Projection.cpp" />
     <ClCompile Include="src\scripting\Entity.cpp" />
     <ClCompile Include="src\graphics\interfaces\Shader.cpp" />
     <ClCompile Include="src\graphics\Shaders\DisplacementShader.cpp" />

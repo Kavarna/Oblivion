@@ -41,8 +41,6 @@ private:
 	void Begin();
 	void End();
 
-	void ReregisterSizeDependent();
-
 	void WriteSettings();
 	
 	bool PickObject();
@@ -66,8 +64,6 @@ private:
 	bool												m_selectObjects = false;
 
 private:
-	std::unique_ptr<Camera>								m_camera;
-	std::unique_ptr<Projection>							m_screen;
 #if DEBUG || _DEBUG
 	std::unique_ptr<Square>								m_debugSquare;
 #endif

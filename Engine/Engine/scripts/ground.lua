@@ -3,6 +3,7 @@ defaultscript = {
 	--path = "Resources/Truck";
 	path = "grid";
 	instances = 4;
+
 	onLoad = function(Entity)
 			Entity:Identity(0);
 			Entity:Translate(0, 50, 0, 0);
@@ -11,13 +12,12 @@ defaultscript = {
 			Entity:Identity(2);
 			Entity:Translate(2, -50, 0, -100);
 			Entity:Identity(3);
-			Entity:Translate(3, 50, 0, - 100)
-			--Log("Oblivion.Screen = " .. Oblivion.Screen);
+			Entity:Translate(3, 50, 0, - 100);
 		end,
 	onUpdate = function(Entity, frameTime)
 		end,
 	onRenderCall = function(Entity)
-			--Entity:setCamera(Oblivion.Camera);
-			Entity:setPipeline(Oblivion.Pipeline.DisplacementTextureLight)			
+			Entity:setCamera(Oblivion.World);
+			Entity:setPipeline(Oblivion.Pipeline.DisplacementTextureLight);
 		end
 }

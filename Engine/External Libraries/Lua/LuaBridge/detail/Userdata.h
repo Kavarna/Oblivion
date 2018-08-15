@@ -383,7 +383,9 @@ public:
   template <class U>
   static inline void push (lua_State* const L, U const& u)
   {
-    new (place (L)) U (u);
+    //new (place (L)) U (u);
+	  new U (u);
+	  place(L);
   }
 };
 

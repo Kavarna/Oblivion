@@ -3,8 +3,17 @@
 
 #include "../common/common.h"
 #include "../graphics/interfaces/GameObject.h"
+
+#include "../graphics/Camera.h"
+#include "../graphics/Projection.h"
+
 #include "LuaManager.h"
 #include "Script.h"
+
+enum CameraType
+{
+	World = 1, Screen = 2
+};
 
 class Entity
 {
@@ -43,7 +52,7 @@ public:
 	void RotateZ(float instanceID, float theta);
 	void Scale1(float instanceID, float S);
 	void Scale3(float instanceID, float Sx, float Sy, float Sz);
-	void SetCamera(ICamera * cam);
+	void SetCamera(float cam);
 	void SetPipeline(float pipeline);
 
 public:

@@ -21,6 +21,7 @@ namespace LuaManager
 		luaL_openlibs(g_luaState.get());
 
 		LuaManager::AddFunction("Log", PrintFromLua);
+
 	}
 
 	void LoadScriptFromFile(std::string const & file)
@@ -34,6 +35,11 @@ namespace LuaManager
 	void LoadScriptFromMemory(std::string const& script)
 	{
 		luaL_dostring(g_luaState.get(), script.c_str());
+	}
+
+	luabridge::Namespace getGlobalNamespace()
+	{
+		return getGlobalNamespace(g_luaState.get());
 	}
 
 	luabridge::LuaRef getGlobal(const char* name)
