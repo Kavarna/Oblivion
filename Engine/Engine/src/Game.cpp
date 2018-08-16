@@ -7,12 +7,6 @@
 std::once_flag			Game::m_gameFlag;
 std::unique_ptr<Game>	Game::m_gameInstance = nullptr;
 
-#if DEBUG || _DEBUG
-#define INCREASE_DEBUG_VAR(var, value) var += value;
-#else
-#define INCREASE_DEBU_VAR(var, value)
-#endif
-
 
 Game* Game::GetInstance()
 {
@@ -34,7 +28,6 @@ Game::~Game()
 
 void Game::Destroy()
 {
-
 	WriteSettings();
 
 	ImGui_ImplDX11_Shutdown();
@@ -120,7 +113,6 @@ void Game::RegisterEngine()
 	BatchRenderer::LuaRegister();
 	Lights::LuaRegister();
 	ICamera::LuaRegister();
-	Camera::LuaRegister();
 
 	getGlobalNamespace()
 		.beginNamespace("Oblivion")
@@ -197,8 +189,13 @@ void Game::Init3D()
 {
 }
 
+float windowWidth;
+float windowHeight;
+
 void Game::InitSizeDependent()
 {
+	windowWidth = m_windowWidth;
+	windowHeight = m_windowHeight;
 	float FOV = DirectX::XM_PI / 4;
 	float HByW = (float)m_windowWidth / (float)m_windowHeight;
 	float nearZ = 1.0f;
@@ -236,6 +233,13 @@ void Game::InitSizeDependent()
 		m_debugSquare->SetName("Debug square");
 #endif
 	}
+
+	US_NS_LUA;
+	getGlobalNamespace()
+		.beginNamespace("Oblivion")
+			.addVariable("WindowWidth", &windowWidth, false)
+			.addVariable("WindowHeight", &windowHeight, false)
+		.endNamespace();
 }
 
 void Game::Run()
@@ -261,7 +265,16 @@ void Game::Run()
 	{
 		entity.reset();
 	}
+	m_entities.clear();
+	for (auto & script : m_gameScripts)
+	{
+		script.reset();
+	}
+	m_gameScripts.clear();
 }
+
+float kMousePositionX = 0;
+float kMousePositionY = 0;
 
 void Game::Update()
 {
@@ -271,6 +284,17 @@ void Game::Update()
 		return;
 	auto kb = m_keyboard->GetState();
 	auto mouse = m_mouse->GetState();
+
+	kMousePositionX = mouse.x;
+	kMousePositionY = mouse.y;
+
+	US_NS_LUA;
+	getGlobalNamespace()
+		.beginNamespace("Oblivion")
+			.addVariable("MouseX", &kMousePositionX, false)
+			.addVariable("MouseY", &kMousePositionY, false)
+		.endNamespace();
+
 	float cameraFrameTime = frameTime;
 	if (kb.LeftShift)
 		cameraFrameTime *= 10;
@@ -569,6 +593,15 @@ void Game::OpenScripts()
 			THROW_ERROR("Script \"%s\" doesn't have a type", scriptPath.c_str());
 	}
 
+	US_NS_LUA;
+	getGlobalNamespace()
+		.beginNamespace("Oblivion")
+			.addVariable("MouseX", &kMousePositionX, false)
+			.addVariable("MouseY", &kMousePositionY, false)
+			.addVariable("WindowWidth", &windowWidth, false)
+			.addVariable("WindowHeight", &windowHeight, false)
+		.endNamespace();
+
 }
 
 void Game::Render()
@@ -589,6 +622,11 @@ void Game::Render()
 	{
 		g_drawCalls = 0;
 		debugDrawer->Begin();
+	}
+
+	for (auto & script : m_gameScripts)
+	{
+		script->OnRender();
 	}
 
 	IGameObject::BindStaticVertexBuffer();
@@ -622,6 +660,9 @@ void Game::OnSize(uint32_t width, uint32_t height)
 	m_windowHeight = height;
 
 	InitSizeDependent();
+
+	for (auto & script : m_gameScripts)
+		script->OnSize();
 
 	Direct3D11::Get()->OnResize(m_windowHandle, m_windowWidth, m_windowHeight);
 
