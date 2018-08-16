@@ -28,7 +28,6 @@ Game::~Game()
 
 void Game::Destroy()
 {
-	WriteSettings();
 
 	ImGui_ImplDX11_Shutdown();
 	ImGui::DestroyContext();
@@ -104,6 +103,11 @@ void SetSun(Sun& light)
 float kWorldCameraID = CameraType::World;
 float kScreenCameraID = CameraType::Screen;
 
+void LuaSleep(float ms)
+{
+	Sleep((DWORD)ms);
+}
+
 void Game::RegisterEngine()
 {
 	US_NS_LUA;
@@ -118,6 +122,7 @@ void Game::RegisterEngine()
 		.beginNamespace("Oblivion")
 			.addVariable("World", &kWorldCameraID, false)
 			.addVariable("Screen", &kScreenCameraID, false)
+			.addFunction("Sleep",LuaSleep)
 			.addFunction("SetSun", SetSun)
 		.endNamespace();
 }
@@ -271,6 +276,7 @@ void Game::Run()
 		script.reset();
 	}
 	m_gameScripts.clear();
+	WriteSettings();
 }
 
 float kMousePositionX = 0;
@@ -468,9 +474,11 @@ void Game::End()
 void Game::WriteSettings()
 {
 	boost::property_tree::ptree pt;
+	
+	bool hasMSAA = Direct3D11::Get()->m_hasMSAA;
 
 	pt.put("Graphics.VSync", Direct3D11::Get()->m_hasVerticalSync);
-	pt.put("Graphics.MSAA", Direct3D11::Get()->m_hasMSAA);
+	pt.put("Graphics.MSAA", hasMSAA);
 
 	pt.put("Gameplay.Mouse sensivity", m_mouseSensivity);
 	pt.put("Gameplay.Developer", g_isDeveloper);

@@ -34,12 +34,10 @@ function getIntersection(ray,segment)
 		y = r_py+r_dy*T1,
 		param = T1
 	};
-	--return nil;
 end
 
 game = {
 	type = "game script",
-
 
 	onSize = function()
 		halfWidth = Oblivion.WindowWidth / 2;
@@ -51,18 +49,70 @@ game = {
 	end,
 
 	onLoad = function()
+		epsilon = 0.00001;
 		renderer = Oblivion.BatchRenderer();
 		renderer:Create();
 		white = Oblivion.float4(1,1,1,1);
 		red = Oblivion.float4(1,0,0,1);
 		yellow = Oblivion.float4(1,1,0,1);
 		green = Oblivion.float4(0,1,0,1);
+		black = Oblivion.float4(0,0,0,1);
 		game.onSize();
 		mouseCoords = converter.convert3Dto2D(0, 0);
 	end,
 
 	onUpdate = function()
 		mouseCoords = converter.convert3Dto2D(Oblivion.MouseX, Oblivion.MouseY);
+		intersectionPoints = {};
+
+		local uniquePoints = {};
+		for i = 1, #level1.points do
+			local locX = level1.points[i].x - mouseCoords.x;
+			local locY = level1.points[i].y - mouseCoords.y;
+			local angle = math.atan2(locY, locX);
+			table.insert(uniquePoints,angle - epsilon);
+			table.insert(uniquePoints,angle);
+			table.insert(uniquePoints,angle + epsilon);
+		end
+
+		table.sort(uniquePoints, function (p1, p2)
+										return p1 > p2;
+									end);
+
+		for i = 1, #uniquePoints do
+			local angle = uniquePoints[i];
+
+			local dx = math.cos(angle);
+			local dy = math.sin(angle);
+
+			local ray = {
+				from = {
+					x = mouseCoords.x,
+					y = mouseCoords.y
+				},
+				to = {
+					x = mouseCoords.x + dx,
+					y = mouseCoords.y + dy
+				}
+			};
+			local closestIntersect = {
+				x = 0,
+				y = 0,
+				param = nil
+			}
+			for j = 1, #level1.lines do
+				local intersection = getIntersection(ray,level1.lines[j]);
+				if intersection then
+					if (closestIntersect.param == nil or intersection.param < closestIntersect.param)then
+						closestIntersect = intersection;
+					end
+				end
+			end
+
+
+			table.insert(intersectionPoints, closestIntersect);
+
+		end
 	end,
 
 	onRender = function()
@@ -73,44 +123,31 @@ game = {
 			renderer:Point(level1.lines[i].to,white);
 		end
 
-		--Log("~~~~~~~~~~~~~~~~~NEW FRAME~~~~~~~~~~~~~~~~~\n");
-		local closestIntersect = {
-			x = 0,
-			y = 0,
-			param = nil
-		}
-		local ray = {
-			from = {
-				x = mouseCoords.x,
-				y = mouseCoords.y
-			},
-			to = {
-				x = center.x,
-				y = center.y
-			}
-		};
-		
-		for i = 1, #level1.lines do
-			local intersect = getIntersection(ray,level1.lines[i]);
-			if (intersect) then
-				if (closestIntersect.param == nil or intersect.param < closestIntersect.param) then
-					closestIntersect = intersect;
-				end
+		renderer:End(Oblivion.Screen,Oblivion.TopologyLineList);
+
+		if (intersectionPoints) then
+			
+			renderer:Begin();
+
+
+			for i = 1, (#intersectionPoints - 1) do
+				local intersection0 = Oblivion.float3(intersectionPoints[i].x, intersectionPoints[i].y, 0);
+				renderer:Point(intersection0,black);
+				local intersection1 = Oblivion.float3(intersectionPoints[i + 1].x, intersectionPoints[i + 1].y, 0);
+				renderer:Point(intersection1,black);
+				renderer:Point(mouseCoords,white);
+				--Log("intersectionPoints[ ".. i .. " ] = (" .. intersectionPoints[i].x .. ", " .. intersectionPoints[i].y .. ", " .. intersectionPoints[i].param .. ")\n");
 			end
+			local intersection0 = Oblivion.float3(intersectionPoints[#intersectionPoints].x, intersectionPoints[#intersectionPoints].y, 0);
+			renderer:Point(intersection0,black);
+			local intersection1 = Oblivion.float3(intersectionPoints[1].x, intersectionPoints[1].y, 0);
+			renderer:Point(intersection1,black);
+			renderer:Point(mouseCoords,white);
+
+			renderer:End(Oblivion.Screen,Oblivion.TopologyTriangleList);
+			--Oblivion.Sleep(1000);
 		end
 
-		--Log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-
-		renderer:End(Oblivion.Screen,Oblivion.TopologyLineList);
-
-		renderer:Begin();
-
-		local intersection = Oblivion.float3(closestIntersect.x,closestIntersect.y, 0);
-
-		renderer:Point(mouseCoords, yellow);
-		renderer:Point(intersection, green);
-
-		renderer:End(Oblivion.Screen,Oblivion.TopologyLineList);
 
 	end
 
