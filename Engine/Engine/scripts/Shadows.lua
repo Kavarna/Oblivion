@@ -132,16 +132,16 @@ game = {
 
 			for i = 1, (#intersectionPoints - 1) do
 				local intersection0 = Oblivion.float3(intersectionPoints[i].x, intersectionPoints[i].y, 0);
-				renderer:Point(intersection0,white);
+				renderer:Point(intersection0,black);
 				local intersection1 = Oblivion.float3(intersectionPoints[i + 1].x, intersectionPoints[i + 1].y, 0);
-				renderer:Point(intersection1,white);
+				renderer:Point(intersection1,black);
 				renderer:Point(mouseCoords,white);
 				--Log("intersectionPoints[ ".. i .. " ] = (" .. intersectionPoints[i].x .. ", " .. intersectionPoints[i].y .. ", " .. intersectionPoints[i].param .. ")\n");
 			end
 			local intersection0 = Oblivion.float3(intersectionPoints[#intersectionPoints].x, intersectionPoints[#intersectionPoints].y, 0);
-			renderer:Point(intersection0,white);
+			renderer:Point(intersection0,black);
 			local intersection1 = Oblivion.float3(intersectionPoints[1].x, intersectionPoints[1].y, 0);
-			renderer:Point(intersection1,white);
+			renderer:Point(intersection1,black);
 			renderer:Point(mouseCoords,white);
 
 			renderer:End(Oblivion.Screen,Oblivion.TopologyTriangleList);
