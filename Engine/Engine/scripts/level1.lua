@@ -16,6 +16,13 @@ function coords2D(x,y)
 
 end
 
+function translatePoint(point, where)
+	local locPoint = Oblivion.float3(0,0,0);
+	locPoint.x = point.x + where.x;
+	locPoint.y = point.y + where.y;
+	return locPoint;
+end
+
 local level1 = {
 	-- Ideal for 640 x 360
 	points = {};
@@ -35,49 +42,42 @@ function level1.Load()
 		coords2D(0,0)
 	};
 
-	local polygon1 = {
+	local L = {
+		coords2D(0, 0),
+		coords2D(0, 150),
 		coords2D(100, 150),
-		coords2D(120, 50),
-		coords2D(200, 80),
-		coords2D(140, 210),
-		coords2D(100, 150)
+		coords2D(100, 130),
+		coords2D(25, 130),
+		coords2D(25, 0),
+		coords2D(0, 0)
 	};
 
-	local polygon2 = {
-		coords2D(100, 200),
-		coords2D(120, 250),
-		coords2D(60, 300),
-		coords2D(100, 200)
+	local M = {
+		coords2D(0, 150),
+		coords2D(0, 0),
+		coords2D(30, 0),
+		coords2D(70, 120),
+		coords2D(120, 0),
+		coords2D(150, 0),
+		coords2D(150, 150),
+		coords2D(130, 150),
+		coords2D(130, 20),
+		coords2D(80, 150),
+		coords2D(60, 150),
+		coords2D(20, 30),
+		coords2D(20, 150),
+		coords2D(0, 150)
 	};
 
-	local polygon3 = {
-		coords2D(200, 260),
-		coords2D(220, 150),
-		coords2D(300, 200),
-		coords2D(350, 320),
-		coords2D(200, 260)
-	};
-
-	local polygon4 = {
-		coords2D(340, 60),
-		coords2D(360, 40),
-		coords2D(370, 70),
-		coords2D(340, 60)
-	};
-
-	local polygon5 = {
-		coords2D(450, 190),
-		coords2D(560, 170),
-		coords2D(540, 270),
-		coords2D(430, 290),
-		coords2D(450, 190)
-	};
-
-	local polygon6 = {
-		coords2D(400, 95),
-		coords2D(580, 50),
-		coords2D(480, 150),
-		coords2D(400, 95)
+	local A = {
+		coords2D(0,150),
+		coords2D(70,0),
+		coords2D(150,150),
+		coords2D(135,150),
+		coords2D(90,60),
+		coords2D(55,60),
+		coords2D(15,150),
+		coords2D(0,150)
 	};
 
 	for i = 1, (#border - 1) do
@@ -90,64 +90,62 @@ function level1.Load()
 		table.insert(level1.points, point);
 	end
 
-	for i = 1, (#polygon1 - 1) do
+	--[[for i = 1, (#L - 1) do
 		local line = {
-			from = polygon1[i],
-			to = polygon1[i + 1]
+			from = L[i],
+			to = L[i + 1]
 		};
 		table.insert(level1.lines, line);
-		local point = polygon1[i];
+		local point = L[i];
 		table.insert(level1.points, point);
+	end]]
+
+	for i = 1, (#L - 1) do
+		
+		where = {
+			x = 100,
+			y = -100
+		}
+		local point0 = translatePoint(L[i],where);
+		local point1 = translatePoint(L[i + 1],where);
+		local line = {
+			from = point0,
+			to = point1
+		};
+		table.insert(level1.lines, line);
+		table.insert(level1.points, point0);
 	end
 
-	for i = 1, (#polygon2 - 1) do
+	for i = 1, (#M - 1) do
+		
+		where = {
+			x = 260,
+			y = -100
+		}
+		local point0 = translatePoint(M[i],where);
+		local point1 = translatePoint(M[i + 1],where);
 		local line = {
-			from = polygon2[i],
-			to = polygon2[i + 1]
+			from = point0,
+			to = point1
 		};
 		table.insert(level1.lines, line);
-		local point = polygon2[i];
-		table.insert(level1.points, point);
-	end
-	
-	for i = 1, (#polygon3 - 1) do
-		local line = {
-			from = polygon3[i],
-			to = polygon3[i + 1]
-		};
-		table.insert(level1.lines, line);
-		local point = polygon3[i];
-		table.insert(level1.points, point);
+		table.insert(level1.points, point0);
 	end
 
-	for i = 1, (#polygon4 - 1) do
+	for i = 1, (#A - 1) do
+		
+		where = {
+			x = 470,
+			y = -100
+		}
+		local point0 = translatePoint(A[i],where);
+		local point1 = translatePoint(A[i + 1],where);
 		local line = {
-			from = polygon4[i],
-			to = polygon4[i + 1]
+			from = point0,
+			to = point1
 		};
 		table.insert(level1.lines, line);
-		local point = polygon4[i];
-		table.insert(level1.points, point);
-	end
-
-	for i = 1, (#polygon5 - 1) do
-		local line = {
-			from = polygon5[i],
-			to = polygon5[i + 1]
-		};
-		table.insert(level1.lines, line);
-		local point = polygon5[i];
-		table.insert(level1.points, point);
-	end
-
-	for i = 1, (#polygon6 - 1) do
-		local line = {
-			from = polygon6[i],
-			to = polygon6[i + 1]
-		};
-		table.insert(level1.lines, line);
-		local point = polygon6[i];
-		table.insert(level1.points, point);
+		table.insert(level1.points, point0);
 	end
 
 end

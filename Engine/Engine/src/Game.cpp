@@ -143,7 +143,7 @@ void Game::InitWindow()
 	RegisterClassEx(&wndClass);
 
 	m_windowHandle = CreateWindowEx(WS_EX_CLIENTEDGE, ENGINE_NAME, ENGINE_NAME,
-		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
+		WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME ^ WS_MAXIMIZEBOX ^ WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT,
 		m_windowWidth, m_windowHeight, nullptr, nullptr,
 		m_windowInstance, nullptr);
 
@@ -405,24 +405,24 @@ void Game::End()
 	auto mouse = m_mouse->GetState();
 	auto renderer = Direct3D11::Get();
 
-	bool hasMSAA = renderer->m_hasMSAA;
-
-	ImGui::Begin("Settings", 0, ImGuiWindowFlags_NoNav |
-		ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-	ImGui::Checkbox("Vertical sync", &renderer->m_hasVerticalSync);
-	ImGui::Checkbox("Use MSAA", &renderer->m_hasMSAA);
-	ImGui::DragFloat("Mouse sensivity", &m_mouseSensivity, 0.01f, 1.0f, 5.0f);
-
-	if (hasMSAA != renderer->m_hasMSAA)
-	{
-		renderer->resetSwapChain();
-		renderer->OnResize(m_windowHandle, m_windowWidth, m_windowHeight);
-	}
-
-	ImGui::End();
-
 	if (m_showDeveloperConsole)
 	{
+		bool hasMSAA = renderer->m_hasMSAA;
+
+		ImGui::Begin("Settings", 0, ImGuiWindowFlags_NoNav |
+			ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+		ImGui::Checkbox("Vertical sync", &renderer->m_hasVerticalSync);
+		ImGui::Checkbox("Use MSAA", &renderer->m_hasMSAA);
+		ImGui::DragFloat("Mouse sensivity", &m_mouseSensivity, 0.01f, 1.0f, 5.0f);
+
+		if (hasMSAA != renderer->m_hasMSAA)
+		{
+			renderer->resetSwapChain();
+			renderer->OnResize(m_windowHandle, m_windowWidth, m_windowHeight);
+		}
+
+		ImGui::End();
+
 		ImGui::Begin("Debug", 0, ImGuiWindowFlags_NoNav |
 			ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
