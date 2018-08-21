@@ -1,12 +1,15 @@
 #include "BatchRenderer.h"
 #include "../../scripting/LuaManager.h"
-#include "../../scripting/Entity.h"
 
-float kPointList = D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
-float kLineList = D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
-float kLineStrip = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
-float kTriangleList = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-float kTriangleStrip = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+
+BatchRenderer::BatchRenderer()
+{
+}
+
+
+BatchRenderer::~BatchRenderer()
+{
+}
 
 void BatchRenderer::LuaRegister()
 {
@@ -14,18 +17,11 @@ void BatchRenderer::LuaRegister()
 	getGlobalNamespace(g_luaState.get())
 		.beginNamespace("Oblivion")
 			.beginClass<BatchRenderer>("BatchRenderer")
-				.addConstructor<void(*)()>()
-				.addFunction("Create", &BatchRenderer::Create)
 				.addFunction("Begin", &BatchRenderer::Begin)
-				.addFunction("End", &BatchRenderer::LuaEnd)
+				.addFunction("End", &BatchRenderer::End)
 				.addFunction("Point", &BatchRenderer::Point)
-				.addFunction("Reconstruct", &BatchRenderer::Reconstruct)
+				.addFunction("Reconstrunct", &BatchRenderer::Reconstruct)
 			.endClass()
-			.addVariable("TopologyPointList", &kPointList,false)
-			.addVariable("TopologyLineList", &kLineList, false)
-			.addVariable("TopologyLineStrip", &kLineStrip, false)
-			.addVariable("TopologyTriangleList", &kTriangleList, false)
-			.addVariable("TopologyTriangleStrip", &kTriangleStrip, false)
 		.endNamespace();
 }
 
@@ -87,26 +83,6 @@ void BatchRenderer::End(ICamera * cam, D3D11_PRIMITIVE_TOPOLOGY topology)
 		m_d3d11Context->Draw(m_currentIndex, 0);
 		if (g_isDeveloper)
 			g_drawCalls++;
-	}
-}
-
-void BatchRenderer::LuaEnd(float camera, float topology)
-{
-	int iCam = (int)camera;
-	CameraType cam = (CameraType)iCam;
-	int iTopology = (int)topology;
-	D3D11_PRIMITIVE_TOPOLOGY top = (D3D11_PRIMITIVE_TOPOLOGY)iTopology;
-
-	switch (cam)
-	{
-	case World:
-		End(g_camera.get(), top);
-		break;
-	case Screen:
-		End(g_screen.get(), top);
-		break;
-	default:
-		break;
 	}
 }
 

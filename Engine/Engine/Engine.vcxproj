@@ -371,12 +371,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="scripts\Car.lua" />
-    <None Include="scripts\Conversions.lua" />
     <None Include="scripts\ground.lua" />
-    <None Include="scripts\level1.lua" />
     <None Include="scripts\Lights.lua" />
     <None Include="scripts\Scripts.list" />
-    <None Include="scripts\Shadows.lua" />
     <None Include="src\shaders\Lights.hlsli" />
     <None Include="src\shaders\Materials.hlsli" />
   </ItemGroup>

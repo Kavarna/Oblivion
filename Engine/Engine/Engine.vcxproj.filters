@@ -110,8 +110,5 @@
     <None Include="scripts\Lights.lua" />
     <None Include="scripts\ground.lua" />
     <None Include="scripts\Car.lua" />
-    <None Include="scripts\Shadows.lua" />
-    <None Include="scripts\level1.lua" />
-    <None Include="scripts\Conversions.lua" />
   </ItemGroup>
 </Project>

@@ -18,9 +18,6 @@ void GameScript::SetScript(std::string const & tablename)
 	m_onCleanupCallback = std::make_unique<LuaRef>(defaultScript["onCleanup"]);
 	if (m_onCleanupCallback->isNil())
 		m_onCleanupCallback.reset();
-	m_onSizeCallback = std::make_unique<LuaRef>(defaultScript["onSize"]);
-	if (m_onSizeCallback->isNil())
-		m_onSizeCallback.reset();
 
 	OnLoad();
 }
@@ -41,12 +38,6 @@ void GameScript::OnRender()
 {
 	if (m_onRenderCallback)
 		(*m_onRenderCallback)();
-}
-
-void GameScript::OnSize()
-{
-	if (m_onSizeCallback)
-		(*m_onSizeCallback)();
 }
 
 void GameScript::OnCleanup()
