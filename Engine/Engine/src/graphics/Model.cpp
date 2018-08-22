@@ -447,17 +447,17 @@ void Model::Create(std::string const& filename)
 	using boost::algorithm::to_lower_copy;
 	if (to_lower_copy(filename) == "cube")
 	{
-		Model::Create(EDefaultObject::Box);
+		this->Create(EDefaultObject::Box);
 		return;
 	}
 	if (to_lower_copy(filename) == "grid")
 	{
-		Model::Create(EDefaultObject::Grid);
+		this->Create(EDefaultObject::Grid);
 		return;
 	}
 	if (to_lower_copy(filename) == "sphere")
 	{
-		Model::Create(EDefaultObject::Sphere);
+		this->Create(EDefaultObject::Sphere);
 		return;
 	}
 	std::ifstream fin;
@@ -569,12 +569,12 @@ void Model::Create(std::string const& filename)
 				vertices.back().Normal = { x,y,z };
 			}
 			if (hasOther)
-			{ // TODO: FIX MODELS!
+			{ 
 				fin >> x >> y >> z;
-				//assert(!(x == 0 && y == 0 && z == 0));
+				assert(!(x == 0 && y == 0 && z == 0));
 				vertices.back().TangentU = { x,y,z };
 				fin >> x >> y >> z;
-				//assert(!(x == 0 && y == 0 && z == 0));
+				assert(!(x == 0 && y == 0 && z == 0));
 				vertices.back().Binormal = { x,y,z };
 			}
 		}
@@ -637,103 +637,6 @@ void Model::Create(std::string const& filename)
 
 	ReadMaterials(filename + ".material");
 
-	/*fin >> check;
-	if (check != "Materials")
-		THROW_ERROR("Model %s is invalid due to it not having \"Materials\"", filename.c_str());
-
-	int materialCount;
-	fin >> materialCount;
-
-	m_materials.resize(materialCount);
-	std::getline(fin, check);
-
-	
-
-	/*
-#pragma region Read Materials
-	for (int i = 0; i < materialCount; ++i)
-	{
-		std::string materialName;
-		fin >> m_materials[i].name;
-		std::getline(fin, check);
-
-		while (true)
-		{
-			fin >> check;
-			if (check == "Texture")
-			{
-				std::string path;
-				std::getline(fin, path);
-				if (path[0] == ' ')
-					path.erase(0, 1);
-				AppendPathToRelative(path, filename);
-				m_materials[i].diffuseTexture = std::make_unique<Texture>(
-					(LPSTR)path.c_str(), m_d3d11Device.Get(), m_d3d11Context.Get()
-					);
-				m_materials[i].hasTexture = true;
-			}
-			else if (check == "Color")
-			{
-				float r, g, b, a;
-				fin >> r >> g >> b >> a;
-				m_materials[i].diffuseColor = { r,g,b,a };
-			}
-			else if (check == "Bump")
-			{
-				std::string path;
-				std::getline(fin, path);
-				if (path[0] == ' ')
-					path.erase(0, 1);
-				AppendPathToRelative(path, filename);
-				m_materials[i].bumpMap = std::make_unique<Texture>(
-					(LPSTR)path.c_str(), m_d3d11Device.Get(), m_d3d11Context.Get()
-					);
-				m_materials[i].hasBumpMap = true;
-			}
-			else if (check == "Shininess")
-			{
-				float val;
-				fin >> val;
-				m_materials[i].specular = val;
-			}
-			else if (check == "Specular")
-			{
-				std::string path;
-				std::getline(fin, path);
-				if (path[0] == ' ')
-					path.erase(0, 1);
-				AppendPathToRelative(path, filename);
-				m_materials[i].specularMap = std::make_unique<Texture>(
-					(LPSTR)path.c_str(), m_d3d11Device.Get(), m_d3d11Context.Get()
-					);
-				m_materials[i].hasSpecularMap = true;
-			}
-			else if (check == "Opacity")
-			{
-				float val;
-				fin >> val;
-				m_materials[i].opacity = val;
-			}
-			else if (check == "Tesselation")
-			{
-				float scale, min, max;
-				fin >> scale >> min >> max;
-				m_materials[i].tessScale = scale;
-				m_materials[i].tessMin = min;
-				m_materials[i].tessMax = max;
-			}
-			else if (check == "}")
-				break;
-			else
-				THROW_ERROR("Model %s is invalid due to it having %s, which is not a known property", filename.c_str(), check.c_str());
-		}
-
-	}
-
-	ReadTillEnd(fin);
-
-#pragma endregion
-*/
 #undef INVALID
 
 	ShaderHelper::CreateBuffer(m_d3d11Device.Get(), &m_indexBuffer,
@@ -779,7 +682,7 @@ void Model::Create(EDefaultObject object)
 	}
 	else if (object == EDefaultObject::Grid)
 	{
-		g.CreateGrid(100.0f, 100.0f, 10, 10, data);
+		g.CreateGrid(100.0f, 100.0f, 7, 7, data);
 		m_boundingBox = DirectX::BoundingBox(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(50.0f, 0.01f, 50.0f));
 	}
 	else if (object == EDefaultObject::Sphere)
@@ -803,7 +706,7 @@ void Model::Create(EDefaultObject object)
 			m_materials.back().opacity = 1.0f;
 			m_materials.back().tessMin = 1.0f;
 			m_materials.back().tessMax = 3.0f;
-			m_materials.back().tessScale = 2.0f;
+			m_materials.back().tessScale = 0.1f;
 			m_materials.back().specular = 1000.0f;
 			m_materials.back().diffuseTexture = std::make_unique<Texture>((LPWSTR)L"Resources/Stones.dds", m_d3d11Device.Get(), m_d3d11Context.Get());
 			m_materials.back().bumpMap = std::make_unique<Texture>((LPWSTR)L"Resources/Stones_nmap.dds", m_d3d11Device.Get(), m_d3d11Context.Get());

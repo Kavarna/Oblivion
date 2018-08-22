@@ -11,6 +11,7 @@
     },
     "blinn1SG": {
         "Texture": "Resources\\truck_color.jpg",
+        "Bump": "Resources\\truck_bump.jpg",
         "Shininess": "0",
         "Opacity": "1",
         "Tesselation": {

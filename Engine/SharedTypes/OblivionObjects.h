@@ -27,6 +27,13 @@ singletoneName * singletoneName::Get()\
 std::call_once(m_singletoneFlag, [&] { m_singletoneInstance = std::make_unique<singletoneName>(); m_singletoneInstance->Create(); });\
 return m_singletoneInstance.get();\
 }
+#define DECLARE_SINGLETONE_WITHOUT_CREATE(singletoneName) std::once_flag	singletoneName::m_singletoneFlag;\
+std::unique_ptr<singletoneName>	singletoneName::m_singletoneInstance;\
+singletoneName * singletoneName::Get()\
+{\
+std::call_once(m_singletoneFlag, [&] { m_singletoneInstance = std::make_unique<singletoneName>(); });\
+return m_singletoneInstance.get();\
+}
 
 
 

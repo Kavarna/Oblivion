@@ -1,10 +1,5 @@
 #include "Game.h"
 
-void PrintFromLua(const char * message)
-{
-	OutputDebugStringA(message);
-}
-
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	LPWSTR lpCmdLine, int iShow)
 {

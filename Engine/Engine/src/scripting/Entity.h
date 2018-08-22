@@ -57,7 +57,7 @@ public:
 
 public:
 	void SetGameObject(IGameObject * object, const CommonTypes::Range& range);
-
+	inline IGameObject* GetGameObject() { return m_object; };
 
 private:
 	uint32_t ClampInstance(uint32_t instanceID);

@@ -21,7 +21,7 @@ public:
 
 public:
 	virtual void							Create(std::string const& filename) override;
-			void							Create(EDefaultObject object);
+	virtual	void							Create(EDefaultObject object);
 	virtual void							Destroy() override;
 
 public:
@@ -62,11 +62,12 @@ private:
 
 	mutable std::vector<uint32_t>			m_drawnInstances;
 
+	Rendering::Material*					m_selectedMaterial;
+	std::string								m_materialFile;
+
+protected:
 	std::vector<Mesh>						m_meshes;
 	std::vector<Rendering::Material>		m_materials;
 	std::vector<uint32_t>					m_indices;
-
-	Rendering::Material*					m_selectedMaterial;
-	std::string								m_materialFile;
 };
 

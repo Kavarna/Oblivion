@@ -23,7 +23,7 @@ void IGameObject::Update(float frameTime)
 	}
 }
 
-DirectX::XMMATRIX& IGameObject::AddInstance(DirectX::FXMMATRIX const& mat)
+uint32_t IGameObject::AddInstance(DirectX::FXMMATRIX const& mat)
 {
 	m_objectWorld.emplace_back(mat);
 
@@ -32,10 +32,10 @@ DirectX::XMMATRIX& IGameObject::AddInstance(DirectX::FXMMATRIX const& mat)
 		sizeof(DirectX::XMMATRIX) * m_objectWorld.size(), 
 		D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,
 		m_objectWorld.data());
-	return m_objectWorld[m_objectWorld.size() - 1];
+	return m_objectWorld.size() - 1;
 }
 
-DirectX::XMMATRIX* IGameObject::AddInstance(uint32_t number)
+uint32_t IGameObject::AddInstance(uint32_t number)
 {
 	uint32_t start = (uint32_t)m_objectWorld.size();
 	m_objectWorld.reserve(start + number);
@@ -49,7 +49,7 @@ DirectX::XMMATRIX* IGameObject::AddInstance(uint32_t number)
 		D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,
 		m_objectWorld.data());
 
-	return &m_objectWorld[start];
+	return start;
 }
 
 CommonTypes::Range IGameObject::MakeEntity(Entity * e, int numInstances)
@@ -58,9 +58,8 @@ CommonTypes::Range IGameObject::MakeEntity(Entity * e, int numInstances)
 	range.begin = m_objectWorld.size();
 	m_entity = e;
 	AddInstance(numInstances);
-	range.end = m_objectWorld.size();
+	range.end = m_objectWorld.size() - 1;
 	return range;
-	//return (uint32_t)m_objectWorld.size() - 1;
 }
 
 void IGameObject::RemoveInstance(int index)

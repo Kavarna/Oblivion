@@ -1,3 +1,4 @@
 "scripts/ground.lua" "defaultscript"
 "scripts/Lights.lua" "lights"
-"scripts/Car.lua" "car"
+"scripts/tree.lua" "tree"
+"scripts/Sphere.lua" "sphere"

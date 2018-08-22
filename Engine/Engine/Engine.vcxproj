@@ -91,7 +91,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)External Libraries\Lua\LuaBridge;$(SolutionDir)External Libraries\Lua\include;$(SolutionDir)SharedTypes;$(SolutionDir)External Libraries\boost</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Bullet Physics\src;$(SolutionDir)External Libraries\Lua\LuaBridge;$(SolutionDir)External Libraries\Lua\include;$(SolutionDir)SharedTypes;$(SolutionDir)External Libraries\boost</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
     </ClCompile>
@@ -106,7 +106,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)External Libraries\Lua\LuaBridge;$(SolutionDir)External Libraries\Lua\include;$(SolutionDir)SharedTypes;$(SolutionDir)External Libraries\boost</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Bullet Physics\src;$(SolutionDir)External Libraries\Lua\LuaBridge;$(SolutionDir)External Libraries\Lua\include;$(SolutionDir)SharedTypes;$(SolutionDir)External Libraries\boost</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)External Libraries\Lua\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -121,7 +121,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)External Libraries\Lua\LuaBridge;$(SolutionDir)External Libraries\Lua\include;$(SolutionDir)SharedTypes;$(SolutionDir)External Libraries\boost</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Bullet Physics\src;$(SolutionDir)External Libraries\Lua\LuaBridge;$(SolutionDir)External Libraries\Lua\include;$(SolutionDir)SharedTypes;$(SolutionDir)External Libraries\boost</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -139,7 +139,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)External Libraries\Lua\LuaBridge;$(SolutionDir)External Libraries\Lua\include;$(SolutionDir)SharedTypes;$(SolutionDir)External Libraries\boost</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Bullet Physics\src;$(SolutionDir)External Libraries\Lua\LuaBridge;$(SolutionDir)External Libraries\Lua\include;$(SolutionDir)SharedTypes;$(SolutionDir)External Libraries\boost</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -152,7 +152,10 @@
   <ItemGroup>
     <ClCompile Include="src\common\commonmath.cpp" />
     <ClCompile Include="src\COM\COMManager.cpp" />
+    <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\graphics\Projection.cpp" />
+    <ClCompile Include="src\physics\CollisionObject.cpp" />
+    <ClCompile Include="src\physics\World.cpp" />
     <ClCompile Include="src\scripting\Entity.cpp" />
     <ClCompile Include="src\graphics\interfaces\Shader.cpp" />
     <ClCompile Include="src\graphics\Shaders\DisplacementShader.cpp" />
@@ -164,7 +167,6 @@
     <ClCompile Include="src\common\Globals.cpp" />
     <ClCompile Include="src\graphics\RenderTexture.cpp" />
     <ClCompile Include="src\graphics\Helpers\BatchRenderer.cpp" />
-    <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\common\common.cpp" />
     <ClCompile Include="src\graphics\interfaces\GameObject.cpp" />
     <ClCompile Include="src\graphics\Shaders\BasicShader.cpp" />
@@ -190,6 +192,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\COM\COMManager.h" />
+    <ClInclude Include="src\physics\CollisionObject.h" />
+    <ClInclude Include="src\physics\World.h" />
     <ClInclude Include="src\scripting\Entity.h" />
     <ClInclude Include="src\graphics\Shaders\EmptyShader.h" />
     <ClInclude Include="src\graphics\Shaders\DisplacementShader.h" />
@@ -370,12 +374,18 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="scripts\Car.lua" />
+    <None Include="scripts\Sphere.lua" />
+    <None Include="scripts\tree.lua" />
     <None Include="scripts\ground.lua" />
     <None Include="scripts\Lights.lua" />
     <None Include="scripts\Scripts.list" />
     <None Include="src\shaders\Lights.hlsli" />
     <None Include="src\shaders\Materials.hlsli" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Bullet Physics\Bullet Physics.vcxproj">
+      <Project>{c69823c0-7e04-4cad-ab1d-8e0c59338069}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

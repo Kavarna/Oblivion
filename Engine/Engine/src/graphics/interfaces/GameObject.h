@@ -75,8 +75,8 @@ protected:
 	virtual			uint32_t						GetVertexCount(int subObject = 0) const = 0;
 
 public:
-	virtual			DirectX::XMMATRIX&				AddInstance(DirectX::FXMMATRIX const& mat = DirectX::XMMatrixIdentity());
-	virtual			DirectX::XMMATRIX*				AddInstance(uint32_t number);
+	virtual			uint32_t						AddInstance(DirectX::FXMMATRIX const& mat = DirectX::XMMatrixIdentity());
+	virtual			uint32_t						AddInstance(uint32_t number);
 	virtual			CommonTypes::Range				MakeEntity(Entity * e, int numInstances = 1);
 	virtual			void							RemoveInstance(int ID);
 	virtual			void							RemoveInstance(CommonTypes::Range const& range);

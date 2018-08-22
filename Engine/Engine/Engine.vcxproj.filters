@@ -6,7 +6,6 @@
     <ClCompile Include="src\graphics\WICTextureLoader.cpp" />
     <ClCompile Include="src\graphics\Texture.cpp" />
     <ClCompile Include="src\graphics\Direct3D11.cpp" />
-    <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\input\Keyboard.cpp" />
     <ClCompile Include="src\input\Mouse.cpp" />
     <ClCompile Include="src\imgui\imgui.cpp" />
@@ -38,6 +37,9 @@
     <ClCompile Include="src\scripting\GameScript.cpp" />
     <ClCompile Include="src\common\commonmath.cpp" />
     <ClCompile Include="src\graphics\Projection.cpp" />
+    <ClCompile Include="src\Game.cpp" />
+    <ClCompile Include="src\physics\World.cpp" />
+    <ClCompile Include="src\physics\CollisionObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\commonmath.h" />
@@ -88,6 +90,8 @@
     <ClInclude Include="src\scripting\Script.h" />
     <ClInclude Include="src\scripting\Entity.h" />
     <ClInclude Include="src\scripting\GameScript.h" />
+    <ClInclude Include="src\physics\World.h" />
+    <ClInclude Include="src\physics\CollisionObject.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\BasicVertexShader.hlsl" />
@@ -109,6 +113,7 @@
     <None Include="scripts\Scripts.list" />
     <None Include="scripts\Lights.lua" />
     <None Include="scripts\ground.lua" />
-    <None Include="scripts\Car.lua" />
+    <None Include="scripts\tree.lua" />
+    <None Include="scripts\Sphere.lua" />
   </ItemGroup>
 </Project>

@@ -98,7 +98,8 @@ void Entity::Identity(float instanceID)
 
 void Entity::Translate(float instanceID, float x, float y, float z)
 {
-	m_object->m_objectWorld[ClampInstance((uint32_t) instanceID)] *= DirectX::XMMatrixTranslation(x, y, z);
+	//m_object->m_objectWorld[ClampInstance((uint32_t) instanceID)] *= DirectX::XMMatrixTranslation(x, y, z);
+	m_object->Translate(x, y, z, instanceID);
 }
 
 void Entity::RotateX(float instanceID, float theta)

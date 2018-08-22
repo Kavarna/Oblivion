@@ -21,7 +21,7 @@ void IShader::LuaRegister()
 				.addVariable("BatchShader",&kPipelineBatchShader,false)
 				.addVariable("Basic",&kPipelineBasic,false)
 				.addVariable("Texture", &kPipelineTexture,false)
-				.addVariable("TextureLight", &kPipelineTexture,false)
+				.addVariable("TextureLight", &kPipelineTextureLight,false)
 				.addVariable("DisplacementTextureLight", &kPipelineDisplacementTextureLight,false)
 			.endNamespace()
 		.endNamespace();

@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Converter", "Converter\Conv
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SharedTypes", "SharedTypes\SharedTypes.vcxitems", "{A067FB91-045C-43A8-8D50-4B9C2DB1EC6B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bullet Physics", "Bullet Physics\Bullet Physics.vcxproj", "{C69823C0-7E04-4CAD-AB1D-8E0C59338069}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		SharedTypes\SharedTypes.vcxitems*{a067fb91-045c-43a8-8d50-4b9c2db1ec6b}*SharedItemsImports = 9
@@ -37,6 +39,14 @@ Global
 		{B641B02C-8049-467D-A0EA-3CC63EDD8A4C}.Release|x64.Build.0 = Release|x64
 		{B641B02C-8049-467D-A0EA-3CC63EDD8A4C}.Release|x86.ActiveCfg = Release|Win32
 		{B641B02C-8049-467D-A0EA-3CC63EDD8A4C}.Release|x86.Build.0 = Release|Win32
+		{C69823C0-7E04-4CAD-AB1D-8E0C59338069}.Debug|x64.ActiveCfg = Debug|x64
+		{C69823C0-7E04-4CAD-AB1D-8E0C59338069}.Debug|x64.Build.0 = Debug|x64
+		{C69823C0-7E04-4CAD-AB1D-8E0C59338069}.Debug|x86.ActiveCfg = Debug|Win32
+		{C69823C0-7E04-4CAD-AB1D-8E0C59338069}.Debug|x86.Build.0 = Debug|Win32
+		{C69823C0-7E04-4CAD-AB1D-8E0C59338069}.Release|x64.ActiveCfg = Release|x64
+		{C69823C0-7E04-4CAD-AB1D-8E0C59338069}.Release|x64.Build.0 = Release|x64
+		{C69823C0-7E04-4CAD-AB1D-8E0C59338069}.Release|x86.ActiveCfg = Release|Win32
+		{C69823C0-7E04-4CAD-AB1D-8E0C59338069}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

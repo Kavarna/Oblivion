@@ -195,6 +195,7 @@ void Game::Init2D()
 
 void Game::Init3D()
 {
+	BulletWorld::Get()->CreateDefaultWorld();
 }
 
 void Game::InitSizeDependent()
@@ -261,6 +262,8 @@ void Game::Run()
 	{
 		entity.reset();
 	}
+	for (auto & gameScript : m_gameScripts)
+		gameScript.reset();
 }
 
 void Game::Update()
@@ -283,7 +286,7 @@ void Game::Update()
 	if (kb.A)
 		g_camera->StrafeLeft(cameraFrameTime);
 
-
+	BulletWorld::Get()->Update(frameTime);
 
 	if (g_isDeveloper)
 	{
@@ -519,6 +522,25 @@ void Game::AddEntityModel(Entity * entity, std::string const& path, int numInsta
 	}
 }
 
+void Game::AddEntityCollisionObject(Entity * entity, std::string const & path, float mass, int numInstances)
+{
+	auto it = m_models.find(path);
+	if (it == m_models.end())
+	{
+		std::unique_ptr<CollisionObject> obj = std::make_unique<CollisionObject>();
+		obj->SetMass(mass);
+		obj->Create(path);
+		auto instances = obj->MakeEntity(entity, numInstances);
+		obj->SetName(path);
+		entity->SetGameObject(obj.get(), instances);
+		m_models[path] = std::move(obj);
+	}
+	else
+	{
+		THROW_ERROR("Engine isn't ready for multiple scripts using the same model. Use instances, pretty please! :D")
+	}
+}
+
 void Game::OpenScripts()
 {
 	// A script can be a model, animation, window or game script
@@ -543,21 +565,31 @@ void Game::OpenScripts()
 			if (to_lower_copy(type.value()) == "model")
 			{
 				auto path = script->GetAttribute<std::string>(mainTable.c_str(), "path");
+				auto mass = script->GetAttribute<float>(mainTable.c_str(), "mass");
 				if (path.has_value())
 				{
 					auto num = script->GetAttribute<int>(mainTable.c_str(), "instances");
 					m_entities.emplace_back(std::make_unique<Entity>());
-					AddEntityModel(m_entities.back().get(), path.value(), num.value());
+					if (mass.has_value())
+					{
+						AddEntityCollisionObject(m_entities.back().get(), path.value(), mass.value(), num.value_or(1));
+					}
+					else
+					{
+						AddEntityModel(m_entities.back().get(), path.value(), num.value_or(1));
+					}
 					m_entities.back()->SetScript(mainTable.c_str());
 				}
 			}
 			else if (to_lower_copy(type.value()) == "animation")
 			{
 				// it's an animation
+				THROW_ERROR("Animations not supported yet");
 			}
 			else if (to_lower_copy(type.value()) == "window")
 			{
 				// it's a window
+				THROW_ERROR("Windows not supported yet");
 			}
 			else if (to_lower_copy(type.value()) == "game script")
 			{

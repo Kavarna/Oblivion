@@ -3,6 +3,8 @@
 #include "../../common/common.h"
 #include "../../common/commonmath.h"
 #include "BatchRenderer.h"
+#include "btBulletCollisionCommon.h"
+#include "btBulletDynamicsCommon.h"
 
 
 

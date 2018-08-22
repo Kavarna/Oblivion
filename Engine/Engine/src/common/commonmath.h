@@ -1,7 +1,11 @@
 #pragma once
 
+#define BT_NO_SIMD_OPERATOR_OVERLOADS
+
 #include <DirectXMath.h>
 #include <DirectXCollision.h>
+#include <btBulletCollisionCommon.h>
+#include <btBulletDynamicsCommon.h>
 #include "common.h"
 
 namespace Math
@@ -92,5 +96,8 @@ namespace Math
 			return true;
 		return false;
 	}
+	btMatrix3x3			__vectorcall	Matrix3x3FromXMMatrix(DirectX::FXMMATRIX& matrix);
+	btVector3			__vectorcall	GetTranslationFromMatrix(DirectX::FXMMATRIX& matrix);
+	DirectX::XMMATRIX					XMMatrixFromMatrix3x3(btMatrix3x3& matrix);
 	void LuaRegister();
 }
