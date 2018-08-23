@@ -1,21 +1,21 @@
-#include "DebugDraw.h"
+#include "GraphicsDebugDraw.h"
 
-std::once_flag	DebugDraw::m_singletoneFlag;
-std::unique_ptr<DebugDraw>	DebugDraw::m_singletoneInstance;
+std::once_flag	GraphicsDebugDraw::m_singletoneFlag;
+std::unique_ptr<GraphicsDebugDraw>	GraphicsDebugDraw::m_singletoneInstance;
 
-DebugDraw * DebugDraw::Get()
+GraphicsDebugDraw * GraphicsDebugDraw::Get()
 {
-	std::call_once(m_singletoneFlag, [&] { m_singletoneInstance = std::make_unique<DebugDraw>(); });
+	std::call_once(m_singletoneFlag, [&] { m_singletoneInstance = std::make_unique<GraphicsDebugDraw>(); });
 	return m_singletoneInstance.get();
 }
 
-void DebugDraw::Begin()
+void GraphicsDebugDraw::Begin()
 {
 	m_batchRenderer->Begin();
 	m_insideBeginEnd = true;
 }
 
-void DebugDraw::RenderBoundingBox(DirectX::BoundingBox const & box)
+void GraphicsDebugDraw::RenderBoundingBox(DirectX::BoundingBox const & box)
 {
 	if (!m_insideBeginEnd)
 		return;
@@ -56,7 +56,7 @@ void DebugDraw::RenderBoundingBox(DirectX::BoundingBox const & box)
 	}
 }
 
-void DebugDraw::RenderBoundingFrustum(DirectX::BoundingFrustum const & frustum)
+void GraphicsDebugDraw::RenderBoundingFrustum(DirectX::BoundingFrustum const & frustum)
 {
 	if (m_insideBeginEnd)
 		return;
@@ -97,13 +97,13 @@ void DebugDraw::RenderBoundingFrustum(DirectX::BoundingFrustum const & frustum)
 	}
 }
 
-void DebugDraw::End(ICamera * cam)
+void GraphicsDebugDraw::End(ICamera * cam)
 {
 	m_batchRenderer->End(cam);
 	m_insideBeginEnd = false;
 }
 
-void DebugDraw::BuildBatchRenderers()
+void GraphicsDebugDraw::BuildBatchRenderers()
 {
 	m_batchRenderer = std::make_unique<BatchRenderer>();
 	m_batchRenderer->Create();

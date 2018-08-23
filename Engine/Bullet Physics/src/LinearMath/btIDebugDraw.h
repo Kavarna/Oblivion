@@ -72,7 +72,7 @@ class	btIDebugDraw
 		DBG_FastWireframe = (1<<13),
 		DBG_DrawNormals = (1<<14),
 		DBG_DrawFrames = (1<<15),
-		DBG_MAX_DEBUG_DRAW_MODE
+		DBG_MAX_DEBUG_DRAW_MODE = ~0
 	};
 
 	virtual ~btIDebugDraw() {};

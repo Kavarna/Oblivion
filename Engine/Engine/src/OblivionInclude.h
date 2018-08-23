@@ -9,6 +9,7 @@
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_dx11.h"
+#include "graphics/Helpers/GraphicsDebugDraw.h"
 #include "graphics/Shaders/BasicShader.h"
 #include "graphics/Shaders/TextureLightShader.h"
 #include "graphics/Shaders/EmptyShader.h"
@@ -25,3 +26,4 @@
 
 #include "physics/World.h"
 #include "physics/CollisionObject.h"
+#include "physics/PhysicsDebugDraw.h"

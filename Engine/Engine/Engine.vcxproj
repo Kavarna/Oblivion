@@ -155,12 +155,13 @@
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\graphics\Projection.cpp" />
     <ClCompile Include="src\physics\CollisionObject.cpp" />
+    <ClCompile Include="src\physics\PhysicsDebugDraw.cpp" />
     <ClCompile Include="src\physics\World.cpp" />
     <ClCompile Include="src\scripting\Entity.cpp" />
     <ClCompile Include="src\graphics\interfaces\Shader.cpp" />
     <ClCompile Include="src\graphics\Shaders\DisplacementShader.cpp" />
     <ClCompile Include="src\graphics\DDSTextureLoader.cpp" />
-    <ClCompile Include="src\graphics\Helpers\DebugDraw.cpp" />
+    <ClCompile Include="src\graphics\Helpers\GraphicsDebugDraw.cpp" />
     <ClCompile Include="src\graphics\interfaces\ICamera.cpp" />
     <ClCompile Include="src\graphics\Shaders\EmptyShader.cpp" />
     <ClCompile Include="src\graphics\Square.cpp" />
@@ -193,12 +194,13 @@
   <ItemGroup>
     <ClInclude Include="src\COM\COMManager.h" />
     <ClInclude Include="src\physics\CollisionObject.h" />
+    <ClInclude Include="src\physics\PhysicsDebugDraw.h" />
     <ClInclude Include="src\physics\World.h" />
     <ClInclude Include="src\scripting\Entity.h" />
     <ClInclude Include="src\graphics\Shaders\EmptyShader.h" />
     <ClInclude Include="src\graphics\Shaders\DisplacementShader.h" />
     <ClInclude Include="src\graphics\DDSTextureLoader.h" />
-    <ClInclude Include="src\graphics\Helpers\DebugDraw.h" />
+    <ClInclude Include="src\graphics\Helpers\GraphicsDebugDraw.h" />
     <ClInclude Include="src\graphics\Square.h" />
     <ClInclude Include="src\graphics\Projection.h" />
     <ClInclude Include="src\common\Globals.h" />

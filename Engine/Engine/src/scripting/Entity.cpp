@@ -93,38 +93,37 @@ void Entity::OnCleanup()
 
 void Entity::Identity(float instanceID)
 {
-	m_object->m_objectWorld[ClampInstance((uint32_t) instanceID)] = DirectX::XMMatrixIdentity();
+	m_object->Identity(ClampInstance((uint32_t)instanceID));
 }
 
 void Entity::Translate(float instanceID, float x, float y, float z)
 {
-	//m_object->m_objectWorld[ClampInstance((uint32_t) instanceID)] *= DirectX::XMMatrixTranslation(x, y, z);
-	m_object->Translate(x, y, z, instanceID);
+	m_object->Translate(x, y, z, ClampInstance((uint32_t)instanceID));
 }
 
 void Entity::RotateX(float instanceID, float theta)
 {
-	m_object->m_objectWorld[ClampInstance((uint32_t)instanceID)] *= DirectX::XMMatrixRotationX(theta);
+	m_object->RotateX(theta, ClampInstance((uint32_t)instanceID));
 }
 
 void Entity::RotateY(float instanceID, float theta)
 {
-	m_object->m_objectWorld[ClampInstance((uint32_t)instanceID)] *= DirectX::XMMatrixRotationY(theta);
+	m_object->RotateY(theta, ClampInstance((uint32_t)instanceID));
 }
 
 void Entity::RotateZ(float instanceID, float theta)
 {
-	m_object->m_objectWorld[ClampInstance((uint32_t)instanceID)] *= DirectX::XMMatrixRotationZ(theta);
+	m_object->RotateZ(theta, ClampInstance((uint32_t)instanceID));
 }
 
 void Entity::Scale1(float instanceID, float S)
 {
-	m_object->m_objectWorld[ClampInstance((uint32_t)instanceID)] *= DirectX::XMMatrixScaling(S, S, S);
+	m_object->Scale(S, ClampInstance((uint32_t)instanceID));
 }
 
 void Entity::Scale3(float instanceID, float Sx, float Sy, float Sz)
 {
-	m_object->m_objectWorld[ClampInstance((uint32_t)instanceID)] *= DirectX::XMMatrixScaling(Sx, Sy, Sz);
+	m_object->Scale(Sx, Sy, Sz, ClampInstance((uint32_t)instanceID));
 }
 
 void Entity::SetCamera(float cam)

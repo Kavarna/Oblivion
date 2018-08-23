@@ -14,7 +14,7 @@
 #include "../Shaders/TextureShader.h"
 #include "../Shaders/DisplacementShader.h"
 
-#include "../Helpers/DebugDraw.h"
+#include "../Helpers/GraphicsDebugDraw.h"
 
 namespace Rendering
 {
@@ -58,7 +58,7 @@ public:
 
 public:
 	virtual inline	void Identity(int instanceID = 0) { m_objectWorld[instanceID] = DirectX::XMMatrixIdentity(); };
-	virtual inline	void Scale(float S, int instanceID = 0) { m_objectWorld[instanceID] *= DirectX::XMMatrixScaling(S, S, S); };
+	virtual inline	void Scale(float S, int instanceID = 0) { Scale(S, S, S, instanceID); };
 	virtual inline	void Scale(float Sx, float Sy, float Sz, int instanceID = 0) { m_objectWorld[instanceID] *= DirectX::XMMatrixScaling(Sx, Sy, Sz); };
 	virtual inline	void Translate(float x, float y, float z, int instanceID = 0) { m_objectWorld[instanceID] *= DirectX::XMMatrixTranslation(x, y, z); };
 	virtual inline	void RotateX(float Theta, int instanceID = 0) { m_objectWorld[instanceID] *= DirectX::XMMatrixRotationX(Theta); };

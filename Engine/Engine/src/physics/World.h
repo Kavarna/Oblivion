@@ -7,6 +7,7 @@
 
 class BulletWorld
 {
+	friend class btDebugDraw;
 public:
 	BulletWorld();
 	~BulletWorld();

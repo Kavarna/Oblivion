@@ -25,11 +25,11 @@ struct SColorScheme
 	{};
 };
 
-class DebugDraw
+class GraphicsDebugDraw
 {
 public:
-	DebugDraw() = default;
-	DebugDraw(unsigned int debugFlags, SColorScheme colorScheme = SColorScheme()) :
+	GraphicsDebugDraw() = default;
+	GraphicsDebugDraw(unsigned int debugFlags, SColorScheme colorScheme = SColorScheme()) :
 		m_debugFlags(debugFlags), m_colorScheme(colorScheme)
 	{
 		BuildBatchRenderers();
@@ -37,9 +37,9 @@ public:
 
 private:
 	static std::once_flag						m_singletoneFlag;
-	static std::unique_ptr<DebugDraw>			m_singletoneInstance;
+	static std::unique_ptr<GraphicsDebugDraw>			m_singletoneInstance;
 public:
-	static DebugDraw*							Get();
+	static GraphicsDebugDraw*							Get();
 
 
 public:

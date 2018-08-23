@@ -401,12 +401,12 @@ void Model::DrawIndexedInstanced(ICamera * cam, const Pipeline& p) const
 	if (g_isDeveloper)
 	{
 		DirectX::BoundingBox toRender;
-		auto debugDrawer = DebugDraw::Get();
+		auto GraphicsDebugDrawer = GraphicsDebugDraw::Get();
 		for (uint32_t i = 0; i < m_objectWorld.size(); ++i)
 		{
 			//toRender = m_boundingBox;
 			m_boundingBox.Transform(toRender, m_objectWorld[i]);
-			debugDrawer->RenderBoundingBox(toRender);
+			GraphicsDebugDrawer->RenderBoundingBox(toRender);
 		}
 	}
 

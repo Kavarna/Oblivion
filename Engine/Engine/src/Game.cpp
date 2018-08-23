@@ -34,9 +34,6 @@ Game::~Game()
 
 void Game::Destroy()
 {
-
-	WriteSettings();
-
 	ImGui_ImplDX11_Shutdown();
 	ImGui::DestroyContext();
 
@@ -93,14 +90,22 @@ void Game::InitSettings()
 	m_mouseSensivity = pt.get_child("Gameplay.Mouse sensivity").get_value<float>();
 	g_isDeveloper = pt.get_child("Gameplay.Developer").get_value<bool>();
 
-	auto debugDrawer = DebugDraw::Get();
-	debugDrawer->BuildBatchRenderers();
-	bool flags;
-	flags = pt.get_child("Developer.Draw AABB").get_value<bool>();
-	if (flags) debugDrawer->SetFlag(DBG_DRAW_BOUNDING_BOX);
-	flags = pt.get_child("Developer.Draw Frustums").get_value<bool>();
-	if (flags) debugDrawer->SetFlag(DBG_DRAW_BOUNDING_FRUSTUM);
-
+	if (g_isDeveloper)
+	{
+		auto graphicsDebugDrawer = GraphicsDebugDraw::Get();
+		graphicsDebugDrawer->BuildBatchRenderers();
+		bool flags;
+		flags = pt.get_child("Developer.Draw AABB").get_value<bool>();
+		if (flags) graphicsDebugDrawer->SetFlag(DBG_DRAW_BOUNDING_BOX);
+		flags = pt.get_child("Developer.Draw Frustums").get_value<bool>();
+		if (flags) graphicsDebugDrawer->SetFlag(DBG_DRAW_BOUNDING_FRUSTUM);
+		auto physicsDebugDrawer = btDebugDraw::Get();
+		int physicsFlags;
+		physicsFlags = pt.get_child("Physics.Debug flags").get_value<int>();
+		physicsDebugDrawer->setDebugMode(physicsFlags);
+		flags = pt.get_child("Physics.Debug enabled").get_value<bool>();
+		if (flags) physicsDebugDrawer->EnableDebug();
+	}
 }
 
 void SetSun(Sun& light)
@@ -258,12 +263,13 @@ void Game::Run()
 			Render();
 		}
 	}
-	for (auto & entity : m_entities) // Release entities
+	for (auto & entity : m_entities)
 	{
 		entity.reset();
 	}
 	for (auto & gameScript : m_gameScripts)
 		gameScript.reset();
+	WriteSettings();
 }
 
 void Game::Update()
@@ -408,19 +414,44 @@ void Game::End()
 
 		ImGui::Begin("Developer");
 
-		auto debugDrawer = DebugDraw::Get();
-		bool bDrawAABB = debugDrawer->RenderBoundingBox();
-		ImGui::Checkbox("Draw Bounding Boxes", &bDrawAABB);
-		bool bDrawFrustum = debugDrawer->RenderBoundingFrustum();
-		ImGui::Checkbox("Draw Bounding Frustums", &bDrawFrustum);
+		{
+			auto graphicsDebugDrawer = GraphicsDebugDraw::Get();
+			bool bDrawAABB = graphicsDebugDrawer->RenderBoundingBox();
+			ImGui::Checkbox("Graphics Draw Bounding Boxes", &bDrawAABB);
+			bool bDrawFrustum = graphicsDebugDrawer->RenderBoundingFrustum();
+			ImGui::Checkbox("Graphics Draw Bounding Frustums", &bDrawFrustum);
 
-		if (bDrawAABB != debugDrawer->RenderBoundingBox())
-		{
-			debugDrawer->ToggleFlag(DBG_DRAW_BOUNDING_BOX);
+			if (bDrawAABB != graphicsDebugDrawer->RenderBoundingBox())
+			{
+				graphicsDebugDrawer->ToggleFlag(DBG_DRAW_BOUNDING_BOX);
+			}
+			if (bDrawFrustum != graphicsDebugDrawer->RenderBoundingFrustum())
+			{
+				graphicsDebugDrawer->ToggleFlag(DBG_DRAW_BOUNDING_FRUSTUM);
+			}
 		}
-		if (bDrawFrustum != debugDrawer->RenderBoundingFrustum())
+		ImGui::Separator();
 		{
-			debugDrawer->ToggleFlag(DBG_DRAW_BOUNDING_FRUSTUM);
+			auto physicsDebugDrawer = PhysicsDebugDraw::Get();
+			bool bDrawAABB = physicsDebugDrawer->GetFlagState(btDebugDraw::DBG_DrawAabb);
+			ImGui::Checkbox("Physics Draw Bounding Boxes", &bDrawAABB);
+			bool bDrawWireframe = physicsDebugDrawer->GetFlagState(btDebugDraw::DBG_DrawWireframe);
+			ImGui::Checkbox("Physics Draw wireframe", &bDrawWireframe);
+			bool bMaxDraw = physicsDebugDrawer->GetFlagState(btDebugDraw::DBG_MAX_DEBUG_DRAW_MODE);
+			ImGui::Checkbox("Physics full debug draw", &bMaxDraw);
+			
+			if (bDrawAABB != physicsDebugDrawer->GetFlagState(btDebugDraw::DBG_DrawAabb))
+				physicsDebugDrawer->ToggleFlag(btDebugDraw::DBG_DrawAabb);
+			if (bDrawWireframe != physicsDebugDrawer->GetFlagState(btDebugDraw::DBG_DrawWireframe))
+				physicsDebugDrawer->ToggleFlag(btDebugDraw::DBG_DrawWireframe);
+			if (bMaxDraw != physicsDebugDrawer->GetFlagState(btDebugDraw::DBG_MAX_DEBUG_DRAW_MODE))
+				physicsDebugDrawer->ToggleFlag(btDebugDraw::DBG_MAX_DEBUG_DRAW_MODE);
+
+			if (ImGui::Button("Toggle Physics debug drawing"))
+				physicsDebugDrawer->ToggleDebug();
+
+
+			ImGui::Separator();
 		}
 
 		if (ImGui::Button("Change materials"))
@@ -454,9 +485,16 @@ void Game::WriteSettings()
 	pt.put("Gameplay.Mouse sensivity", m_mouseSensivity);
 	pt.put("Gameplay.Developer", g_isDeveloper);
 
-	auto debugDrawer = DebugDraw::Get();
-	pt.put("Developer.Draw AABB", debugDrawer->RenderBoundingBox());
-	pt.put("Developer.Draw Frustums", debugDrawer->RenderBoundingFrustum());
+	//pt.put("Physics.Debug flags", )
+
+	auto graphicsDebugDrawer = GraphicsDebugDraw::Get();
+	pt.put("Developer.Draw AABB", graphicsDebugDrawer->RenderBoundingBox());
+	pt.put("Developer.Draw Frustums", graphicsDebugDrawer->RenderBoundingFrustum());
+
+	auto physicsDebugDrawer = btDebugDraw::Get();
+	int flags = physicsDebugDrawer->getDebugMode();
+	pt.put("Physics.Debug flags", flags);
+	pt.put("Physics.Debug enabled", physicsDebugDrawer->isEnabled());
 
 	boost::property_tree::json_parser::write_json("Settings.json", pt);
 }
@@ -616,11 +654,12 @@ void Game::Render()
 
 	Begin();
 
-	auto debugDrawer = DebugDraw::Get();
+	auto graphicsDebugDrawer = GraphicsDebugDraw::Get();
 	if (g_isDeveloper)
 	{
 		g_drawCalls = 0;
-		debugDrawer->Begin();
+		graphicsDebugDrawer->Begin();
+		btDebugDraw::Get()->Render();
 	}
 
 	IGameObject::BindStaticVertexBuffer();
@@ -639,7 +678,7 @@ void Game::Render()
 
 	if (g_isDeveloper)
 	{
-		debugDrawer->End(g_camera.get());
+		graphicsDebugDrawer->End(g_camera.get());
 	}
 
 

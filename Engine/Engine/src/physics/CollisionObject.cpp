@@ -45,7 +45,7 @@ void CollisionObject::Create(EDefaultObject object)
 		m_collisionShape = new btCylinderShape(btVector3(0.5f, 1.5f, 0.5f));
 		break;
 	case EDefaultObject::Grid:
-		m_collisionShape = new btBoxShape(btVector3(100.0f, 0.0f, 100.0f));
+		m_collisionShape = new btBoxShape(btVector3(50.0f, 0.0f, 50.0f));
 		break;
 	default:
 		break;

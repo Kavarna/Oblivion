@@ -1,13 +1,13 @@
 #include "ICamera.h"
-#include "../Helpers/DebugDraw.h"
+#include "../Helpers/GraphicsDebugDraw.h"
 #include "../../scripting/LuaManager.h"
 
 inline void ICamera::RenderDebug() const
 {
 	if (g_isDeveloper)
 	{
-		auto debugDrawer = DebugDraw::Get();
-		debugDrawer->RenderBoundingFrustum(m_viewFrustum);
+		auto GraphicsDebugDrawer = GraphicsDebugDraw::Get();
+		GraphicsDebugDrawer->RenderBoundingFrustum(m_viewFrustum);
 	}
 }
 
