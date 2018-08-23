@@ -16,9 +16,9 @@ lights = {
 		Oblivion.SetSun(sun);
 	end,
 
-	--[[onUpdate = function(frameTime)
+	--onUpdate = function(frameTime)
 		
-		r = r + deltar * frameTime * 0.2;
+		--[[r = r + deltar * frameTime * 0.2;
 		if r <= 0 or r >= 1 then
 			deltar = deltar * (-1);
 		end
@@ -31,9 +31,9 @@ lights = {
 		b = b + deltab * frameTime * 0.01;
 		if b <= 0 or b >= 1 then
 			deltab = deltab * (-1);
-		end
+		end]]
 
-		angle = angle + frameTime;
+		--[[angle = angle + frameTime;
 		x = math.sin(angle);
 		x = math.abs(x);
 		y = math.cos(angle);

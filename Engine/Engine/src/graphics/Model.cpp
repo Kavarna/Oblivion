@@ -667,7 +667,7 @@ void Model::Create(EDefaultObject object)
 	GeometryGenerator::MeshData data;
 	if (object == EDefaultObject::Box)
 	{
-		g.CreateBox(1.0f, 1.0f, 1.0f, data);
+		g.CreateBox(2.0f, 2.0f, 2.0f, data);
 		m_boundingBox = DirectX::BoundingBox(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f));
 	}
 	else if (object == EDefaultObject::Cylinder)
