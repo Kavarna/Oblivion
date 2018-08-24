@@ -19,46 +19,49 @@ public:
 	~CollisionObject();
 
 public:
-	void							Create(std::string const& filename) override;
-	void							Create(EDefaultObject object) override;
-	void							Destroy() override;
+			void							Create(std::string const& filename) override;
+			void							Create(EDefaultObject object) override;
+			void							Destroy() override;
 
-	uint32_t						AddInstance(DirectX::FXMMATRIX const& mat = DirectX::XMMatrixIdentity()) override;
-	uint32_t						AddInstance(uint32_t num) override;
-	
-	void							Update(float frameTime) override;
+			uint32_t						AddInstance(DirectX::FXMMATRIX const& mat = DirectX::XMMatrixIdentity()) override;
+			uint32_t						AddInstance(uint32_t num) override;
+			
+			void							Update(float frameTime) override;
 
-	void							SetMass(float mass);
+			void							SetMass(float mass);
 
-	void							Translate(float x, float y, float z, int instanceID) override 
+	inline	void							Identity(int instanceID) override
 	{
-		for (uint32_t i = 0; i < m_rigidBodies.size(); ++i)
-			if (m_rigidBodies[i]->m_instanceID == instanceID)
-			{
-				m_rigidBodies[i]->m_body->translate(btVector3(x, y, z));
-				return;
-			}
+		m_rigidBodies[instanceID]->m_body->
+			getMotionState()->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1)));
 	}
+	inline	void							Translate(float x, float y, float z, int instanceID) override 
+	{
+		m_rigidBodies[instanceID]->m_body->translate(btVector3(x, y, z));
+	}
+	inline	void							RotateX(float theta, int instanceID = 0) override;
+	inline	void							RotateY(float theta, int instanceID = 0) override;
+	inline	void							RotateZ(float theta, int instanceID = 0) override;
+	inline	void							Scale(float Sx, float Sy, float Sz, int instanceID = 0) override;
 
 private:
 	struct RigidBodyInfo
 	{
-		float			m_mass;
-		btMotionState*	m_motionState;
-		btRigidBody*	m_body;
-		uint32_t		m_instanceID;
+		float				m_mass;
+		btMotionState*		m_motionState		= nullptr;
+		btRigidBody*		m_body				= nullptr;
 
 		RigidBodyInfo() = default;
-		RigidBodyInfo(float mass, btMotionState * state, btRigidBody * bd, uint32_t iid) :
-			m_mass(mass), m_motionState(state), m_body(bd), m_instanceID(iid) {};
+		RigidBodyInfo(float mass, btMotionState * state, btRigidBody * bd) :
+			m_mass(mass), m_motionState(state), m_body(bd) {};
 	};
 
 private:
-	inline btVector3				CalculateLocalIntertia(float mass);
+	inline	btVector3							CalculateLocalIntertia(float mass);
 
 private:
-	float							m_mass;
-	ECollisionObjectType			m_collisionType;
-	btCollisionShape*				m_collisionShape				= nullptr;
-	std::vector<RigidBodyInfo*>		m_rigidBodies;
+	float										m_mass;
+	ECollisionObjectType						m_collisionType;
+	btCollisionShape*							m_collisionShape				= nullptr;
+	std::map<uint32_t, RigidBodyInfo*>			m_rigidBodies;
 };

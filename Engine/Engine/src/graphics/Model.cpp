@@ -460,6 +460,11 @@ void Model::Create(std::string const& filename)
 		this->Create(EDefaultObject::Sphere);
 		return;
 	}
+	if (to_lower_copy(filename) == "cylinder")
+	{
+		this->Create(EDefaultObject::Cylinder);
+		return;
+	}
 	std::ifstream fin;
 
 	fin.open((filename + ".obl").c_str());
@@ -672,7 +677,7 @@ void Model::Create(EDefaultObject object)
 	}
 	else if (object == EDefaultObject::Cylinder)
 	{
-		g.CreateCylinder(1.0f, 1.0f, 3.0f, 32, 32, data);
+		g.CreateCylinder(0.5f, 0.5f, 3.0f, 32, 32, data);
 		m_boundingBox = DirectX::BoundingBox(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(1.0f, 3.0f, 1.0f));
 	}
 	else if (object == EDefaultObject::Geosphere)
@@ -687,7 +692,7 @@ void Model::Create(EDefaultObject object)
 	}
 	else if (object == EDefaultObject::Sphere)
 	{
-		g.CreateSphere(1.0f, 20, 20, data);
+		g.CreateSphere(1.0f, 12, 12, data);
 		m_boundingBox = DirectX::BoundingBox(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f));
 	}
 	std::vector<Oblivion::SVertex> vertices;

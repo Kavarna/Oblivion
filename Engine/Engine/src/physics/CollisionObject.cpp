@@ -8,7 +8,10 @@ CollisionObject::CollisionObject() :
 CollisionObject::CollisionObject(ECollisionObjectType col) :
 	Model(),
 	m_collisionType(col)
-{};
+{
+	if (col == ECollisionObjectType::eKinematic)
+		THROW_ERROR("Engine doesn't support Kinematic Objects for now");
+};
 
 CollisionObject::CollisionObject(Model * model, ECollisionObjectType col) :
 	Model(),
@@ -26,6 +29,17 @@ CollisionObject::~CollisionObject()
 void CollisionObject::Create(std::string const & filename)
 {
 	Model::Create(filename);
+
+	switch (m_collisionType)
+	{
+	case ECollisionObjectType::eStatic:
+
+		break;
+	case ECollisionObjectType::eDynamic:
+		break;
+	default:
+		break;
+	}
 }
 
 void CollisionObject::Create(EDefaultObject object)
@@ -54,11 +68,11 @@ void CollisionObject::Create(EDefaultObject object)
 
 void CollisionObject::Destroy()
 {
-	for (auto & body : m_rigidBodies)
+	for (auto it = m_rigidBodies.begin(); it != m_rigidBodies.end(); ++it)
 	{
-		delete body->m_motionState;
-		delete body->m_body;
-		delete body;
+		delete it->second->m_motionState;
+		delete it->second->m_body;
+		delete it->second;
 	}
 
 	m_rigidBodies.clear();
@@ -76,7 +90,8 @@ uint32_t CollisionObject::AddInstance(DirectX::FXMMATRIX const & mat)
 
 	uint32_t instanceID = IGameObject::AddInstance(mat);
 
-	m_rigidBodies.emplace_back(new RigidBodyInfo(m_mass, motionState, body, instanceID));
+	//m_rigidBodies.emplace_back(new RigidBodyInfo(m_mass, motionState, body, instanceID));
+	m_rigidBodies[instanceID] = new RigidBodyInfo(m_mass, motionState, body);
 
 	BulletWorld::Get()->AddRigidBody(body);
 
@@ -95,7 +110,7 @@ uint32_t CollisionObject::AddInstance(uint32_t num)
 		btRigidBody * body = new btRigidBody(bodyCI);
 		uint32_t instanceID = start + i;
 
-		m_rigidBodies.emplace_back(new RigidBodyInfo(m_mass, motionState, body, instanceID));
+		m_rigidBodies[instanceID] = new RigidBodyInfo(m_mass, motionState, body);
 
 		BulletWorld::Get()->AddRigidBody(body);
 	}
@@ -105,13 +120,21 @@ uint32_t CollisionObject::AddInstance(uint32_t num)
 
 void CollisionObject::Update(float frameTime)
 {
-	for (auto & body : m_rigidBodies)
+	/*for (auto & body : m_rigidBodies)
 	{
 		btTransform trans;
 		body->m_motionState->getWorldTransform(trans);
 		float m[16];
 		trans.getOpenGLMatrix(m);
 		m_objectWorld[body->m_instanceID] = DirectX::XMMATRIX(m);
+	}*/
+	for (auto it = m_rigidBodies.begin(); it != m_rigidBodies.end(); ++it)
+	{
+		btTransform trans;
+		it->second->m_motionState->getWorldTransform(trans);
+		float m[16];
+		trans.getOpenGLMatrix(m);
+		m_objectWorld[it->first] = DirectX::XMMATRIX(m);
 	}
 	Model::Update(frameTime);
 }
@@ -121,6 +144,80 @@ void CollisionObject::SetMass(float mass)
 	m_mass = mass;
 }
 
+inline void CollisionObject::RotateX(float theta, int instanceID)
+{
+	if (m_collisionType == ECollisionObjectType::eDynamic)
+	{
+		m_rigidBodies[instanceID]->m_body->setAngularVelocity(btVector3(theta, 0, 0));
+	}
+	else
+	{
+		btMatrix3x3 rotMat;
+		rotMat.setEulerYPR(0, theta, 0); // Pitch = theta
+		btTransform trans;
+		m_rigidBodies[instanceID]->m_motionState->getWorldTransform(trans);
+		btMatrix3x3 curRot = trans.getBasis();
+		rotMat = curRot * rotMat;
+		trans.setBasis(rotMat);
+		m_rigidBodies[instanceID]->m_motionState->setWorldTransform(trans);
+	}
+}
+
+inline void CollisionObject::RotateY(float theta, int instanceID)
+{
+	if (m_collisionType == ECollisionObjectType::eDynamic)
+	{
+		m_rigidBodies[instanceID]->m_body->setAngularVelocity(btVector3(0, theta, 0));
+	}
+	else
+	{
+		btMatrix3x3 rotMat;
+		rotMat.setEulerYPR(theta, 0, 0); // Pitch = theta
+		btTransform trans;
+		m_rigidBodies[instanceID]->m_motionState->getWorldTransform(trans);
+		btMatrix3x3 curRot = trans.getBasis();
+		rotMat = curRot * rotMat;
+		trans.setBasis(rotMat);
+		m_rigidBodies[instanceID]->m_motionState->setWorldTransform(trans);
+	}
+}
+
+inline void CollisionObject::RotateZ(float theta, int instanceID)
+{
+	if (m_collisionType == ECollisionObjectType::eDynamic)
+	{
+		m_rigidBodies[instanceID]->m_body->setAngularVelocity(btVector3(0, 0, theta));
+	}
+	else
+	{
+		btMatrix3x3 rotMat;
+		rotMat.setEulerYPR(0, 0, theta); // Pitch = theta
+		btTransform trans;
+		m_rigidBodies[instanceID]->m_motionState->getWorldTransform(trans);
+		btMatrix3x3 curRot = trans.getBasis();
+		rotMat = curRot * rotMat;
+		trans.setBasis(rotMat);
+		m_rigidBodies[instanceID]->m_motionState->setWorldTransform(trans);
+	}
+}
+
+inline void CollisionObject::Scale(float Sx, float Sy, float Sz, int instanceID)
+{
+	THROW_ERROR("Scaling not available for physics-basec objects");
+	/*if (m_rigidBodies[instanceID]->m_collisionShape)
+	{
+		m_collisionShape->setLocalScaling(btVector3(Sx, Sy, Sz));
+	}
+	else
+	{
+		for (auto it = m_rigidBodies.begin(); it != m_rigidBodies.end(); ++it)
+		{
+			RigidBodyInfo* object = it->second;
+			
+		}
+	}*/
+}
+
 btVector3 CollisionObject::CalculateLocalIntertia(float mass)
 {
 	if (mass == 0 || m_collisionType == ECollisionObjectType::eStatic)
@@ -128,6 +225,6 @@ btVector3 CollisionObject::CalculateLocalIntertia(float mass)
 
 	btVector3 ret;
 	m_collisionShape->calculateLocalInertia(mass, ret);
-
+	
 	return ret;
 }

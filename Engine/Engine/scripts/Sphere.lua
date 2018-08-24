@@ -1,6 +1,6 @@
 sphere = {
 	type = "Model";
-	path = "cube";
+	path = "sphere";
 	mass = 1;
 
 	onLoad = function(Entity)
