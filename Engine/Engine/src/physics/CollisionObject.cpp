@@ -5,12 +5,13 @@ CollisionObject::CollisionObject() :
 	m_collisionType(ECollisionObjectType::eStatic)
 {};
 
-CollisionObject::CollisionObject(ECollisionObjectType col) :
+CollisionObject::CollisionObject(float mass, ECollisionObjectType col) :
 	Model(),
-	m_collisionType(col)
+	m_mass(mass),
+	m_collisionType(ECollisionObjectType::eDontCare)
 {
 	if (col == ECollisionObjectType::eKinematic)
-		THROW_ERROR("Engine doesn't support Kinematic Objects for now");
+		THROW_ERROR("Can't create a kinematic collision object yet");
 };
 
 CollisionObject::CollisionObject(Model * model, ECollisionObjectType col) :
@@ -30,22 +31,28 @@ void CollisionObject::Create(std::string const & filename)
 {
 	Model::Create(filename);
 
-	switch (m_collisionType)
+	if (m_shapeType != EShapeType::eDefaultMesh)
 	{
-	case ECollisionObjectType::eStatic:
-
-		break;
-	case ECollisionObjectType::eDynamic:
-		break;
-	default:
-		break;
+		switch (m_shapeType)
+		{
+		case EShapeType::eGImpactMesh:
+			break;
+		case EShapeType::eStaticMesh:
+			break;
+		case EShapeType::eDontCare:
+		case EShapeType::eHullMesh:
+			m_collisionShape = CreateHullCollisionShape();
+			break;
+		default:
+			break;
+		}
 	}
 }
 
 void CollisionObject::Create(EDefaultObject object)
 {
 	Model::Create(object);
-
+	m_shapeType = EShapeType::eDefaultMesh;
 	switch (object)
 	{
 	case EDefaultObject::Box:
@@ -90,7 +97,6 @@ uint32_t CollisionObject::AddInstance(DirectX::FXMMATRIX const & mat)
 
 	uint32_t instanceID = IGameObject::AddInstance(mat);
 
-	//m_rigidBodies.emplace_back(new RigidBodyInfo(m_mass, motionState, body, instanceID));
 	m_rigidBodies[instanceID] = new RigidBodyInfo(m_mass, motionState, body);
 
 	BulletWorld::Get()->AddRigidBody(body);
@@ -120,18 +126,9 @@ uint32_t CollisionObject::AddInstance(uint32_t num)
 
 void CollisionObject::Update(float frameTime)
 {
-	/*for (auto & body : m_rigidBodies)
-	{
-		btTransform trans;
-		body->m_motionState->getWorldTransform(trans);
-		float m[16];
-		trans.getOpenGLMatrix(m);
-		m_objectWorld[body->m_instanceID] = DirectX::XMMATRIX(m);
-	}*/
 	for (auto it = m_rigidBodies.begin(); it != m_rigidBodies.end(); ++it)
 	{
-		btTransform trans;
-		it->second->m_motionState->getWorldTransform(trans);
+		btTransform trans = it->second->m_body->getWorldTransform();
 		float m[16];
 		trans.getOpenGLMatrix(m);
 		m_objectWorld[it->first] = DirectX::XMMATRIX(m);
@@ -139,15 +136,11 @@ void CollisionObject::Update(float frameTime)
 	Model::Update(frameTime);
 }
 
-void CollisionObject::SetMass(float mass)
-{
-	m_mass = mass;
-}
-
 inline void CollisionObject::RotateX(float theta, int instanceID)
 {
 	if (m_collisionType == ECollisionObjectType::eDynamic)
 	{
+		Activate(instanceID);
 		m_rigidBodies[instanceID]->m_body->setAngularVelocity(btVector3(theta, 0, 0));
 	}
 	else
@@ -167,6 +160,7 @@ inline void CollisionObject::RotateY(float theta, int instanceID)
 {
 	if (m_collisionType == ECollisionObjectType::eDynamic)
 	{
+		Activate(instanceID);
 		m_rigidBodies[instanceID]->m_body->setAngularVelocity(btVector3(0, theta, 0));
 	}
 	else
@@ -186,6 +180,7 @@ inline void CollisionObject::RotateZ(float theta, int instanceID)
 {
 	if (m_collisionType == ECollisionObjectType::eDynamic)
 	{
+		Activate(instanceID);
 		m_rigidBodies[instanceID]->m_body->setAngularVelocity(btVector3(0, 0, theta));
 	}
 	else
@@ -227,4 +222,22 @@ btVector3 CollisionObject::CalculateLocalIntertia(float mass)
 	m_collisionShape->calculateLocalInertia(mass, ret);
 	
 	return ret;
+}
+
+btCollisionShape * CollisionObject::CreateHullCollisionShape()
+{
+	uint32_t startIndex = INT_MAX, endIndex = 0;
+	for (auto & mesh : m_meshes)
+	{
+		if (mesh.m_vertexRange.begin < startIndex)
+			startIndex = mesh.m_vertexRange.begin;
+		if (mesh.m_vertexRange.end > endIndex)
+			endIndex = mesh.m_vertexRange.end;
+	}
+	btConvexHullShape * hullShape = new btConvexHullShape(
+		(btScalar*)&m_staticVertices[startIndex],
+		endIndex - startIndex,
+		sizeof(Oblivion::Vertex)
+	);
+	return hullShape;
 }

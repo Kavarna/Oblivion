@@ -7,14 +7,19 @@
 
 enum class ECollisionObjectType
 {
-	eStatic, eDynamic, eKinematic
+	eStatic, eDynamic, eKinematic, eDontCare
+};
+
+enum class EShapeType
+{
+	eGImpactMesh, eStaticMesh, eHullMesh, eDefaultMesh, eDontCare
 };
 
 class CollisionObject : public Model
 {
 public:
 	CollisionObject();
-	CollisionObject(ECollisionObjectType);
+	CollisionObject(float mass, ECollisionObjectType = ECollisionObjectType::eDontCare);
 	CollisionObject(Model*, ECollisionObjectType);
 	~CollisionObject();
 
@@ -28,15 +33,19 @@ public:
 			
 			void							Update(float frameTime) override;
 
-			void							SetMass(float mass);
+	inline	void							Activate(int instanceID)
+	{
+		m_rigidBodies[instanceID]->m_body->activate(true);
+	};
 
 	inline	void							Identity(int instanceID) override
 	{
-		m_rigidBodies[instanceID]->m_body->
-			getMotionState()->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1)));
+		Activate(instanceID);
+		m_rigidBodies[instanceID]->m_motionState->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1)));
 	}
 	inline	void							Translate(float x, float y, float z, int instanceID) override 
 	{
+		Activate(instanceID);
 		m_rigidBodies[instanceID]->m_body->translate(btVector3(x, y, z));
 	}
 	inline	void							RotateX(float theta, int instanceID = 0) override;
@@ -53,15 +62,22 @@ private:
 
 		RigidBodyInfo() = default;
 		RigidBodyInfo(float mass, btMotionState * state, btRigidBody * bd) :
-			m_mass(mass), m_motionState(state), m_body(bd) {};
+			m_mass(mass), m_motionState(state), m_body(bd) {
+			m_body->setRestitution(0.5f);
+			m_body->setSpinningFriction(1.0f);
+			m_body->setFriction(1.0f);
+			m_body->setRollingFriction(0.2f);
+		};
 	};
 
 private:
 	inline	btVector3							CalculateLocalIntertia(float mass);
+			btCollisionShape*					CreateHullCollisionShape();
 
 private:
 	float										m_mass;
 	ECollisionObjectType						m_collisionType;
 	btCollisionShape*							m_collisionShape				= nullptr;
+	EShapeType									m_shapeType						= EShapeType::eDontCare;
 	std::map<uint32_t, RigidBodyInfo*>			m_rigidBodies;
 };

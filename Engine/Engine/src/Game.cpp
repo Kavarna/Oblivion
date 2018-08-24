@@ -272,6 +272,39 @@ void Game::Run()
 	WriteSettings();
 }
 
+void Game::AddEntity(Entity* e, const Script* s, const std::string& tablename)
+{
+	auto path = s->GetAttribute<std::string>(tablename, "path");
+	if (!path.has_value())
+		THROW_ERROR("Entity \"%s\" hasn't a path", tablename.c_str());
+	auto it = m_models.find(path.value());
+	if (it == m_models.end())
+	{
+		auto numInstances = s->GetAttribute<int>(tablename, "instances");
+		auto mass = s->GetAttribute<float>(tablename, "mass");
+		if (mass.has_value())
+		{ // Collision object
+			std::unique_ptr<CollisionObject> obj = std::make_unique<CollisionObject>(mass.value());
+			obj->Create(path.value());
+			auto instances = obj->MakeEntity(e, numInstances.value_or(1));
+			obj->SetName(path.value());
+			e->SetGameObject(obj.get(), instances);
+			m_models[path.value()] = std::move(obj);
+		}
+		else
+		{ // Model
+			std::unique_ptr<Model> model = std::make_unique<Model>();
+			model->Create(path.value());
+			auto instances = model->MakeEntity(e, numInstances.value_or(1));
+			model->SetName(path.value());
+			e->SetGameObject(model.get(), instances);
+			m_models[path.value()] = std::move(model);
+		}
+	}
+	else
+		THROW_ERROR("Engine isn't ready for multiple scripts using the same model. Use instances, pretty please! :D")
+}
+
 void Game::Update()
 {
 	auto renderer = Direct3D11::Get();
@@ -542,43 +575,6 @@ bool Game::PickObject()
 	return m_selectedObject != 0;
 }
 
-void Game::AddEntityModel(Entity * entity, std::string const& path, int numInstances)
-{
-	auto it = m_models.find(path);
-	if (it == m_models.end())
-	{
-		std::unique_ptr<Model> model = std::make_unique<Model>();
-		model->Create(path);
-		auto instances = model->MakeEntity(entity, numInstances);
-		model->SetName(path);
-		entity->SetGameObject(model.get(), instances);
-		m_models[path] = std::move(model);
-	}
-	else
-	{
-		THROW_ERROR("Engine isn't ready for multiple scripts using the same model. Use instances, pretty please! :D")
-	}
-}
-
-void Game::AddEntityCollisionObject(Entity * entity, std::string const & path, float mass, int numInstances)
-{
-	auto it = m_models.find(path);
-	if (it == m_models.end())
-	{
-		std::unique_ptr<CollisionObject> obj = std::make_unique<CollisionObject>();
-		obj->SetMass(mass);
-		obj->Create(path);
-		auto instances = obj->MakeEntity(entity, numInstances);
-		obj->SetName(path);
-		entity->SetGameObject(obj.get(), instances);
-		m_models[path] = std::move(obj);
-	}
-	else
-	{
-		THROW_ERROR("Engine isn't ready for multiple scripts using the same model. Use instances, pretty please! :D")
-	}
-}
-
 void Game::OpenScripts()
 {
 	// A script can be a model, animation, window or game script
@@ -602,22 +598,9 @@ void Game::OpenScripts()
 		{
 			if (to_lower_copy(type.value()) == "model")
 			{
-				auto path = script->GetAttribute<std::string>(mainTable.c_str(), "path");
-				auto mass = script->GetAttribute<float>(mainTable.c_str(), "mass");
-				if (path.has_value())
-				{
-					auto num = script->GetAttribute<int>(mainTable.c_str(), "instances");
-					m_entities.emplace_back(std::make_unique<Entity>());
-					if (mass.has_value())
-					{
-						AddEntityCollisionObject(m_entities.back().get(), path.value(), mass.value(), num.value_or(1));
-					}
-					else
-					{
-						AddEntityModel(m_entities.back().get(), path.value(), num.value_or(1));
-					}
-					m_entities.back()->SetScript(mainTable.c_str());
-				}
+				m_entities.emplace_back(std::make_unique<Entity>());
+				AddEntity(m_entities.back().get(), script.get(), mainTable);
+				m_entities.back()->SetScript(mainTable.c_str());
 			}
 			else if (to_lower_copy(type.value()) == "animation")
 			{
