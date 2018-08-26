@@ -3,7 +3,7 @@ defaultscript = {
 	--path = "Resources/Truck";
 	path = "grid";
 	instances = 4;
-	mass = 0,
+	collisionsEnabled = true;
 
 	onLoad = function(Entity)
 			--Entity:Translate(0, 50, 0, 0);

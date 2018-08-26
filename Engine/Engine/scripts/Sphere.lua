@@ -2,11 +2,11 @@ sphere = {
 	type = "Model";
 	path = "sphere";
 	instances = 2;
-	mass = 1;
+	collisionsEnabled = true;
 
 	onLoad = function(Entity)
-		Entity:Translate(0, 0, 50, 0);
-		Entity:Translate(1, 0, 55, 0);
+		Entity:Translate(0, 0, 100, -50);
+		Entity:Translate(1, 0, 70, -51);
 	end,
 	onUpdate = function(Entity, frametime)
 	end,

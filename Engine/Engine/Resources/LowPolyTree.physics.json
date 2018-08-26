@@ -1,0 +1,13 @@
+{
+    "Physics": {
+        "Mass": "0",
+        "Friction": "1",
+        "Restitution": "0.5",
+        "Spinning friction": "0.200000003",
+        "Rolling friction": "0.200000003",
+        "Collision Shape": {
+            "Dynamics": "eStatic",
+            "Type": "eStaticMesh"
+        }
+    }
+}

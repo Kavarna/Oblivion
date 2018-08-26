@@ -85,6 +85,8 @@ MessageBoxA(NULL,"Unexpected error occured", "Error", MB_ICONERROR| MB_OK); exit
 #include <typeindex>
 #include <optional>
 
+#include <boost/property_tree/ptree.hpp>
+
 #include <OblivionObjects.h>
 
 #include "commonmath.h"
@@ -143,6 +145,24 @@ namespace DX
 	{
 		return first < second ? first : second;
 	}
+	/// <summary>Queries a tree for an attribute, if found returns it, else returns value</summary>
+	template <class type, class property_tree>
+	type GetAttributeOrValue(const property_tree& tree, const std::string& attribute, type value)
+	{
+		auto child = tree.get_child_optional(attribute);
+		if (child.is_initialized())
+			return child.get().get_value_optional<type>().get_value_or(value);
+		else
+			return value;
+
+	}
+	/// <summary>Queries a tree for an attribute, if found returns it, else returns value</summary>
+	template <class type, class property_tree>
+	type GetAttributeOrValue(const property_tree& tree, const char* attribute, type value)
+	{
+		return GetAttributeOrValue(tree, std::string(attribute), value);
+	}
+
 	/// <summary>Returns the polar angle of the point (x,y) in [0, 2*PI).</summary>
 	inline float AngleFromXY(float x, float y)
 	{
@@ -166,6 +186,8 @@ namespace DX
 
 		return theta;
 	}
+	/// <summary>Checks if file exists</summary>
+	bool FileExists(const std::string& path);
 	/// <summary>Gets the component count from known simple formats (RGBA,BGRA...); -1 if it's an invalid format</summary>
 	int GetComponentCountFromFormat(DXGI_FORMAT format);
 	/// <summary>Initializes Direct3D states</summary>

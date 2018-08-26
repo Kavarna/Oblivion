@@ -32,7 +32,7 @@ uint32_t IGameObject::AddInstance(DirectX::FXMMATRIX const& mat)
 		sizeof(DirectX::XMMATRIX) * m_objectWorld.size(), 
 		D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,
 		m_objectWorld.data());
-	return m_objectWorld.size() - 1;
+	return (uint32_t)m_objectWorld.size() - 1;
 }
 
 uint32_t IGameObject::AddInstance(uint32_t number)
@@ -55,10 +55,10 @@ uint32_t IGameObject::AddInstance(uint32_t number)
 CommonTypes::Range IGameObject::MakeEntity(Entity * e, int numInstances)
 {
 	CommonTypes::Range range;
-	range.begin = m_objectWorld.size();
+	range.begin = (uint32_t)m_objectWorld.size();
 	m_entity = e;
 	AddInstance(numInstances);
-	range.end = m_objectWorld.size() - 1;
+	range.end = (uint32_t)m_objectWorld.size() - 1;
 	return range;
 }
 

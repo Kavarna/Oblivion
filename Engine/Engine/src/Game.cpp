@@ -281,10 +281,10 @@ void Game::AddEntity(Entity* e, const Script* s, const std::string& tablename)
 	if (it == m_models.end())
 	{
 		auto numInstances = s->GetAttribute<int>(tablename, "instances");
-		auto mass = s->GetAttribute<float>(tablename, "mass");
-		if (mass.has_value())
+		auto collisions = s->GetAttribute<bool>(tablename, "collisionsEnabled");
+		if (collisions.value_or(false))
 		{ // Collision object
-			std::unique_ptr<CollisionObject> obj = std::make_unique<CollisionObject>(mass.value());
+			std::unique_ptr<CollisionObject> obj = std::make_unique<CollisionObject>();
 			obj->Create(path.value());
 			auto instances = obj->MakeEntity(e, numInstances.value_or(1));
 			obj->SetName(path.value());

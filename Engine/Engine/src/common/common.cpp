@@ -2,6 +2,10 @@
 
 namespace DX
 {
+	bool FileExists(const std::string & path)
+	{
+		return std::ifstream(path).is_open();
+	}
 	int GetComponentCountFromFormat( DXGI_FORMAT format )
 	{ // Please keep this folded
 		switch ( format )

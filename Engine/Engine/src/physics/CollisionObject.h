@@ -4,6 +4,7 @@
 #include "../graphics/Model.h"
 #include "../common/commonmath.h"
 #include "World.h"
+#include <boost/property_tree/ptree.hpp>
 
 enum class ECollisionObjectType
 {
@@ -19,8 +20,6 @@ class CollisionObject : public Model
 {
 public:
 	CollisionObject();
-	CollisionObject(float mass, ECollisionObjectType = ECollisionObjectType::eDontCare);
-	CollisionObject(Model*, ECollisionObjectType);
 	~CollisionObject();
 
 public:
@@ -33,6 +32,8 @@ public:
 			
 			void							Update(float frameTime) override;
 
+			void							ReadPhysicsFile(const std::string& filename);
+			void							SavePhysics();
 	inline	void							Activate(int instanceID)
 	{
 		m_rigidBodies[instanceID]->m_body->activate(true);
@@ -62,17 +63,15 @@ private:
 
 		RigidBodyInfo() = default;
 		RigidBodyInfo(float mass, btMotionState * state, btRigidBody * bd) :
-			m_mass(mass), m_motionState(state), m_body(bd) {
-			m_body->setRestitution(0.5f);
-			m_body->setSpinningFriction(1.0f);
-			m_body->setFriction(1.0f);
-			m_body->setRollingFriction(0.2f);
-		};
+			m_mass(mass), m_motionState(state), m_body(bd) { };
 	};
 
 private:
 	inline	btVector3							CalculateLocalIntertia(float mass);
+			btCollisionShape*					CreateStaticCollisionShape();
 			btCollisionShape*					CreateHullCollisionShape();
+	inline	void								InitDefaultProperties(ECollisionObjectType = ECollisionObjectType::eDynamic);
+	inline	void								InitBodyWithProperties(btRigidBody*);
 
 private:
 	float										m_mass;
@@ -80,4 +79,6 @@ private:
 	btCollisionShape*							m_collisionShape				= nullptr;
 	EShapeType									m_shapeType						= EShapeType::eDontCare;
 	std::map<uint32_t, RigidBodyInfo*>			m_rigidBodies;
+	boost::property_tree::ptree					m_properties;
+	std::string									m_physicsFile;
 };

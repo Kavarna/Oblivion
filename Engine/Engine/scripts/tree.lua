@@ -2,10 +2,10 @@ tree = {
 	type = "model",
 	path = "Resources/LowPolyTree",
 	instances = 1,
-	mass = 0,
+	collisionsEnabled = true;
 	onLoad = function(Entity)
 			--Entity:Scale1(0, 0.50)
-			--Entity:Translate(0, 0, 0, -50);
+			Entity:Translate(0, 0, 0, -50);
 		end,
 	onRenderCall = function(Entity)
 			Entity:setCamera(Oblivion.World);
