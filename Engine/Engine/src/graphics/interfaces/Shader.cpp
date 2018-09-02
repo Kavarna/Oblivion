@@ -7,6 +7,7 @@ Pipeline IShader::m_currentlyBoundPipeline = Pipeline::PipelineNone;
 
 float kPipelineNone = PipelineNone;
 float kPipelineBatchShader = PipelineBatchShader;
+float kPipelineTextureBatchShader = PipelineTextureBatchShader;
 float kPipelineBasic = PipelineBasic;
 float kPipelineTexture = PipelineTexture;
 float kPipelineTextureLight = PipelineTextureLight;
@@ -19,6 +20,7 @@ void IShader::LuaRegister()
 			.beginNamespace("Pipeline")
 				.addVariable("None",&kPipelineNone,false)
 				.addVariable("BatchShader",&kPipelineBatchShader,false)
+				.addVariable("TextureBatchShader", &kPipelineBatchShader, false)
 				.addVariable("Basic",&kPipelineBasic,false)
 				.addVariable("Texture", &kPipelineTexture,false)
 				.addVariable("TextureLight", &kPipelineTextureLight,false)

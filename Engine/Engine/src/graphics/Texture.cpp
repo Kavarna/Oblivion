@@ -1,22 +1,57 @@
 #include "Texture.h"
 #include <atlbase.h>
+#include "../scripting/LuaManager.h"
 
-
-Texture::Texture(LPWSTR lpPath, ID3D11Device * device, ID3D11DeviceContext * context, bool hasUAV) :
-	mDevice(device)
+Texture* ToTextureView(const LuaTextureWrapper& ltw)
 {
-	Create(lpPath, device, context, hasUAV);
+	return (Texture*)ltw;
+}
+
+void Texture::LuaRegister()
+{
+	US_NS_LUA;
+
+	LuaTextureWrapper::LuaRegister();
+	getGlobalNamespace()
+		.beginNamespace("Oblivion")
+			.beginClass<Texture>("TextureView")
+			.endClass()
+			.addFunction("ToTextureView",ToTextureView)
+		.endNamespace();
+}
+
+void LuaTextureWrapper::LuaRegister()
+{
+	US_NS_LUA;
+
+	getGlobalNamespace()
+		.beginNamespace("Oblivion")
+			.beginClass<LuaTextureWrapper>("Texture")
+				.addConstructor<void(*)(std::string)>()
+			.endClass()
+		.endNamespace();
+}
+
+Texture::Texture(std::string path)
+{
+	USES_CONVERSION;
+	LPWSTR lpwPath = A2W(path.c_str());
+	Create(lpwPath, false);
+}
+
+Texture::Texture(LPWSTR lpPath, bool hasUAV)
+{
+	Create(lpPath, hasUAV);
 	USES_CONVERSION;
 	LPSTR pathA = W2A(lpPath);
 	mPath = std::string(pathA);
 }
 
-Texture::Texture(LPSTR lpPath, ID3D11Device * device, ID3D11DeviceContext * context, bool hasUAV) :
-	mDevice(device)
+Texture::Texture(LPSTR lpPath, bool hasUAV)
 {
 	USES_CONVERSION;
 	LPWSTR lpwPath = A2W(lpPath);
-	Create(lpwPath, device, context, hasUAV);
+	Create(lpwPath, hasUAV);
 	mPath = std::string(lpPath);
 }
 
@@ -25,7 +60,7 @@ Texture::~Texture()
 	mTextureSRV.Reset();
 }
 
-void Texture::Create(LPWSTR lpPath, ID3D11Device * device, ID3D11DeviceContext * context, bool hasUAV)
+void Texture::Create(LPWSTR lpPath, bool hasUAV)
 {
 	auto extension = StrRChrW(lpPath, lpPath + lstrlenW(lpPath), L'.');
 	if (StrCmpW(extension, L".dds") == 0)
@@ -33,7 +68,7 @@ void Texture::Create(LPWSTR lpPath, ID3D11Device * device, ID3D11DeviceContext *
 		if (hasUAV)
 		{
 			ThrowIfFailed(
-				DirectX::CreateDDSTextureFromFile(device, context, lpPath,
+				DirectX::CreateDDSTextureFromFile(m_d3d11Device.Get(), m_d3d11Context.Get(), lpPath,
 					reinterpret_cast<ID3D11Resource**>(mTexture.GetAddressOf()),
 					&mTextureSRV, D3D11_BIND_FLAG::D3D11_BIND_UNORDERED_ACCESS)
 			);
@@ -43,7 +78,7 @@ void Texture::Create(LPWSTR lpPath, ID3D11Device * device, ID3D11DeviceContext *
 		else
 		{
 			ThrowIfFailed(
-				DirectX::CreateDDSTextureFromFile(device, context, lpPath,
+				DirectX::CreateDDSTextureFromFile(m_d3d11Device.Get(), m_d3d11Context.Get(), lpPath,
 					reinterpret_cast<ID3D11Resource**>(mTexture.GetAddressOf()),
 					&mTextureSRV)
 			);
@@ -54,7 +89,7 @@ void Texture::Create(LPWSTR lpPath, ID3D11Device * device, ID3D11DeviceContext *
 		if (hasUAV)
 		{
 			ThrowIfFailed(
-				CreateWICTextureFromFile(device, context, lpPath,
+				CreateWICTextureFromFile(m_d3d11Device.Get(), m_d3d11Context.Get(), lpPath,
 					reinterpret_cast<ID3D11Resource**>(mTexture.GetAddressOf()), &mTextureSRV,
 					D3D11_BIND_FLAG::D3D11_BIND_UNORDERED_ACCESS)
 			);
@@ -64,7 +99,7 @@ void Texture::Create(LPWSTR lpPath, ID3D11Device * device, ID3D11DeviceContext *
 		else
 		{
 			ThrowIfFailed(
-				CreateWICTextureFromFile(device, context, lpPath,
+				CreateWICTextureFromFile(m_d3d11Device.Get(), m_d3d11Context.Get(), lpPath,
 					reinterpret_cast<ID3D11Resource**>(mTexture.GetAddressOf()), &mTextureSRV)
 			);
 		}
@@ -78,5 +113,5 @@ void Texture::CreateUAV()
 	if (texture == nullptr)
 		throw std::exception("Can't create a UAV from a null texture");
 
-	TextureUtilities::CreateUAVFromTexture(mDevice, texture, &mTextureUAV);
+	TextureUtilities::CreateUAVFromTexture(m_d3d11Device.Get(), texture, &mTextureUAV);
 }

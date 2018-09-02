@@ -9,6 +9,8 @@ class RenderTexture :
 	public IObject
 {
 public:
+	static void LuaRegister();
+public:
 	RenderTexture() = default;
 	RenderTexture(uint32_t width, uint32_t height, bool depth = false, uint32_t MSAACount = 1, uint32_t MSAAQuality = 0);
 	~RenderTexture();

@@ -25,7 +25,7 @@ Square::~Square()
 void Square::Create(std::string const & texture)
 {
 	m_material.hasTexture = TRUE;
-	m_material.diffuseTexture = std::make_unique<Texture>((LPSTR)texture.c_str(),m_d3d11Device.Get(),m_d3d11Context.Get());
+	m_material.diffuseTexture = std::make_unique<Texture>((LPSTR)texture.c_str());
 }
 
 void Square::Create()

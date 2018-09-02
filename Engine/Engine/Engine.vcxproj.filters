@@ -108,6 +108,8 @@
     <FxCompile Include="src\shaders\DisplacementMappingPixelShader.hlsl" />
     <FxCompile Include="src\shaders\DisplacementMappingHullShader.hlsl" />
     <FxCompile Include="src\shaders\DisplacementMappingDomainShader.hlsl" />
+    <FxCompile Include="src\shaders\TextureBatchVertexShader.hlsl" />
+    <FxCompile Include="src\shaders\TextureBatchPixelShader.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\Lights.hlsli" />

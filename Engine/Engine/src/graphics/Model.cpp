@@ -150,7 +150,7 @@ void Model::ImGuiChangeMaterial()
 			{
 				try
 				{
-					Texture * tex = new Texture((LPSTR)ret.value().c_str(), m_d3d11Device.Get(), m_d3d11Context.Get());
+					Texture * tex = new Texture((LPSTR)ret.value().c_str());
 
 					m_selectedMaterial->diffuseTexture.reset(tex);
 				}
@@ -178,7 +178,7 @@ void Model::ImGuiChangeMaterial()
 			{
 				try
 				{
-					Texture * tex = new Texture((LPSTR)ret.value().c_str(), m_d3d11Device.Get(), m_d3d11Context.Get());
+					Texture * tex = new Texture((LPSTR)ret.value().c_str());
 
 					m_selectedMaterial->bumpMap.reset(tex);
 				}
@@ -206,7 +206,7 @@ void Model::ImGuiChangeMaterial()
 			{
 				try
 				{
-					Texture * tex = new Texture((LPSTR)ret.value().c_str(), m_d3d11Device.Get(), m_d3d11Context.Get());
+					Texture * tex = new Texture((LPSTR)ret.value().c_str());
 
 					m_selectedMaterial->specularMap.reset(tex);
 				}
@@ -253,9 +253,7 @@ void Model::ReadMaterials(std::string const & filename)
 		{
 			resultMaterial.hasTexture = true;
 			std::string texturePath = textureChild.value().get_value<std::string>();
-			resultMaterial.diffuseTexture = std::make_unique<Texture>(
-				(LPSTR)texturePath.c_str(), m_d3d11Device.Get(), m_d3d11Context.Get()
-				);
+			resultMaterial.diffuseTexture = std::make_unique<Texture>((LPSTR)texturePath.c_str());
 		}
 		else
 		{
@@ -270,9 +268,7 @@ void Model::ReadMaterials(std::string const & filename)
 		{
 			resultMaterial.hasBumpMap = true;
 			std::string texturePath = textureChild.value().get_value<std::string>();
-			resultMaterial.bumpMap = std::make_unique<Texture>(
-				(LPSTR)texturePath.c_str(), m_d3d11Device.Get(), m_d3d11Context.Get()
-				);
+			resultMaterial.bumpMap = std::make_unique<Texture>((LPSTR)texturePath.c_str());
 		}
 
 		auto specularChild = materialTree.get_child_optional("specular map");
@@ -280,9 +276,7 @@ void Model::ReadMaterials(std::string const & filename)
 		{
 			resultMaterial.hasSpecularMap = true;
 			std::string texturePath = textureChild.value().get_value<std::string>();
-			resultMaterial.specularMap = std::make_unique<Texture>(
-				(LPSTR)texturePath.c_str(), m_d3d11Device.Get(), m_d3d11Context.Get()
-				);
+			resultMaterial.specularMap = std::make_unique<Texture>((LPSTR)texturePath.c_str());
 		}
 
 		resultMaterial.specular = materialTree.get_child("shininess").get_value<float>();
@@ -713,8 +707,8 @@ void Model::Create(EDefaultObject object)
 			m_materials.back().tessMax = 3.0f;
 			m_materials.back().tessScale = 0.1f;
 			m_materials.back().specular = 1000.0f;
-			m_materials.back().diffuseTexture = std::make_unique<Texture>((LPWSTR)L"Resources/Stones.dds", m_d3d11Device.Get(), m_d3d11Context.Get());
-			m_materials.back().bumpMap = std::make_unique<Texture>((LPWSTR)L"Resources/Stones_nmap.dds", m_d3d11Device.Get(), m_d3d11Context.Get());
+			m_materials.back().diffuseTexture = std::make_unique<Texture>((LPWSTR)L"Resources/Stones.dds");
+			m_materials.back().bumpMap = std::make_unique<Texture>((LPWSTR)L"Resources/Stones_nmap.dds");
 			m_meshes.back().m_materialIndex = 0;
 		}
 		else
@@ -729,8 +723,8 @@ void Model::Create(EDefaultObject object)
 			m_materials.back().tessMin = 1.0f;
 			m_materials.back().tessMax = 64.0f;
 			m_materials.back().tessScale = 0.3f;
-			m_materials.back().diffuseTexture = std::make_unique<Texture>((LPWSTR)L"Resources/Stones.dds", m_d3d11Device.Get(), m_d3d11Context.Get());
-			m_materials.back().bumpMap = std::make_unique<Texture>((LPWSTR)L"Resources/Stones_nmap.dds", m_d3d11Device.Get(), m_d3d11Context.Get());
+			m_materials.back().diffuseTexture = std::make_unique<Texture>((LPWSTR)L"Resources/Stones.dds");
+			m_materials.back().bumpMap = std::make_unique<Texture>((LPWSTR)L"Resources/Stones_nmap.dds");
 			m_meshes.back().m_materialIndex = 0;
 		}
 	}

@@ -113,6 +113,7 @@ void SetSun(Sun& light)
 	TextureLightShader::Get()->SetLightInformations(light);
 }
 
+
 float kWorldCameraID = CameraType::World;
 float kScreenCameraID = CameraType::Screen;
 
@@ -120,6 +121,7 @@ void Game::RegisterEngine()
 {
 	US_NS_LUA;
 	Math::LuaRegister();
+	Texture::LuaRegister();
 	IShader::LuaRegister();
 	Entity::LuaRegister();
 	BatchRenderer::LuaRegister();
@@ -196,6 +198,9 @@ void Game::InitImGui()
 
 void Game::Init2D()
 {
+	m_texture = std::make_unique<Texture>("Resources//ceva.png");
+	m_textureTest = std::make_unique<TextureBatchRenderer>();
+	m_textureTest->Create();
 }
 
 void Game::Init3D()
@@ -656,6 +661,19 @@ void Game::Render()
 		//model.second->Render(g_camera.get(), Pipeline::PipelineDisplacementTextureLight);
 		model.second->Render();
 	}
+
+
+	renderer->RSCullNone();
+	m_textureTest->Begin();
+
+	m_textureTest->Point(DirectX::XMFLOAT3(0, 0, 0), DirectX::XMFLOAT2(0, 0));
+	m_textureTest->Point(DirectX::XMFLOAT3(100, 0, 0), DirectX::XMFLOAT2(1, 0));
+	m_textureTest->Point(DirectX::XMFLOAT3(100, 100, 0), DirectX::XMFLOAT2(1, 1));
+	m_textureTest->Point(DirectX::XMFLOAT3(0, 0, 0), DirectX::XMFLOAT2(0, 0));
+	m_textureTest->Point(DirectX::XMFLOAT3(100, 100, 0), DirectX::XMFLOAT2(1, 1));
+	m_textureTest->Point(DirectX::XMFLOAT3(0, 100, 0), DirectX::XMFLOAT2(0, 1));
+
+	m_textureTest->End(g_screen.get(), m_texture.get());
 
 	EmptyShader::Get()->bind(); // Clear the pipeline
 

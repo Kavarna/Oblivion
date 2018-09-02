@@ -4,12 +4,16 @@
 #include "DDSTextureLoader.h"
 #include "Helpers/TextureUtilities.h"
 #include "../common/common.h"
+#include "interfaces/Object.h"
 
 
 
 
-class Texture
+class Texture : public IObject
 {
+public:
+	static void LuaRegister();
+private:
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> mTexture;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> mTextureSRV;
 
@@ -17,15 +21,14 @@ class Texture
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> mTextureUAV;
 
 	std::string mPath;
-	
-	ID3D11Device * mDevice;
 public:
 	Texture() = default;
-	Texture(LPWSTR lpPath, ID3D11Device *, ID3D11DeviceContext *, bool hasUAV = false);
-	Texture(LPSTR lpPath, ID3D11Device *, ID3D11DeviceContext *, bool hasUAV = false);
+	Texture(std::string);
+	Texture(LPWSTR lpPath, bool hasUAV = false);
+	Texture(LPSTR lpPath, bool hasUAV = false);
 	~Texture();
 private:
-	void Create(LPWSTR lpPath, ID3D11Device *, ID3D11DeviceContext *, bool hasUAV);
+	void Create(LPWSTR lpPath, bool hasUAV);
 public:
 	std::string GetPath() const
 	{
@@ -56,4 +59,28 @@ public:
 	}
 private:
 	void CreateUAV();
+};
+
+
+struct LuaTextureWrapper
+{
+public:
+	static void LuaRegister();
+public:
+	LuaTextureWrapper(std::string path)
+	{
+		m_texture = std::make_shared<Texture>(path);
+	}
+	~LuaTextureWrapper()
+	{
+		m_texture.reset();
+	}
+
+	inline operator Texture*() const
+	{
+		return m_texture.get();
+	}
+
+public:
+	std::shared_ptr<Texture> m_texture = nullptr;
 };

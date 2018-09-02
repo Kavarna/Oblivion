@@ -46,8 +46,6 @@ private:
 	bool PickObject();
 
 private:
-	//void AddEntityModel(Entity* entity, std::string const& path, int numInstances = 1);
-	//void AddEntityCollisionObject(Entity* entity, std::string const& path, float mass, int numInstances = 1);
 	void AddEntity(Entity* e, const Script* s, const std::string& tablename);
 
 private:
@@ -74,6 +72,8 @@ private:
 	std::vector<std::unique_ptr<Entity>>				m_entities;
 	std::map<std::string, std::unique_ptr<Model>>		m_models;
 	Model*												m_selectedObject;
+	std::unique_ptr<TextureBatchRenderer>				m_textureTest;
+	std::unique_ptr<Texture>							m_texture;
 
 private:
 	std::unique_ptr<DirectX::Mouse>						m_mouse;
