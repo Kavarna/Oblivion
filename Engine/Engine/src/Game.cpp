@@ -171,6 +171,9 @@ void Game::InitImGui()
 
 void Game::Init2D()
 {
+	m_level = std::make_unique<Texture>("Resources/Level.png");
+	
+	
 }
 
 void Game::Init3D()

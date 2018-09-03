@@ -68,6 +68,7 @@ inline void Square::Scale(float Sx, float Sy, float Sz, int instanceID)
 
 void Square::TranslateTo(float X, float Y, int InstanceID)
 {
+	Identity(InstanceID);
 	float halfWidth = (float)m_width / 2.0f;
 	float halfHeight = (float)m_height / 2.0f;
 	X += halfWidth;

@@ -6,6 +6,8 @@
 #include "graphics/Direct3D11.h"
 #include "input/Mouse.h"
 
+#include "common/Bezier/BezierEasing.h"
+
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_dx11.h"

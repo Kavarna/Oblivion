@@ -67,6 +67,8 @@ private:
 	std::unique_ptr<CollisionObject>					m_sphere;
 	std::unique_ptr<CollisionObject>					m_tree;
 
+	std::unique_ptr<Texture>							m_level;
+
 	std::vector<Model*>									m_models;
 	Model*												m_selectedObject;
 

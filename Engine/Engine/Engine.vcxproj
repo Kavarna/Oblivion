@@ -150,6 +150,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\common\Bezier\BezierEasing.cpp" />
     <ClCompile Include="src\common\commonmath.cpp" />
     <ClCompile Include="src\COM\COMManager.cpp" />
     <ClCompile Include="src\Game.cpp" />
@@ -188,6 +189,8 @@
     <ClCompile Include="src\graphics\Shaders\TextureShader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\common\Bezier\BezierEasing.h" />
+    <ClInclude Include="src\common\Bezier\p2Point.h" />
     <ClInclude Include="src\COM\COMManager.h" />
     <ClInclude Include="src\physics\CollisionObject.h" />
     <ClInclude Include="src\physics\PhysicsDebugDraw.h" />
