@@ -35,8 +35,6 @@ private:
 	void Init3D();
 	void InitSizeDependent();
 	void InitSettings();
-	void RegisterEngine();
-	void OpenScripts();
 
 	void Begin();
 	void End();
@@ -44,9 +42,6 @@ private:
 	void WriteSettings();
 	
 	bool PickObject();
-
-private:
-	void AddEntity(Entity* e, const Script* s, const std::string& tablename);
 
 private:
 	void Update();
@@ -68,12 +63,12 @@ private:
 	std::unique_ptr<Square>								m_debugSquare;
 #endif
 
-	std::vector<std::unique_ptr<GameScript>>			m_gameScripts;
-	std::vector<std::unique_ptr<Entity>>				m_entities;
-	std::map<std::string, std::unique_ptr<Model>>		m_models;
+	std::unique_ptr<CollisionObject>					m_ground;
+	std::unique_ptr<CollisionObject>					m_sphere;
+	std::unique_ptr<CollisionObject>					m_tree;
+
+	std::vector<Model*>									m_models;
 	Model*												m_selectedObject;
-	std::unique_ptr<TextureBatchRenderer>				m_textureTest;
-	std::unique_ptr<Texture>							m_texture;
 
 private:
 	std::unique_ptr<DirectX::Mouse>						m_mouse;

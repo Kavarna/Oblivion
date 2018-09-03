@@ -1,7 +1,6 @@
 #pragma once
 
 #include <DirectXMath.h>
-#include "../../scripting/LuaManager.h"
 
 struct Sun
 {
@@ -32,21 +31,3 @@ struct Sun
 		m_ambientColor.z = b;
 	}
 };
-
-
-namespace Lights
-{
-	inline void LuaRegister()
-	{
-		US_NS_LUA;
-		getGlobalNamespace(g_luaState.get())
-			.beginNamespace("Oblivion")
-				.beginClass<Sun>("Sun")
-					.addConstructor<void(*)(void)>()
-					.addFunction("setDirection", &Sun::setDirection)
-					.addFunction("setDiffuseColor", &Sun::setDiffuseColor)
-					.addFunction("setAmbientColor", &Sun::setAmbientColor)
-				.endClass()
-			.endNamespace();
-	}
-}

@@ -1,5 +1,4 @@
 #include "commonmath.h"
-#include "../scripting/LuaManager.h"
 
 using namespace DirectX;
 
@@ -49,27 +48,4 @@ XMMATRIX Math::XMMatrixFromMatrix3x3(btMatrix3x3 & matrix)
 	XMVectorSetZ(resultMatrix.r[2], matrix[2][2]);
 
 	return resultMatrix;
-}
-
-void Math::LuaRegister()
-{
-	US_NS_LUA;
-	getGlobalNamespace(g_luaState.get())
-		.beginNamespace("Oblivion")
-			.beginClass<XMFLOAT2>("float2")
-				.addData("x", &XMFLOAT2::x,true)
-				.addData("y", &XMFLOAT2::y,true)
-			.endClass()
-			.beginClass<XMFLOAT3>("float3")
-				.addData("x", &XMFLOAT3::x, true)
-				.addData("y", &XMFLOAT3::y, true)
-				.addData("z", &XMFLOAT3::z, true)
-			.endClass()
-			.beginClass<XMFLOAT4>("float4")
-				.addData("x", &XMFLOAT4::x,true)
-				.addData("y", &XMFLOAT4::y, true)
-				.addData("z", &XMFLOAT4::z,true)
-				.addData("w", &XMFLOAT4::w,true)
-			.endClass()
-		.endNamespace();
 }

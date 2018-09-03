@@ -15,9 +15,6 @@ public:
 	~BatchRenderer();
 
 public:
-	static void LuaRegister();
-
-public:
 	void Create();
 
 public:
@@ -25,7 +22,6 @@ public:
 	void Begin();
 	void Vertex(BatchShader::SVertex const& vertex);
 	void Vertex(DirectX::XMFLOAT3 const& pos, DirectX::XMFLOAT4 const& color);
-	void Point(DirectX::XMFLOAT3 const& pos, DirectX::XMFLOAT4 const& color); // For lua register
 	void End(ICamera *, D3D11_PRIMITIVE_TOPOLOGY = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
 private:
@@ -47,7 +43,7 @@ public:
 public:
 	void Reconstruct(uint32_t newSize);
 	void Begin();
-	void Point(DirectX::XMFLOAT3 const& pos, DirectX::XMFLOAT2 const& tex);
+	void Vertex(DirectX::XMFLOAT3 const& pos, DirectX::XMFLOAT2 const& tex);
 	void End(ICamera *, Texture *, D3D11_PRIMITIVE_TOPOLOGY = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 private:

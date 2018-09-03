@@ -13,9 +13,6 @@ public:
 	~Projection() = default;
 
 public:
-	static void LuaRegister();
-
-public:
 	float m_width;
 	float m_height;
 	float m_nearZ;

@@ -1,17 +1,6 @@
 #include "RenderTexture.h"
-#include "../scripting/LuaManager.h"
 
 
-
-void RenderTexture::LuaRegister()
-{
-	US_NS_LUA;
-
-	getGlobalNamespace()
-		.beginClass<RenderTexture>("RenderTexture")
-			
-		.endClass();
-}
 
 RenderTexture::RenderTexture(uint32_t width, uint32_t height,
 	bool depth, uint32_t MSAACount, uint32_t MSAAQuality)

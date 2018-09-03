@@ -44,8 +44,6 @@ public:
 	}
 	inline void RenderDebug() const;
 
-	static void LuaRegister();
-
 protected:
 	void BuildViewFrustum()
 	{

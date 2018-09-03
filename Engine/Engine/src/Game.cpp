@@ -55,9 +55,6 @@ void Game::Create(HINSTANCE hInstance, uint32_t width, uint32_t height)
 	Init3D();
 	InitSizeDependent();
 	InitSettings();
-
-	RegisterEngine();
-	OpenScripts();
 }
 
 void Game::InitSettings()
@@ -111,30 +108,6 @@ void Game::InitSettings()
 void SetSun(Sun& light)
 {
 	TextureLightShader::Get()->SetLightInformations(light);
-}
-
-
-float kWorldCameraID = CameraType::World;
-float kScreenCameraID = CameraType::Screen;
-
-void Game::RegisterEngine()
-{
-	US_NS_LUA;
-	Math::LuaRegister();
-	Texture::LuaRegister();
-	IShader::LuaRegister();
-	Entity::LuaRegister();
-	BatchRenderer::LuaRegister();
-	Lights::LuaRegister();
-	ICamera::LuaRegister();
-	Camera::LuaRegister();
-
-	getGlobalNamespace()
-		.beginNamespace("Oblivion")
-			.addVariable("World", &kWorldCameraID, false)
-			.addVariable("Screen", &kScreenCameraID, false)
-			.addFunction("SetSun", SetSun)
-		.endNamespace();
 }
 
 void Game::InitWindow()
@@ -198,14 +171,27 @@ void Game::InitImGui()
 
 void Game::Init2D()
 {
-	m_texture = std::make_unique<Texture>("Resources//ceva.png");
-	m_textureTest = std::make_unique<TextureBatchRenderer>();
-	m_textureTest->Create();
 }
 
 void Game::Init3D()
 {
 	BulletWorld::Get()->CreateDefaultWorld();
+
+	m_ground = std::make_unique<CollisionObject>();
+	m_ground->Create(EDefaultObject::Grid);
+	m_ground->AddInstance();
+
+	m_sphere = std::make_unique<CollisionObject>();
+	m_sphere->Create(EDefaultObject::Sphere);
+	m_sphere->AddInstance(DirectX::XMMatrixTranslation(0.f, 30.f, 0.f));
+
+	m_tree = std::make_unique<CollisionObject>();
+	m_tree->Create("Resources/LowPolyTree");
+	m_tree->AddInstance();
+
+	m_models.push_back(m_ground.get());
+	m_models.push_back(m_sphere.get());
+	m_models.push_back(m_tree.get());
 }
 
 void Game::InitSizeDependent()
@@ -268,46 +254,7 @@ void Game::Run()
 			Render();
 		}
 	}
-	for (auto & entity : m_entities)
-	{
-		entity.reset();
-	}
-	for (auto & gameScript : m_gameScripts)
-		gameScript.reset();
 	WriteSettings();
-}
-
-void Game::AddEntity(Entity* e, const Script* s, const std::string& tablename)
-{
-	auto path = s->GetAttribute<std::string>(tablename, "path");
-	if (!path.has_value())
-		THROW_ERROR("Entity \"%s\" hasn't a path", tablename.c_str());
-	auto it = m_models.find(path.value());
-	if (it == m_models.end())
-	{
-		auto numInstances = s->GetAttribute<int>(tablename, "instances");
-		auto collisions = s->GetAttribute<bool>(tablename, "collisionsEnabled");
-		if (collisions.value_or(false))
-		{ // Collision object
-			std::unique_ptr<CollisionObject> obj = std::make_unique<CollisionObject>();
-			obj->Create(path.value());
-			auto instances = obj->MakeEntity(e, numInstances.value_or(1));
-			obj->SetName(path.value());
-			e->SetGameObject(obj.get(), instances);
-			m_models[path.value()] = std::move(obj);
-		}
-		else
-		{ // Model
-			std::unique_ptr<Model> model = std::make_unique<Model>();
-			model->Create(path.value());
-			auto instances = model->MakeEntity(e, numInstances.value_or(1));
-			model->SetName(path.value());
-			e->SetGameObject(model.get(), instances);
-			m_models[path.value()] = std::move(model);
-		}
-	}
-	else
-		THROW_ERROR("Engine isn't ready for multiple scripts using the same model. Use instances, pretty please! :D")
 }
 
 void Game::Update()
@@ -402,11 +349,7 @@ void Game::Update()
 
 	for (auto & model : m_models)
 	{
-		model.second->Update(frameTime);
-	}
-	for (auto & script : m_gameScripts)
-	{
-		script->OnUpdate(frameTime);
+		model->Update(frameTime);
 	}
 }
 
@@ -569,64 +512,15 @@ bool Game::PickObject()
 
 	for (auto & model : m_models)
 	{
-		CommonTypes::RayHitInfo rayHit = model.second->PickObject(pickRayPos, pickRayDir);
+		CommonTypes::RayHitInfo rayHit = model->PickObject(pickRayPos, pickRayDir);
 		if (rayHit < min && rayHit.instanceID != -1 && rayHit.dist > 0.0f)
 		{
 			min = rayHit;
-			m_selectedObject = model.second.get();
+			m_selectedObject = model;
 		}
 	}
 	
 	return m_selectedObject != 0;
-}
-
-void Game::OpenScripts()
-{
-	// A script can be a model, animation, window or game script
-	using namespace boost::algorithm;
-	std::ifstream fin("scripts/Scripts.list");
-	auto scriptManager = ScriptManager::Get();
-
-	while (!fin.eof())
-	{
-		std::string skip;
-		std::string scriptPath;
-		std::getline(std::getline(fin, skip, '"'), scriptPath, '"');
-		std::string mainTable;
-		std::getline(std::getline(fin, skip, '"'), mainTable, '"');
-		if (scriptPath == "")
-			break;
-		std::unique_ptr<Script> script = std::make_unique<Script>(std::filesystem::path(scriptPath));
-		auto type = script->GetAttribute<std::string>(mainTable.c_str(), "type");
-		scriptManager->AddScript(std::move(script));
-		if (type.has_value())
-		{
-			if (to_lower_copy(type.value()) == "model")
-			{
-				m_entities.emplace_back(std::make_unique<Entity>());
-				AddEntity(m_entities.back().get(), script.get(), mainTable);
-				m_entities.back()->SetScript(mainTable.c_str());
-			}
-			else if (to_lower_copy(type.value()) == "animation")
-			{
-				// it's an animation
-				THROW_ERROR("Animations not supported yet");
-			}
-			else if (to_lower_copy(type.value()) == "window")
-			{
-				// it's a window
-				THROW_ERROR("Windows not supported yet");
-			}
-			else if (to_lower_copy(type.value()) == "game script")
-			{
-				m_gameScripts.emplace_back(std::make_unique<GameScript>());
-				m_gameScripts.back()->SetScript(mainTable.c_str());
-			}
-		}
-		else
-			THROW_ERROR("Script \"%s\" doesn't have a type", scriptPath.c_str());
-	}
-
 }
 
 void Game::Render()
@@ -634,11 +528,6 @@ void Game::Render()
 	auto renderer = Direct3D11::Get();
 	if (!renderer->Available())
 		return;
-
-	for (auto & entity : m_entities)
-	{
-		entity->OnRenderCall();
-	}
 
 	Begin();
 
@@ -653,27 +542,13 @@ void Game::Render()
 	IGameObject::BindStaticVertexBuffer();
 	
 #if DEBUG || _DEBUG
-	m_debugSquare->Render(g_screen.get(), Pipeline::PipelineTexture);
+	m_debugSquare->Render<TextureShader>(g_screen.get());
 #endif
 
-	for (auto & model : m_models)
+	for (const auto & model : m_models)
 	{
-		//model.second->Render(g_camera.get(), Pipeline::PipelineDisplacementTextureLight);
-		model.second->Render();
+		model->Render<DisplacementShader>(g_camera.get());
 	}
-
-
-	renderer->RSCullNone();
-	m_textureTest->Begin();
-
-	m_textureTest->Point(DirectX::XMFLOAT3(0, 0, 0), DirectX::XMFLOAT2(0, 0));
-	m_textureTest->Point(DirectX::XMFLOAT3(100, 0, 0), DirectX::XMFLOAT2(1, 0));
-	m_textureTest->Point(DirectX::XMFLOAT3(100, 100, 0), DirectX::XMFLOAT2(1, 1));
-	m_textureTest->Point(DirectX::XMFLOAT3(0, 0, 0), DirectX::XMFLOAT2(0, 0));
-	m_textureTest->Point(DirectX::XMFLOAT3(100, 100, 0), DirectX::XMFLOAT2(1, 1));
-	m_textureTest->Point(DirectX::XMFLOAT3(0, 100, 0), DirectX::XMFLOAT2(0, 1));
-
-	m_textureTest->End(g_screen.get(), m_texture.get());
 
 	EmptyShader::Get()->bind(); // Clear the pipeline
 

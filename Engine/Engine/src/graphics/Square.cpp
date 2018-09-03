@@ -77,7 +77,7 @@ void Square::TranslateTo(float X, float Y, int InstanceID)
 	m_objectWorld[InstanceID] *= DirectX::XMMatrixTranslation(NewX, NewY, 0.0f);
 }
 
-void Square::DrawIndexedInstanced(ICamera * cam, const Pipeline& p) const
+void Square::DrawIndexedInstanced(ICamera * cam) const
 {
 	std::function<bool(uint32_t)> func = [](int) ->bool { return true; };
 	int renderInstances = PrepareInstances(func);

@@ -334,7 +334,7 @@ void Model::WriteMaterials()
 	boost::property_tree::write_json(m_materialFile, materialsTree);
 }
 
-void Model::DrawIndexedInstanced(ICamera * cam, const Pipeline& p) const
+void Model::DrawIndexedInstanced(ICamera * cam) const
 {
 	//std::function<bool(uint32_t)> func = std::bind(&Model::ShouldRenderInstance, this, cam, std::placeholders::_1);
 	m_drawnInstances.clear();

@@ -1,36 +1,5 @@
 #include "Texture.h"
 #include <atlbase.h>
-#include "../scripting/LuaManager.h"
-
-Texture* ToTextureView(const LuaTextureWrapper& ltw)
-{
-	return (Texture*)ltw;
-}
-
-void Texture::LuaRegister()
-{
-	US_NS_LUA;
-
-	LuaTextureWrapper::LuaRegister();
-	getGlobalNamespace()
-		.beginNamespace("Oblivion")
-			.beginClass<Texture>("TextureView")
-			.endClass()
-			.addFunction("ToTextureView",ToTextureView)
-		.endNamespace();
-}
-
-void LuaTextureWrapper::LuaRegister()
-{
-	US_NS_LUA;
-
-	getGlobalNamespace()
-		.beginNamespace("Oblivion")
-			.beginClass<LuaTextureWrapper>("Texture")
-				.addConstructor<void(*)(std::string)>()
-			.endClass()
-		.endNamespace();
-}
 
 Texture::Texture(std::string path)
 {

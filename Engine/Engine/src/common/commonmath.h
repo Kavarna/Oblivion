@@ -99,5 +99,4 @@ namespace Math
 	btMatrix3x3			__vectorcall	Matrix3x3FromXMMatrix(DirectX::FXMMATRIX& matrix);
 	btVector3			__vectorcall	GetTranslationFromMatrix(DirectX::FXMMATRIX& matrix);
 	DirectX::XMMATRIX					XMMatrixFromMatrix3x3(btMatrix3x3& matrix);
-	void LuaRegister();
 }

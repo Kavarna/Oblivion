@@ -1,5 +1,4 @@
 #include "GameObject.h"
-#include "../../scripting/Entity.h"
 #include "../Direct3D11.h"
 
 using CommonTypes::Range;
@@ -17,10 +16,6 @@ IGameObject::IGameObject()
 
 void IGameObject::Update(float frameTime)
 {
-	if (isEntity())
-	{
-		m_entity->OnUpdate(frameTime);
-	}
 }
 
 uint32_t IGameObject::AddInstance(DirectX::FXMMATRIX const& mat)
@@ -52,16 +47,6 @@ uint32_t IGameObject::AddInstance(uint32_t number)
 	return start;
 }
 
-CommonTypes::Range IGameObject::MakeEntity(Entity * e, int numInstances)
-{
-	CommonTypes::Range range;
-	range.begin = (uint32_t)m_objectWorld.size();
-	m_entity = e;
-	AddInstance(numInstances);
-	range.end = (uint32_t)m_objectWorld.size() - 1;
-	return range;
-}
-
 void IGameObject::RemoveInstance(int index)
 {
 	m_objectWorld.erase(m_objectWorld.begin() + index, m_objectWorld.begin() + index + 1);
@@ -81,27 +66,11 @@ int IGameObject::PrepareInstances(std::function<bool(uint32_t)> & shouldRender) 
 {
 	auto data = (DirectX::XMMATRIX*)ShaderHelper::MapBuffer(m_d3d11Context.Get(), m_instanceBuffer.Get());
 	uint32_t renderInstances = 0;
-	if (isEntity())
+	for (size_t i = 0; i < m_objectWorld.size(); ++i)
 	{
-		for (size_t i = 0; i < m_objectWorld.size(); ++i)
+		if (shouldRender((uint32_t)i))
 		{
-			if (shouldRender((uint32_t)i))
-			{
-				if (m_entity->OnRender())
-				{
-					data[renderInstances++] = m_objectWorld[i];
-				}
-			}
-		}
-	}
-	else
-	{
-		for (size_t i = 0; i < m_objectWorld.size(); ++i)
-		{
-			if (shouldRender((uint32_t)i))
-			{
-				data[renderInstances++] = m_objectWorld[i];
-			}
+			data[renderInstances++] = m_objectWorld[i];
 		}
 	}
 	
@@ -130,20 +99,7 @@ void IGameObject::Render(ICamera * cam, const Pipeline& p) const
 	default:
 		return;
 	}
-	DrawIndexedInstanced(cam, p);
-}
-
-void IGameObject::Render() const
-{
-	if (isEntity())
-	{
-		Render(m_entity->m_cameraToUse, m_entity->m_pipelineToUse);
-	}
-}
-
-bool IGameObject::isEntity() const
-{
-	return (m_entity != nullptr);
+	DrawIndexedInstanced(cam);
 }
 
 void IGameObject::RenderBasic(ICamera * cam) const

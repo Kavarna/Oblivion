@@ -1,12 +1,4 @@
 #include "BatchRenderer.h"
-#include "../../scripting/LuaManager.h"
-#include "../../scripting/Entity.h"
-
-float kPointList = D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
-float kLineList = D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
-float kLineStrip = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
-float kTriangleList = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-float kTriangleStrip = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
 
 BatchRenderer::BatchRenderer()
 {
@@ -15,25 +7,6 @@ BatchRenderer::BatchRenderer()
 
 BatchRenderer::~BatchRenderer()
 {
-}
-
-void BatchRenderer::LuaRegister()
-{
-	US_NS_LUA;
-	getGlobalNamespace(g_luaState.get())
-		.beginNamespace("Oblivion")
-			.beginClass<BatchRenderer>("BatchRenderer")
-				.addFunction("Begin", &BatchRenderer::Begin)
-				.addFunction("End", &BatchRenderer::End)
-				.addFunction("Point", &BatchRenderer::Point)
-				.addFunction("Reconstruct", &BatchRenderer::Reconstruct)
-			.endClass()
-			.addVariable("TopologyPointList", &kPointList, false)
-			.addVariable("TopologyLineList", &kLineList, false)
-			.addVariable("TopologyLineStrip", &kLineStrip, false)
-			.addVariable("TopologyTriangleList", &kTriangleList, false)
-			.addVariable("TopologyTriangleStrip", &kTriangleStrip, false)
-		.endNamespace();
 }
 
 void BatchRenderer::Create()
@@ -66,11 +39,6 @@ void BatchRenderer::Vertex(DirectX::XMFLOAT3 const & pos, DirectX::XMFLOAT4 cons
 	m_bufferData[m_currentIndex].Color = color;
 	m_currentIndex++;
 	assert(m_currentIndex < m_numMaxVertices);
-}
-
-void BatchRenderer::Point(DirectX::XMFLOAT3 const & pos, DirectX::XMFLOAT4 const & color)
-{
-	Vertex(pos, color);
 }
 
 void BatchRenderer::End(ICamera * cam, D3D11_PRIMITIVE_TOPOLOGY topology)
@@ -124,7 +92,7 @@ void TextureBatchRenderer::Begin()
 	m_currentIndex = 0;
 }
 
-void TextureBatchRenderer::Point(DirectX::XMFLOAT3 const & pos, DirectX::XMFLOAT2 const & tex)
+void TextureBatchRenderer::Vertex(DirectX::XMFLOAT3 const & pos, DirectX::XMFLOAT2 const & tex)
 {
 	m_bufferData[m_currentIndex].Position = pos;
 	m_bufferData[m_currentIndex].texCoord = tex;

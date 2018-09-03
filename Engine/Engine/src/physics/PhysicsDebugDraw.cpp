@@ -28,11 +28,11 @@ void btDebugDraw::drawLine(const btVector3 & from, const btVector3 & to, const b
 	DirectX::XMFLOAT3 XMfromPoint = DirectX::XMFLOAT3(from.x(), from.y(), from.z());
 	DirectX::XMFLOAT4 XMfromColor = DirectX::XMFLOAT4(fromColor.x(), fromColor.y(),
 		fromColor.z(), from.w());
-	m_renderer->Point(XMfromPoint, XMfromColor);
+	m_renderer->Vertex(XMfromPoint, XMfromColor);
 	DirectX::XMFLOAT3 XMtoPoint = DirectX::XMFLOAT3(to.x(), to.y(), to.z());
 	DirectX::XMFLOAT4 XMtoColor = DirectX::XMFLOAT4(toColor.x(), toColor.y(),
 		toColor.z(), toColor.w());
-	m_renderer->Point(XMtoPoint, XMtoColor);
+	m_renderer->Vertex(XMtoPoint, XMtoColor);
 }
 
 void btDebugDraw::drawContactPoint(const btVector3 & PointOnB, const btVector3 & normalOnB, btScalar distance, int lifeTime, const btVector3 & color)

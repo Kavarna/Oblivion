@@ -19,11 +19,6 @@
 #include "graphics/RenderTexture.h"
 #include "graphics/Square.h"
 
-
-#include "scripting/Script.h"
-#include "scripting/Entity.h"
-#include "scripting/GameScript.h"
-
 #include "physics/World.h"
 #include "physics/CollisionObject.h"
 #include "physics/PhysicsDebugDraw.h"

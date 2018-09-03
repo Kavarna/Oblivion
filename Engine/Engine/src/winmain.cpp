@@ -10,7 +10,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		if (FAILED(hr))
 			throw std::exception("Can't initialize COM");
 		COM::InitializeComObjects();
-		LuaManager::InitializeLua();
 		Game* joc = Game::GetInstance();
 		joc->Create(hInstance);
 		joc->Run();

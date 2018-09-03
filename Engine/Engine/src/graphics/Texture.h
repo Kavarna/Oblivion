@@ -11,8 +11,6 @@
 
 class Texture : public IObject
 {
-public:
-	static void LuaRegister();
 private:
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> mTexture;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> mTextureSRV;
@@ -59,28 +57,4 @@ public:
 	}
 private:
 	void CreateUAV();
-};
-
-
-struct LuaTextureWrapper
-{
-public:
-	static void LuaRegister();
-public:
-	LuaTextureWrapper(std::string path)
-	{
-		m_texture = std::make_shared<Texture>(path);
-	}
-	~LuaTextureWrapper()
-	{
-		m_texture.reset();
-	}
-
-	inline operator Texture*() const
-	{
-		return m_texture.get();
-	}
-
-public:
-	std::shared_ptr<Texture> m_texture = nullptr;
 };

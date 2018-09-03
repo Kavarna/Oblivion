@@ -22,9 +22,6 @@ public:
 	~Camera();
 
 public:
-	static void LuaRegister();
-
-public:
 	void Update(float frameTime, float horizontalMouseMove, float verticalMouseMove);
 	void Construct();
 

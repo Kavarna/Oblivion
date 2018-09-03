@@ -91,13 +91,13 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Bullet Physics\src;$(SolutionDir)External Libraries\Lua\LuaBridge;$(SolutionDir)External Libraries\Lua\include;$(SolutionDir)SharedTypes;$(SolutionDir)External Libraries\boost</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Bullet Physics\src;$(SolutionDir)SharedTypes;$(SolutionDir)External Libraries\boost</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)External Libraries\Lua\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lua51.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -106,11 +106,11 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Bullet Physics\src;$(SolutionDir)External Libraries\Lua\LuaBridge;$(SolutionDir)External Libraries\Lua\include;$(SolutionDir)SharedTypes;$(SolutionDir)External Libraries\boost</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Bullet Physics\src;$(SolutionDir)SharedTypes;$(SolutionDir)External Libraries\boost</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)External Libraries\Lua\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lua5.3.0.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -146,7 +146,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(SolutionDir)External Libraries\Lua\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lua5.3.0.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -157,7 +157,6 @@
     <ClCompile Include="src\physics\CollisionObject.cpp" />
     <ClCompile Include="src\physics\PhysicsDebugDraw.cpp" />
     <ClCompile Include="src\physics\World.cpp" />
-    <ClCompile Include="src\scripting\Entity.cpp" />
     <ClCompile Include="src\graphics\interfaces\Shader.cpp" />
     <ClCompile Include="src\graphics\Shaders\DisplacementShader.cpp" />
     <ClCompile Include="src\graphics\DDSTextureLoader.cpp" />
@@ -185,9 +184,6 @@
     <ClCompile Include="src\imgui\imgui_impl_dx11.cpp" />
     <ClCompile Include="src\input\Keyboard.cpp" />
     <ClCompile Include="src\input\Mouse.cpp" />
-    <ClCompile Include="src\scripting\GameScript.cpp" />
-    <ClCompile Include="src\scripting\LuaManager.cpp" />
-    <ClCompile Include="src\scripting\Script.cpp" />
     <ClCompile Include="src\winmain.cpp" />
     <ClCompile Include="src\graphics\Shaders\TextureShader.cpp" />
   </ItemGroup>
@@ -196,7 +192,6 @@
     <ClInclude Include="src\physics\CollisionObject.h" />
     <ClInclude Include="src\physics\PhysicsDebugDraw.h" />
     <ClInclude Include="src\physics\World.h" />
-    <ClInclude Include="src\scripting\Entity.h" />
     <ClInclude Include="src\graphics\Shaders\EmptyShader.h" />
     <ClInclude Include="src\graphics\Shaders\DisplacementShader.h" />
     <ClInclude Include="src\graphics\DDSTextureLoader.h" />
@@ -240,9 +235,6 @@
     <ClInclude Include="src\input\PlatformHelpers.h" />
     <ClInclude Include="src\OblivionInclude.h" />
     <ClInclude Include="src\graphics\Shaders\TextureShader.h" />
-    <ClInclude Include="src\scripting\GameScript.h" />
-    <ClInclude Include="src\scripting\LuaManager.h" />
-    <ClInclude Include="src\scripting\Script.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\BasicPixelShader.hlsl">
@@ -396,11 +388,6 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="scripts\Sphere.lua" />
-    <None Include="scripts\tree.lua" />
-    <None Include="scripts\ground.lua" />
-    <None Include="scripts\Lights.lua" />
-    <None Include="scripts\Scripts.list" />
     <None Include="src\shaders\Lights.hlsli" />
     <None Include="src\shaders\Materials.hlsli" />
   </ItemGroup>

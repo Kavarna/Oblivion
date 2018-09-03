@@ -40,7 +40,7 @@ private:
 			void							WriteMaterials();
 
 protected:
-			void							DrawIndexedInstanced(ICamera * cam, const Pipeline& p) const override;
+			void							DrawIndexedInstanced(ICamera * cam) const override;
 			bool							PrepareIA(const Pipeline& p) const override;
 
 

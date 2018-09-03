@@ -40,8 +40,6 @@ namespace Rendering
 	} SMaterial, Material;
 }
 
-class Entity;
-
 class IGameObject : public AlignedObject, public IObject
 {
 	friend class Entity;
@@ -77,20 +75,20 @@ protected:
 public:
 	virtual			uint32_t						AddInstance(DirectX::FXMMATRIX const& mat = DirectX::XMMatrixIdentity());
 	virtual			uint32_t						AddInstance(uint32_t number);
-	virtual			CommonTypes::Range				MakeEntity(Entity * e, int numInstances = 1);
 	virtual			void							RemoveInstance(int ID);
 	virtual			void							RemoveInstance(CommonTypes::Range const& range);
 	virtual			int								PrepareInstances(std::function<bool(uint32_t)> & func) const;
 	virtual			void							Render(ICamera * cam, const Pipeline& p) const;
-	virtual			void							Render() const;
-	virtual			bool							isEntity() const;
+
+	template <class Shader>
+					void							Render(ICamera * cam) const;
 
 protected:
 	virtual			void							RenderBasic(ICamera * cam) const;
 	virtual			void							RenderTexture(ICamera * cam) const;
 	virtual			void							RenderTextureLight(ICamera * cam) const;
 	virtual			void							RenderDisplacementTextureLight(ICamera * cam) const;
-	virtual			void							DrawIndexedInstanced(ICamera * cam, const Pipeline&) const = 0;
+	virtual			void							DrawIndexedInstanced(ICamera * cam) const = 0;
 	virtual			bool							PrepareIA(const Pipeline&) const = 0;
 
 protected:
@@ -107,9 +105,6 @@ protected:
 public:
 	static			void							BindStaticVertexBuffer();
 
-private:
-			Entity*									m_entity = nullptr;
-
 protected:
 	static	std::vector<Oblivion::SVertex>			m_staticVertices;
 	static	MicrosoftPointer<ID3D11Buffer>			m_staticVerticesBuffer;
@@ -121,3 +116,41 @@ protected:
 	mutable int										m_bindMaterialToShader;
 			std::string								m_objectName;
 };
+
+template<class Shader>
+inline void IGameObject::Render(ICamera * cam) const
+{
+	static_assert(std::is_base_of<IShader, Shader>::value,
+		"Generic argument for Rende must be a IShader based class");
+
+	if (m_objectWorld.size() < 1)
+		return;
+
+	if constexpr (std::is_same<Shader, BasicShader>::value)
+	{
+		PrepareIA(Pipeline::PipelineBasic);
+		RenderBasic(cam);
+	}
+	else if constexpr (std::is_same<Shader, TextureShader>::value)
+	{
+		PrepareIA(Pipeline::PipelineTexture);
+		RenderTexture(cam);
+	}
+	else if constexpr (std::is_same<Shader, TextureLightShader>::value)
+	{
+		PrepareIA(Pipeline::PipelineTextureLight);
+		RenderTextureLight(cam);
+	}
+	else if constexpr (std::is_same<Shader, DisplacementShader>::value)
+	{
+		PrepareIA(Pipeline::PipelineDisplacementTextureLight);
+		RenderDisplacementTextureLight(cam);
+	}
+	else
+	{
+		static_assert(false,
+			"Can't render a game object using this shader");
+	}
+
+	DrawIndexedInstanced(cam);
+}

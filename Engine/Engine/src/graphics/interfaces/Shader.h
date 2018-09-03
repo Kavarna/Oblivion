@@ -83,7 +83,6 @@ public:
 		}
 	}
 	
-	static void								LuaRegister();
 	static IShader*							Get()
 	{
 		return nullptr;

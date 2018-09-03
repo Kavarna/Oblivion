@@ -30,10 +30,6 @@
     <ClCompile Include="src\graphics\interfaces\Shader.cpp" />
     <ClCompile Include="src\graphics\Shaders\EmptyShader.cpp" />
     <ClCompile Include="src\COM\COMManager.cpp" />
-    <ClCompile Include="src\scripting\LuaManager.cpp" />
-    <ClCompile Include="src\scripting\Script.cpp" />
-    <ClCompile Include="src\scripting\Entity.cpp" />
-    <ClCompile Include="src\scripting\GameScript.cpp" />
     <ClCompile Include="src\common\commonmath.cpp" />
     <ClCompile Include="src\graphics\Projection.cpp" />
     <ClCompile Include="src\Game.cpp" />
@@ -86,10 +82,6 @@
     <ClInclude Include="src\graphics\Shaders\DisplacementShader.h" />
     <ClInclude Include="src\graphics\Shaders\EmptyShader.h" />
     <ClInclude Include="src\COM\COMManager.h" />
-    <ClInclude Include="src\scripting\LuaManager.h" />
-    <ClInclude Include="src\scripting\Script.h" />
-    <ClInclude Include="src\scripting\Entity.h" />
-    <ClInclude Include="src\scripting\GameScript.h" />
     <ClInclude Include="src\physics\World.h" />
     <ClInclude Include="src\physics\CollisionObject.h" />
     <ClInclude Include="src\physics\PhysicsDebugDraw.h" />
@@ -114,10 +106,5 @@
   <ItemGroup>
     <None Include="src\shaders\Lights.hlsli" />
     <None Include="src\shaders\Materials.hlsli" />
-    <None Include="scripts\Scripts.list" />
-    <None Include="scripts\Lights.lua" />
-    <None Include="scripts\ground.lua" />
-    <None Include="scripts\tree.lua" />
-    <None Include="scripts\Sphere.lua" />
   </ItemGroup>
 </Project>
