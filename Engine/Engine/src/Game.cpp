@@ -474,8 +474,9 @@ void Game::WriteSettings()
 
 	auto physicsDebugDrawer = btDebugDraw::Get();
 	int flags = physicsDebugDrawer->getDebugMode();
+	bool debugEnabled = physicsDebugDrawer->isEnabled();
 	pt.put("Physics.Debug flags", flags);
-	pt.put("Physics.Debug enabled", physicsDebugDrawer->isEnabled());
+	pt.put("Physics.Debug enabled", debugEnabled);
 
 	boost::property_tree::json_parser::write_json("Settings.json", pt);
 }
