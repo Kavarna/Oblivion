@@ -51,9 +51,9 @@ void Game::Create(HINSTANCE hInstance, uint32_t width, uint32_t height)
 	InitInput();
 	InitDirect3D();
 	InitImGui();
+	InitSizeDependent();
 	Init2D();
 	Init3D();
-	InitSizeDependent();
 	InitSettings();
 }
 
@@ -171,16 +171,16 @@ void Game::InitImGui()
 
 void Game::Init2D()
 {
-	m_level = std::make_unique<Texture>("Resources/Level.png");
-	
-	
+	//m_level = std::make_unique<Texture>("Resources/ceva.png");
+	//m_debugSquare->SetTexture(std::move(m_level));
+	//const std::string path = "Resources/ceva.png";
 }
 
 void Game::Init3D()
 {
 	BulletWorld::Get()->CreateDefaultWorld();
 
-	m_ground = std::make_unique<CollisionObject>();
+	/*m_ground = std::make_unique<CollisionObject>();
 	m_ground->Create(EDefaultObject::Grid);
 	m_ground->AddInstance();
 
@@ -194,7 +194,7 @@ void Game::Init3D()
 
 	m_models.push_back(m_ground.get());
 	m_models.push_back(m_sphere.get());
-	m_models.push_back(m_tree.get());
+	m_models.push_back(m_tree.get());*/
 }
 
 void Game::InitSizeDependent()
@@ -235,6 +235,12 @@ void Game::InitSizeDependent()
 		m_debugSquare->TranslateTo(m_windowWidth - 76.0f, m_windowHeight - 76.0f);
 		m_debugSquare->SetName("Debug square");
 #endif
+		m_animationSquare = std::make_unique<Square>();
+		m_animationSquare->Create("Resources/ceva.png");
+		m_animationSquare->AddInstance();
+		//m_animationSquare->Scale(50.0f, 50.0f);
+		//m_animationSquare->TranslateTo(0, 0);
+		//m_animationSquare->SetWindowInfo((float)m_windowWidth, (float)m_windowHeight);
 	}
 }
 
@@ -354,6 +360,7 @@ void Game::Update()
 	{
 		model->Update(frameTime);
 	}
+	m_animation.Update(frameTime);
 }
 
 void Game::Begin()
@@ -369,23 +376,23 @@ void Game::End()
 	auto renderer = Direct3D11::Get();
 
 	bool hasMSAA = renderer->m_hasMSAA;
-
-	ImGui::Begin("Settings", 0, ImGuiWindowFlags_NoNav |
-		ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-	ImGui::Checkbox("Vertical sync", &renderer->m_hasVerticalSync);
-	ImGui::Checkbox("Use MSAA", &renderer->m_hasMSAA);
-	ImGui::DragFloat("Mouse sensivity", &m_mouseSensivity, 0.01f, 1.0f, 5.0f);
-
-	if (hasMSAA != renderer->m_hasMSAA)
-	{
-		renderer->resetSwapChain();
-		renderer->OnResize(m_windowHandle, m_windowWidth, m_windowHeight);
-	}
-
-	ImGui::End();
-
 	if (m_showDeveloperConsole)
 	{
+		ImGui::Begin("Settings", 0, ImGuiWindowFlags_NoNav |
+			ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+		ImGui::Checkbox("Vertical sync", &renderer->m_hasVerticalSync);
+		ImGui::Checkbox("Use MSAA", &renderer->m_hasMSAA);
+		ImGui::DragFloat("Mouse sensivity", &m_mouseSensivity, 0.01f, 1.0f, 5.0f);
+
+		if (hasMSAA != renderer->m_hasMSAA)
+		{
+			renderer->resetSwapChain();
+			renderer->OnResize(m_windowHandle, m_windowWidth, m_windowHeight);
+		}
+
+		ImGui::End();
+
+
 		ImGui::Begin("Debug", 0, ImGuiWindowFlags_NoNav |
 			ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
@@ -549,6 +556,8 @@ void Game::Render()
 	m_debugSquare->Render<TextureShader>(g_screen.get());
 #endif
 
+	m_animationSquare->Render<TextureShader>(g_screen.get());
+
 	for (const auto & model : m_models)
 	{
 		model->Render<DisplacementShader>(g_camera.get());
@@ -580,6 +589,11 @@ void Game::OnSize(uint32_t width, uint32_t height)
 	ImGui_ImplDX11_CreateDeviceObjects();
 }
 
+void Game::OnMouseMove()
+{
+	m_animation.OnMouseMove();
+}
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	if (ImGui_ImplWin32_WndProcHandler(hWnd, Message, wParam, lParam))
@@ -594,8 +608,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 
 	break;
 
-	case WM_INPUT:
 	case WM_MOUSEMOVE:
+	DirectX::Mouse::ProcessMessage(Message, wParam, lParam);
+	Game::GetInstance()->OnMouseMove();
+	break;
+	case WM_INPUT:
 	case WM_LBUTTONDOWN:
 	case WM_LBUTTONUP:
 	case WM_RBUTTONDOWN:
@@ -628,4 +645,53 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 	break;
 	}
 	return DefWindowProc(hWnd, Message, wParam, lParam);
+}
+
+void SAnimation::Update(float frameTime)
+{
+	static Game* instance = Game::GetInstance();
+	if (bActive)
+	{
+		accumulatedTime += frameTime;
+		if (accumulatedTime >= 1.0f)
+		{
+			bActive = false;
+			DX::OutputVDebugString(L"Deactivate animation\n");
+			return;
+		}
+
+
+		float eas = easing.GetEasingProgress(accumulatedTime);
+		currentPosition.x += (endPosition.x - currentPosition.x) * eas * animationScale;
+		currentPosition.y += (endPosition.y - currentPosition.y) * eas * animationScale;
+		//currentPosition.x = eas * animationScale * dir.x + startPosition.x;
+		//currentPosition.y = eas * animationScale * dir.y + startPosition.y;
+		DX::OutputVDebugString(L"%.3f\n", eas);
+	}
+	instance->m_animationSquare->Identity();
+	instance->m_animationSquare->Scale(100.0f, 100.0f);
+	instance->m_animationSquare->TranslateTo(currentPosition.x, currentPosition.y);
+	//DX::OutputVDebugString(L"currentPosition = { %.2f, %.2f }\n", currentPosition.x, currentPosition.y);
+}
+
+void SAnimation::OnMouseMove()
+{
+	static Game* instance = Game::GetInstance();
+	auto mouse = instance->m_mouse->GetState();
+
+	currMouseCoords.x = mouse.x;
+	currMouseCoords.y = mouse.y;
+
+	bActive = true;
+	accumulatedTime = 0.0f;
+
+	startPosition = currentPosition;
+
+	endPosition.x = startPosition.x + animationScale * (currMouseCoords.x - lastMouseCoords.x);
+	endPosition.y = startPosition.y + animationScale * (currMouseCoords.y - lastMouseCoords.y);
+
+	dir.x = currMouseCoords.x - lastMouseCoords.x;
+	dir.y = currMouseCoords.y - lastMouseCoords.y;
+
+	lastMouseCoords = currMouseCoords;
 }

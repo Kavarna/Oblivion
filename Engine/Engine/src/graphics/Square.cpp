@@ -53,6 +53,12 @@ uint32_t Square::GetVertexCount(int subObject) const
 	return m_vertexRange.end - m_vertexRange.begin;
 }
 
+void Square::SetTexture(std::unique_ptr<Texture>&& tex)
+{
+	m_material.hasTexture = true;
+	m_material.diffuseTexture = std::move(tex);
+}
+
 void Square::SetWindowInfo(float windowWidth, float windowHeight)
 {
 	m_windowWidth = windowWidth;
@@ -68,7 +74,6 @@ inline void Square::Scale(float Sx, float Sy, float Sz, int instanceID)
 
 void Square::TranslateTo(float X, float Y, int InstanceID)
 {
-	Identity(InstanceID);
 	float halfWidth = (float)m_width / 2.0f;
 	float halfHeight = (float)m_height / 2.0f;
 	X += halfWidth;
@@ -92,7 +97,7 @@ void Square::DrawIndexedInstanced(ICamera * cam) const
 	if (renderInstances == 0)
 		return;
 
-	BindMaterial(m_material, (int)Shader::ShaderType::ePixel);
+	BindMaterial(m_material, m_bindMaterialToShader);
 	m_d3d11Context->DrawIndexedInstanced(GetIndexCount(),
 		renderInstances, 0, m_vertexRange.begin, 0);
 	if (g_isDeveloper)

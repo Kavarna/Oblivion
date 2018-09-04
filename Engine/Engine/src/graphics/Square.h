@@ -18,14 +18,13 @@ public:
 			void						Destroy() override;
 	inline	uint32_t					GetIndexCount(int subObject = 0) const override;
 	inline	uint32_t					GetVertexCount(int subObject = 0) const override;
+			void						SetTexture(std::unique_ptr<Texture>&& tex);
 
 
 			void						SetWindowInfo(float windowWidth, float windowHeight);
 	inline	void						Scale(float Sx, float Sy, float Sz = 1.0f, int instanceID = 0) override;
 
 			void						TranslateTo(float X, float Y, int InstanceID = 0);
-
-
 private:
 			void						DrawIndexedInstanced(ICamera * cam) const override;
 			bool						PrepareIA(const Pipeline& p) const override;
