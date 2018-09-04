@@ -53,16 +53,10 @@ uint32_t Square::GetVertexCount(int subObject) const
 	return m_vertexRange.end - m_vertexRange.begin;
 }
 
-void Square::SetTexture(std::unique_ptr<Texture>&& tex)
+void Square::SetTexture(std::shared_ptr<Texture> tex)
 {
 	m_material.hasTexture = true;
-	m_material.diffuseTexture = std::move(tex);
-}
-
-void Square::SetWindowInfo(float windowWidth, float windowHeight)
-{
-	m_windowWidth = windowWidth;
-	m_windowHeight = windowHeight;
+	m_material.diffuseTexture = tex;
 }
 
 inline void Square::Scale(float Sx, float Sy, float Sz, int instanceID)
@@ -74,12 +68,14 @@ inline void Square::Scale(float Sx, float Sy, float Sz, int instanceID)
 
 void Square::TranslateTo(float X, float Y, int InstanceID)
 {
-	float halfWidth = (float)m_width / 2.0f;
-	float halfHeight = (float)m_height / 2.0f;
+	Identity(InstanceID);
+	float halfWidth = (float)m_width;
+	float halfHeight = (float)m_height;
 	X += halfWidth;
 	Y += halfHeight;
 	float NewX = (float(m_windowWidth / 2) * -1 + X);
 	float NewY = (float(m_windowHeight / 2) - Y);
+	m_objectWorld[InstanceID] *= DirectX::XMMatrixScaling(m_width, m_height, 1.0f);
 	m_objectWorld[InstanceID] *= DirectX::XMMatrixTranslation(NewX, NewY, 0.0f);
 }
 

@@ -185,6 +185,7 @@
     <ClCompile Include="src\imgui\imgui_impl_dx11.cpp" />
     <ClCompile Include="src\input\Keyboard.cpp" />
     <ClCompile Include="src\input\Mouse.cpp" />
+    <ClCompile Include="src\ShadowLight.cpp" />
     <ClCompile Include="src\winmain.cpp" />
     <ClCompile Include="src\graphics\Shaders\TextureShader.cpp" />
   </ItemGroup>
@@ -192,6 +193,7 @@
     <ClInclude Include="src\common\Bezier\BezierEasing.h" />
     <ClInclude Include="src\common\Bezier\p2Point.h" />
     <ClInclude Include="src\COM\COMManager.h" />
+    <ClInclude Include="src\graphics\interfaces\I2DTransforms.h" />
     <ClInclude Include="src\physics\CollisionObject.h" />
     <ClInclude Include="src\physics\PhysicsDebugDraw.h" />
     <ClInclude Include="src\physics\World.h" />
@@ -238,6 +240,7 @@
     <ClInclude Include="src\input\PlatformHelpers.h" />
     <ClInclude Include="src\OblivionInclude.h" />
     <ClInclude Include="src\graphics\Shaders\TextureShader.h" />
+    <ClInclude Include="src\ShadowLight.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\BasicPixelShader.hlsl">

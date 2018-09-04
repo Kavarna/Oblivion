@@ -3,13 +3,14 @@
 #include "../input/Mouse.h"
 #include "../input/Keyboard.h"
 #include "interfaces/ICamera.h"
+#include "interfaces/I2DTransforms.h"
 
 
 class Projection :
-	public ICamera, public AlignedObject
+	public ICamera, public AlignedObject, public I2DTransforms
 {
 public:
-	Projection() = default;
+	Projection();
 	~Projection() = default;
 
 public:
@@ -22,14 +23,25 @@ public:
 	void Construct() override
 	{
 		m_projectionMatrix = DirectX::XMMatrixOrthographicLH(m_width, m_height, m_nearZ, m_farZ);
-		m_viewMatrix = DirectX::XMMatrixIdentity();
 	}
+	void ConstructTransform()
+	{
+		m_viewMatrix = DirectX::XMMatrixLookToLH(m_position, m_direction, m_up);
+	}
+
+	void TranslateTo(float x, float y);
+	void Translate(float x, float y);
+	void SetOrtho(bool yDown);
 
 	DirectX::XMMATRIX& GetView() override { return m_viewMatrix; };
 	DirectX::XMMATRIX& GetProjection() override { return m_projectionMatrix; };
-
+	
 private:
 	DirectX::XMMATRIX	m_projectionMatrix;
 	DirectX::XMMATRIX	m_viewMatrix;
+
+	DirectX::XMVECTOR	m_position;
+	DirectX::XMVECTOR	m_direction;
+	DirectX::XMVECTOR	m_up;
 };
 

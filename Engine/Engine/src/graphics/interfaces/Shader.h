@@ -31,6 +31,7 @@ enum Pipeline
 	PipelineTexture = 2,
 	PipelineTextureLight = 3,
 	PipelineDisplacementTextureLight = 4,
+	PipelineCompute2D = 5,
 };
 
 class IShader : public IObject

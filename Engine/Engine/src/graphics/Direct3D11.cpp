@@ -299,11 +299,8 @@ void Direct3D11::InitializeStates()
 
 void Direct3D11::Begin()
 {
-	m_d3d11Context->OMSetRenderTargets(1, m_defaultRenderTarget.GetAddressOf(), m_depthStencilView.Get());
-	static FLOAT color[4] = { 0.0f,0.0f,0.0f,1.0f };
-	m_d3d11Context->ClearRenderTargetView(m_defaultRenderTarget.Get(), color);
-	m_d3d11Context->ClearDepthStencilView(m_depthStencilView.Get(), D3D11_CLEAR_FLAG::D3D11_CLEAR_DEPTH, 1.0f, 0);
-	m_d3d11Context->RSSetViewports(1, &m_viewPort);
+	SetRenderTargetAndDepth();
+	ClearRenderTargetAndDepth();
 }
 
 void Direct3D11::End()
@@ -312,6 +309,19 @@ void Direct3D11::End()
 		m_dxgiSwapChain->Present(1, 0);
 	else
 		m_dxgiSwapChain->Present(0, 0);
+}
+
+void Direct3D11::ClearRenderTargetAndDepth()
+{
+	static FLOAT color[4] = { 0.0f,0.0f,0.0f,1.0f };
+	m_d3d11Context->ClearRenderTargetView(m_defaultRenderTarget.Get(), color);
+	m_d3d11Context->ClearDepthStencilView(m_depthStencilView.Get(), D3D11_CLEAR_FLAG::D3D11_CLEAR_DEPTH, 1.0f, 0);
+}
+
+void Direct3D11::SetRenderTargetAndDepth()
+{
+	m_d3d11Context->OMSetRenderTargets(1, m_defaultRenderTarget.GetAddressOf(), m_depthStencilView.Get());
+	m_d3d11Context->RSSetViewports(1, &m_viewPort);
 }
 
 void Direct3D11::RSWireframeRender()

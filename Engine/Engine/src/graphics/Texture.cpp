@@ -24,6 +24,23 @@ Texture::Texture(LPSTR lpPath, bool hasUAV)
 	mPath = std::string(lpPath);
 }
 
+Texture::Texture(ID3D11Texture2D * tex, ID3D11ShaderResourceView * srv, ID3D11UnorderedAccessView * uav)
+{
+	mHasUAV = false;
+	mTexture.Reset();
+	mTexture = MicrosoftPointer<ID3D11Texture2D>(tex);
+
+	mTextureSRV.Reset();
+	mTextureSRV = MicrosoftPointer<ID3D11ShaderResourceView>(srv);
+
+	if (uav)
+	{
+		mHasUAV = true;
+		mTextureUAV.Reset();
+		mTextureUAV = MicrosoftPointer<ID3D11UnorderedAccessView>(uav);
+	}
+}
+
 Texture::~Texture()
 {
 	mTextureSRV.Reset();

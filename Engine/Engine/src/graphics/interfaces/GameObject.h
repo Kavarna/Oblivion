@@ -30,9 +30,9 @@ namespace Rendering
 		float tessMin = 1.0f;
 		float tessMax = 1.0f;
 		float tessScale = 1.0f;
-		std::unique_ptr<Texture> diffuseTexture;
-		std::unique_ptr<Texture> bumpMap;
-		std::unique_ptr<Texture> specularMap;
+		std::shared_ptr<Texture> diffuseTexture;
+		std::shared_ptr<Texture> bumpMap;
+		std::shared_ptr<Texture> specularMap;
 
 		material_t() : hasTexture(false),
 			hasBumpMap(false),
@@ -75,6 +75,8 @@ protected:
 public:
 	virtual			uint32_t						AddInstance(DirectX::FXMMATRIX const& mat = DirectX::XMMatrixIdentity());
 	virtual			uint32_t						AddInstance(uint32_t number);
+	virtual			uint32_t						GetNumInstances() const { return m_objectWorld.size(); };
+	virtual			void							ClearInstances() { m_objectWorld.clear(); };
 	virtual			void							RemoveInstance(int ID);
 	virtual			void							RemoveInstance(CommonTypes::Range const& range);
 	virtual			int								PrepareInstances(std::function<bool(uint32_t)> & func) const;

@@ -33,7 +33,7 @@ public:
 			void							ImGuiChangeMaterial();
 
 public:
-			void							SetMaterial(Rendering::Material && mat, int materialIndex = 0);
+			void							SetMaterial(Rendering::Material const& mat, int materialIndex = 0);
 
 private:
 			void							ReadMaterials(std::string const& filename);

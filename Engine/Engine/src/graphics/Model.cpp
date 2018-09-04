@@ -228,9 +228,9 @@ void Model::ImGuiChangeMaterial()
 	}
 }
 
-void Model::SetMaterial(Rendering::Material && mat, int materialIndex)
+void Model::SetMaterial(Rendering::Material const& mat, int materialIndex)
 {
-	m_materials[materialIndex] = std::move(mat);
+	m_materials[materialIndex] = mat;
 }
 
 void Model::ReadMaterials(std::string const & filename)
@@ -253,7 +253,7 @@ void Model::ReadMaterials(std::string const & filename)
 		{
 			resultMaterial.hasTexture = true;
 			std::string texturePath = textureChild.value().get_value<std::string>();
-			resultMaterial.diffuseTexture = std::make_unique<Texture>((LPSTR)texturePath.c_str());
+			resultMaterial.diffuseTexture = std::make_shared<Texture>((LPSTR)texturePath.c_str());
 		}
 		else
 		{
@@ -268,7 +268,7 @@ void Model::ReadMaterials(std::string const & filename)
 		{
 			resultMaterial.hasBumpMap = true;
 			std::string texturePath = textureChild.value().get_value<std::string>();
-			resultMaterial.bumpMap = std::make_unique<Texture>((LPSTR)texturePath.c_str());
+			resultMaterial.bumpMap = std::make_shared<Texture>((LPSTR)texturePath.c_str());
 		}
 
 		auto specularChild = materialTree.get_child_optional("specular map");
@@ -276,7 +276,7 @@ void Model::ReadMaterials(std::string const & filename)
 		{
 			resultMaterial.hasSpecularMap = true;
 			std::string texturePath = textureChild.value().get_value<std::string>();
-			resultMaterial.specularMap = std::make_unique<Texture>((LPSTR)texturePath.c_str());
+			resultMaterial.specularMap = std::make_shared<Texture>((LPSTR)texturePath.c_str());
 		}
 
 		resultMaterial.specular = materialTree.get_child("shininess").get_value<float>();
@@ -707,8 +707,8 @@ void Model::Create(EDefaultObject object)
 			m_materials.back().tessMax = 3.0f;
 			m_materials.back().tessScale = 0.1f;
 			m_materials.back().specular = 1000.0f;
-			m_materials.back().diffuseTexture = std::make_unique<Texture>((LPWSTR)L"Resources/Stones.dds");
-			m_materials.back().bumpMap = std::make_unique<Texture>((LPWSTR)L"Resources/Stones_nmap.dds");
+			m_materials.back().diffuseTexture = std::make_shared<Texture>((LPWSTR)L"Resources/Stones.dds");
+			m_materials.back().bumpMap = std::make_shared<Texture>((LPWSTR)L"Resources/Stones_nmap.dds");
 			m_meshes.back().m_materialIndex = 0;
 		}
 		else
@@ -723,8 +723,8 @@ void Model::Create(EDefaultObject object)
 			m_materials.back().tessMin = 1.0f;
 			m_materials.back().tessMax = 64.0f;
 			m_materials.back().tessScale = 0.3f;
-			m_materials.back().diffuseTexture = std::make_unique<Texture>((LPWSTR)L"Resources/Stones.dds");
-			m_materials.back().bumpMap = std::make_unique<Texture>((LPWSTR)L"Resources/Stones_nmap.dds");
+			m_materials.back().diffuseTexture = std::make_shared<Texture>((LPWSTR)L"Resources/Stones.dds");
+			m_materials.back().bumpMap = std::make_shared<Texture>((LPWSTR)L"Resources/Stones_nmap.dds");
 			m_meshes.back().m_materialIndex = 0;
 		}
 	}

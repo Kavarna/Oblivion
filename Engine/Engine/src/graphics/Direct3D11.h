@@ -30,6 +30,8 @@ public:
 
 	void										Begin();
 	void										End();
+	void										ClearRenderTargetAndDepth();
+	void										SetRenderTargetAndDepth();
 	void										RSWireframeRender();
 	void										RSSolidRender();
 	void										RSCullNone();

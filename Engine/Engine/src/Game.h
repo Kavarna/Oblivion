@@ -1,27 +1,7 @@
 #pragma once
 
 #include "OblivionInclude.h"
-
-struct SAnimation
-{
-	void Update(float frameTime);
-	void OnMouseMove();
-
-private:
-	BezierEasing easing = BezierEasing({ 0.61f, 0.07f }, { 0.46f, 0.89f });
-	bool bActive = false;
-	float accumulatedTime;
-	const float animationScale = 0.1f;
-
-	DirectX::XMFLOAT2 currentPosition = DirectX::XMFLOAT2(0.0f, 0.0f);
-	DirectX::XMFLOAT2 startPosition = DirectX::XMFLOAT2(0.0f, 0.0f);
-	DirectX::XMFLOAT2 endPosition = DirectX::XMFLOAT2(0.0f, 0.0f);
-
-	DirectX::XMFLOAT2 dir;
-
-	DirectX::XMFLOAT2 lastMouseCoords;
-	DirectX::XMFLOAT2 currMouseCoords = DirectX::XMFLOAT2(0.0f, 0.0f);
-};
+#include "ShadowLight.h"
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -42,8 +22,13 @@ public:
 
 public:
 	void Create(HINSTANCE hInstance, uint32_t width = 800, uint32_t height = 600);
+	void Create(HWND hWnd);
 	void Run();
 	void Destroy();
+
+public:
+	inline float GetNearZ() const { return 1.0f; };
+	inline float GetFarZ() const { return 1000.0f; };
 
 public:
 	void OnSize(uint32_t width, uint32_t height);
@@ -85,18 +70,14 @@ private:
 #if DEBUG || _DEBUG
 	std::unique_ptr<Square>								m_debugSquare;
 #endif
-	std::unique_ptr<Square>								m_animationSquare;
 	//std::unique_ptr<CollisionObject>					m_ground;
 	//std::unique_ptr<CollisionObject>					m_sphere;
 	//std::unique_ptr<CollisionObject>					m_tree;
 
-	//std::unique_ptr<Texture>							m_level;
+	std::unique_ptr<ShadowLight>						m_demo;
 
 	std::vector<Model*>									m_models;
 	Model*												m_selectedObject;
-
-
-	SAnimation											m_animation;
 
 private:
 	std::unique_ptr<DirectX::Mouse>						m_mouse;

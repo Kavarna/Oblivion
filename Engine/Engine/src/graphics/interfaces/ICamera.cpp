@@ -1,7 +1,7 @@
 #include "ICamera.h"
 #include "../Helpers/GraphicsDebugDraw.h"
 
-inline void ICamera::RenderDebug() const
+void ICamera::RenderDebug() const
 {
 	if (g_isDeveloper)
 	{

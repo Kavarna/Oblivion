@@ -48,8 +48,13 @@ void Game::Create(HINSTANCE hInstance, uint32_t width, uint32_t height)
 	m_windowHeight = height;
 
 	InitWindow();
-	InitInput();
+}
+
+void Game::Create(HWND hWnd)
+{
+	m_windowHandle = hWnd;
 	InitDirect3D();
+	InitInput();
 	InitImGui();
 	InitSizeDependent();
 	Init2D();
@@ -125,7 +130,7 @@ void Game::InitWindow()
 
 	RegisterClassEx(&wndClass);
 
-	m_windowHandle = CreateWindowEx(WS_EX_CLIENTEDGE, ENGINE_NAME, ENGINE_NAME,
+	CreateWindowEx(WS_EX_CLIENTEDGE, ENGINE_NAME, ENGINE_NAME,
 		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
 		m_windowWidth, m_windowHeight, nullptr, nullptr,
 		m_windowInstance, nullptr);
@@ -171,38 +176,36 @@ void Game::InitImGui()
 
 void Game::Init2D()
 {
-	//m_level = std::make_unique<Texture>("Resources/ceva.png");
-	//m_debugSquare->SetTexture(std::move(m_level));
-	//const std::string path = "Resources/ceva.png";
+	m_demo = std::make_unique<ShadowLight>();
 }
 
 void Game::Init3D()
 {
 	BulletWorld::Get()->CreateDefaultWorld();
 
-	/*m_ground = std::make_unique<CollisionObject>();
-	m_ground->Create(EDefaultObject::Grid);
-	m_ground->AddInstance();
+	//m_ground = std::make_unique<CollisionObject>();
+	//m_ground->Create(EDefaultObject::Grid);
+	//m_ground->AddInstance();
 
-	m_sphere = std::make_unique<CollisionObject>();
-	m_sphere->Create(EDefaultObject::Sphere);
-	m_sphere->AddInstance(DirectX::XMMatrixTranslation(0.f, 30.f, 0.f));
+	//m_sphere = std::make_unique<CollisionObject>();
+	//m_sphere->Create(EDefaultObject::Sphere);
+	//m_sphere->AddInstance(DirectX::XMMatrixTranslation(0.f, 30.f, 0.f));
 
-	m_tree = std::make_unique<CollisionObject>();
-	m_tree->Create("Resources/LowPolyTree");
-	m_tree->AddInstance();
+	//m_tree = std::make_unique<CollisionObject>();
+	//m_tree->Create("Resources/LowPolyTree");
+	//m_tree->AddInstance();
 
-	m_models.push_back(m_ground.get());
-	m_models.push_back(m_sphere.get());
-	m_models.push_back(m_tree.get());*/
+	//m_models.push_back(m_ground.get());
+	//m_models.push_back(m_sphere.get());
+	//m_models.push_back(m_tree.get());
 }
 
 void Game::InitSizeDependent()
 {
 	float FOV = DirectX::XM_PI / 4;
 	float HByW = (float)m_windowWidth / (float)m_windowHeight;
-	float nearZ = 1.0f;
-	float farZ = 1000.0f;
+	float nearZ = GetNearZ();
+	float farZ = GetFarZ();
 	if (g_camera)
 	{
 		Camera * cam = new Camera(FOV, HByW, nearZ, farZ);
@@ -235,12 +238,6 @@ void Game::InitSizeDependent()
 		m_debugSquare->TranslateTo(m_windowWidth - 76.0f, m_windowHeight - 76.0f);
 		m_debugSquare->SetName("Debug square");
 #endif
-		m_animationSquare = std::make_unique<Square>();
-		m_animationSquare->Create("Resources/ceva.png");
-		m_animationSquare->AddInstance();
-		//m_animationSquare->Scale(50.0f, 50.0f);
-		//m_animationSquare->TranslateTo(0, 0);
-		//m_animationSquare->SetWindowInfo((float)m_windowWidth, (float)m_windowHeight);
 	}
 }
 
@@ -360,7 +357,8 @@ void Game::Update()
 	{
 		model->Update(frameTime);
 	}
-	m_animation.Update(frameTime);
+
+	m_demo->Update(frameTime);
 }
 
 void Game::Begin()
@@ -542,6 +540,8 @@ void Game::Render()
 
 	Begin();
 
+	m_demo->Render();
+
 	auto graphicsDebugDrawer = GraphicsDebugDraw::Get();
 	if (g_isDeveloper)
 	{
@@ -555,8 +555,6 @@ void Game::Render()
 #if DEBUG || _DEBUG
 	m_debugSquare->Render<TextureShader>(g_screen.get());
 #endif
-
-	m_animationSquare->Render<TextureShader>(g_screen.get());
 
 	for (const auto & model : m_models)
 	{
@@ -584,6 +582,7 @@ void Game::OnSize(uint32_t width, uint32_t height)
 	InitSizeDependent();
 
 	Direct3D11::Get()->OnResize(m_windowHandle, m_windowWidth, m_windowHeight);
+	m_demo->OnSize(m_windowWidth, m_windowHeight);
 
 	ImGui_ImplDX11_InvalidateDeviceObjects();
 	ImGui_ImplDX11_CreateDeviceObjects();
@@ -591,7 +590,8 @@ void Game::OnSize(uint32_t width, uint32_t height)
 
 void Game::OnMouseMove()
 {
-	m_animation.OnMouseMove();
+	auto mouse = m_mouse->GetState();
+	m_demo->OnMouseMove(mouse.x, mouse.y);
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
@@ -637,6 +637,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 	Game::GetInstance()->OnSize(LOWORD(lParam), HIWORD(lParam));
 	break;
 
+	case WM_CREATE:
+	Game::GetInstance()->Create(hWnd);
+	break;
+
 	case WM_QUIT:
 	DestroyWindow(hWnd);
 	break;
@@ -645,53 +649,4 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 	break;
 	}
 	return DefWindowProc(hWnd, Message, wParam, lParam);
-}
-
-void SAnimation::Update(float frameTime)
-{
-	static Game* instance = Game::GetInstance();
-	if (bActive)
-	{
-		accumulatedTime += frameTime;
-		if (accumulatedTime >= 1.0f)
-		{
-			bActive = false;
-			DX::OutputVDebugString(L"Deactivate animation\n");
-			return;
-		}
-
-
-		float eas = easing.GetEasingProgress(accumulatedTime);
-		currentPosition.x += (endPosition.x - currentPosition.x) * eas * animationScale;
-		currentPosition.y += (endPosition.y - currentPosition.y) * eas * animationScale;
-		//currentPosition.x = eas * animationScale * dir.x + startPosition.x;
-		//currentPosition.y = eas * animationScale * dir.y + startPosition.y;
-		DX::OutputVDebugString(L"%.3f\n", eas);
-	}
-	instance->m_animationSquare->Identity();
-	instance->m_animationSquare->Scale(100.0f, 100.0f);
-	instance->m_animationSquare->TranslateTo(currentPosition.x, currentPosition.y);
-	//DX::OutputVDebugString(L"currentPosition = { %.2f, %.2f }\n", currentPosition.x, currentPosition.y);
-}
-
-void SAnimation::OnMouseMove()
-{
-	static Game* instance = Game::GetInstance();
-	auto mouse = instance->m_mouse->GetState();
-
-	currMouseCoords.x = mouse.x;
-	currMouseCoords.y = mouse.y;
-
-	bActive = true;
-	accumulatedTime = 0.0f;
-
-	startPosition = currentPosition;
-
-	endPosition.x = startPosition.x + animationScale * (currMouseCoords.x - lastMouseCoords.x);
-	endPosition.y = startPosition.y + animationScale * (currMouseCoords.y - lastMouseCoords.y);
-
-	dir.x = currMouseCoords.x - lastMouseCoords.x;
-	dir.y = currMouseCoords.y - lastMouseCoords.y;
-
-	lastMouseCoords = currMouseCoords;
 }

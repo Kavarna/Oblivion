@@ -3,6 +3,7 @@
 
 #include "interfaces/Object.h"
 #include "Helpers/TextureUtilities.h"
+#include "Texture.h"
 
 
 class RenderTexture :
@@ -19,10 +20,10 @@ public:
 	void SetRenderTarget();
 
 public:
-	ID3D11Texture2D * GetTexture() { return m_texture.Get(); };
-	ID3D11ShaderResourceView * GetTextureSRV() { return m_shaderResourceView.Get(); };
-	ID3D11UnorderedAccessView * GetTextureUAV() { return m_unorderedAccessView.Get(); };
-
+	ID3D11Texture2D * GetTexture() const { return m_texture.Get(); };
+	ID3D11ShaderResourceView * GetTextureSRV() const { return m_shaderResourceView.Get(); };
+	ID3D11UnorderedAccessView * GetTextureUAV() const { return m_unorderedAccessView.Get(); };
+	std::shared_ptr<Texture> GetOblivionTexture() const { return m_oblTexture; };
 
 
 private:
@@ -36,6 +37,8 @@ private:
 	
 	MicrosoftPointer<ID3D11Texture2D>			m_textureDepth				= nullptr;
 	MicrosoftPointer<ID3D11DepthStencilView>	m_depthView					= nullptr;
+
+	std::shared_ptr<Texture>					m_oblTexture				= nullptr; // Oblivion Texture
 
 	D3D11_VIEWPORT								m_viewPort;
 };

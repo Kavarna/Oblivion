@@ -34,6 +34,8 @@ void RenderTexture::Reset(uint32_t width, uint32_t height,
 		CreateDSVFromTexture(m_d3d11Device.Get(), m_textureDepth.Get(), &m_depthView);
 	}
 
+	m_oblTexture = std::make_shared<Texture>(m_texture.Get(), m_shaderResourceView.Get(), m_unorderedAccessView.Get());
+
 	m_viewPort.TopLeftX = 0;
 	m_viewPort.TopLeftY = 0;
 	m_viewPort.Width = (FLOAT)width;
@@ -52,6 +54,7 @@ void RenderTexture::SetRenderTarget()
 {
 	// m_depthView might be null, but that's not a problem
 	m_d3d11Context->OMSetRenderTargets(1, m_renderTargetView.GetAddressOf(), m_depthView.Get());
+	m_d3d11Context->RSSetViewports(1, &m_viewPort);
 }
 
 void RenderTexture::Reset()

@@ -38,6 +38,7 @@
     <ClCompile Include="src\physics\PhysicsDebugDraw.cpp" />
     <ClCompile Include="src\graphics\Helpers\GraphicsDebugDraw.cpp" />
     <ClCompile Include="src\common\Bezier\BezierEasing.cpp" />
+    <ClCompile Include="src\ShadowLight.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\commonmath.h" />
@@ -89,6 +90,8 @@
     <ClInclude Include="src\graphics\Helpers\GraphicsDebugDraw.h" />
     <ClInclude Include="src\common\Bezier\p2Point.h" />
     <ClInclude Include="src\common\Bezier\BezierEasing.h" />
+    <ClInclude Include="src\ShadowLight.h" />
+    <ClInclude Include="src\graphics\interfaces\I2DTransforms.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\BasicVertexShader.hlsl" />

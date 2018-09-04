@@ -42,7 +42,7 @@ public:
 	{
 		return 0.0f;
 	}
-	inline void RenderDebug() const;
+	void RenderDebug() const;
 
 protected:
 	void BuildViewFrustum()
