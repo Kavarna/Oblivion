@@ -22,6 +22,7 @@ private:
 public:
 	Texture() = default;
 	Texture(std::string);
+	Texture(float width, float height, bool hasUAV);
 	Texture(LPWSTR lpPath, bool hasUAV = false);
 	Texture(LPSTR lpPath, bool hasUAV = false);
 	Texture(ID3D11Texture2D *, ID3D11ShaderResourceView *, ID3D11UnorderedAccessView * = nullptr);

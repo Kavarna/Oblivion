@@ -1,4 +1,5 @@
 #include "Texture.h"
+#include "Helpers/TextureUtilities.h"
 #include <atlbase.h>
 
 Texture::Texture(std::string path)
@@ -6,6 +7,20 @@ Texture::Texture(std::string path)
 	USES_CONVERSION;
 	LPWSTR lpwPath = A2W(path.c_str());
 	Create(lpwPath, false);
+}
+
+Texture::Texture(float width, float height, bool hasUAV)
+{
+	UINT flags = D3D11_BIND_FLAG::D3D11_BIND_SHADER_RESOURCE;
+	if (hasUAV)
+		flags |= D3D11_BIND_FLAG::D3D11_BIND_UNORDERED_ACCESS;
+	TextureUtilities::CreateTexture(m_d3d11Device.Get(),
+		&mTexture, width, height, flags,
+		DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT,
+		1, 0);
+
+	TextureUtilities::CreateSRVFromTexture(m_d3d11Device.Get(), mTexture.Get(), &mTextureSRV);
+	TextureUtilities::CreateUAVFromTexture(m_d3d11Device.Get(), mTexture.Get(), &mTextureUAV);
 }
 
 Texture::Texture(LPWSTR lpPath, bool hasUAV)

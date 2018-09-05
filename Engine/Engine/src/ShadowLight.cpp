@@ -2,8 +2,13 @@
 #include "Game.h"
 
 
-ShadowLight::ShadowLight()
+ShadowLight::ShadowLight() :
+	IObject()
 {
+	ID3D11ComputeShader ** CS = &m_buildShadowMapCS;
+	ShaderHelper::CreateShaderFromFile(L"Shaders/BuildShadowMapComputeShader.cso", "cs_5_0",
+		m_d3d11Device.Get(), &m_buildShadowMapCSBlob, reinterpret_cast<ID3D11DeviceChild**>(CS));
+
 	m_lights.emplace_back();
 	m_lights.back().position = DirectX::XMFLOAT2(0.0f, 0.0f);
 	m_lights.back().quality = 256.0f;
@@ -20,7 +25,8 @@ ShadowLight::ShadowLight()
 
 	for (auto & light : m_lights)
 	{
-		m_occlusionMaps.emplace_back(new RenderTexture((uint32_t)light.range, (uint32_t)light.range));
+		light.occlusionMap = std::make_unique<RenderTexture>((uint32_t)light.range, (uint32_t)light.range);
+		light.shadowMap = std::make_shared<Texture>(light.quality, 1.f, true); // light.quality x 1 with UAV
 	}
 
 	m_heartSprites = std::make_unique<Square>();
@@ -39,8 +45,12 @@ ShadowLight::ShadowLight()
 	m_debugSquare = std::make_unique<Square>();
 	m_debugSquare->Create();
 	m_debugSquare->AddInstance();
+	m_debugSquare->SetTexture(m_lights[0].occlusionMap->GetOblivionTexture());
 
-	m_debugSquare->SetTexture(m_occlusionMaps[0]->GetOblivionTexture());
+	m_shadowMapDebugSquare = std::make_unique<Square>();
+	m_shadowMapDebugSquare->Create();
+	m_shadowMapDebugSquare->AddInstance();
+	m_shadowMapDebugSquare->SetTexture(m_lights[0].shadowMap);
 }
 
 ShadowLight::~ShadowLight()
@@ -49,23 +59,57 @@ ShadowLight::~ShadowLight()
 
 void ShadowLight::Update(float frameTime)
 {
-	for (uint32_t i = 0; i < m_lights.size(); ++i)
+	static auto renderer = Direct3D11::Get();
+	for (auto & light : m_lights)
 	{
-		m_occlusionMaps[i]->SetRenderTarget();
-		m_occlusionMaps[i]->ClearTexture(0.0f, 1.0f, 0.0f, 1.0f);
+		light.occlusionMap->SetRenderTarget();
+		light.occlusionMap->ClearTexture(0.0f, 0.0f, 0.0f, 0.0f);
 
 		for (const auto & occluder : m_occluders)
 		{
-			occluder->Render<TextureShader>(&m_lights[i].proj);
+			occluder->Render<TextureShader>(&light.proj);
 		}
-
 	}
+	ID3D11RenderTargetView * nullrtv[] = 
+	{
+		nullptr
+	};
+	m_d3d11Context->OMSetRenderTargets(1, nullrtv, nullptr);
+	EmptyShader::Get()->bind();
+	m_d3d11Context->CSSetShader(m_buildShadowMapCS.Get(), nullptr, 0);
+	for (auto & light : m_lights)
+	{
+		ID3D11ShaderResourceView * res[] =
+		{
+			light.occlusionMap->GetOblivionTexture()->GetTextureSRV()
+		};
+		m_d3d11Context->CSSetShaderResources(0, 1, res);
+		ID3D11UnorderedAccessView * uav[] = 
+		{
+			light.shadowMap->GetTextureUAV()
+		};
+		m_d3d11Context->CSSetSamplers(0, 1, renderer->m_linearClampSampler.GetAddressOf());
+		m_d3d11Context->CSSetUnorderedAccessViews(0, 1, uav, nullptr);
+		m_d3d11Context->Dispatch((UINT)ceil((float)light.quality / 512.0f), 1, 1);
+	}
+	ID3D11ShaderResourceView * nullres[] =
+	{
+		nullptr
+	};
+	m_d3d11Context->CSSetShaderResources(0, 1, nullres);
+	ID3D11UnorderedAccessView * nulluav[] =
+	{
+		nullptr
+	};
+	m_d3d11Context->CSSetUnorderedAccessViews(0, 1, nulluav, nullptr);
+	EmptyShader::Get()->bind();
 }
 
 void ShadowLight::Render()
 {
 	Direct3D11::Get()->DepthDisable();
 	m_debugSquare->Render<TextureShader>(g_screen.get());
+	m_shadowMapDebugSquare->Render<TextureShader>(g_screen.get());
 
 	m_heartSprites->Render<TextureShader>(g_screen.get());
 	m_gridSprites->Render<TextureShader>(g_screen.get());
@@ -81,8 +125,8 @@ void ShadowLight::OnMouseMove(float x, float y)
 	m_lights[0].position.x = x;
 	m_lights[0].position.y = y;
 
-	m_lights.back().proj.TranslateTo(x, y);
-	m_lights.back().proj.ConstructTransform();
+	m_lights[0].proj.TranslateTo(x, y);
+	m_lights[0].proj.ConstructTransform();
 }
 
 void ShadowLight::OnSize(float width, float height)
@@ -119,4 +163,9 @@ void ShadowLight::OnSize(float width, float height)
 	m_debugSquare->Identity();
 	m_debugSquare->Scale(256.f, 256.f);
 	m_debugSquare->TranslateTo(width - 300.0f, height - 300.0f);
+
+	m_shadowMapDebugSquare->SetWindowInfo(width, height);
+	m_shadowMapDebugSquare->Identity();
+	m_shadowMapDebugSquare->Scale(3 * 256.f, 10.f);
+	m_shadowMapDebugSquare->TranslateTo(0, height - 30.f);
 }
