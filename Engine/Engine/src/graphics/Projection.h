@@ -35,6 +35,19 @@ public:
 
 	DirectX::XMMATRIX& GetView() override { return m_viewMatrix; };
 	DirectX::XMMATRIX& GetProjection() override { return m_projectionMatrix; };
+
+	void GetPosition(DirectX::XMFLOAT3& pos) const
+	{
+		DirectX::XMStoreFloat3(&pos, m_position);
+	}
+	void GetDirection(DirectX::XMFLOAT3& dir) const
+	{
+		DirectX::XMStoreFloat3(&dir, m_direction);
+	}
+	void GetUpDirection(DirectX::XMFLOAT3& dir) const
+	{
+		DirectX::XMStoreFloat3(&dir, m_up);
+	}
 	
 private:
 	DirectX::XMMATRIX	m_projectionMatrix;

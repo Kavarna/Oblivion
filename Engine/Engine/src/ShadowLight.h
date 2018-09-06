@@ -8,6 +8,7 @@ struct SLight
 	float quality;
 	DirectX::XMFLOAT2 position;
 	Projection proj;
+	DirectX::XMFLOAT4 color;
 	std::unique_ptr<RenderTexture> occlusionMap;
 	std::shared_ptr<Texture> shadowMap;
 };
@@ -38,4 +39,6 @@ private:
 
 	MicrosoftPointer<ID3D11ComputeShader>			m_buildShadowMapCS;
 	MicrosoftPointer<ID3DBlob>						m_buildShadowMapCSBlob;
+
+	std::unique_ptr<TextureBatchRenderer>			m_batchRenderer;
 };

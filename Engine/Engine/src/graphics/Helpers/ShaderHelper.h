@@ -18,6 +18,15 @@ namespace Shader
 namespace ShaderHelper
 {
 
+	inline void CreateInputLayout(ID3D11Device * device, ID3DBlob * shaderBlob,
+		const std::vector<D3D11_INPUT_ELEMENT_DESC>& layoutDesc,ID3D11InputLayout ** layout)
+	{
+		ThrowIfFailed(
+			device->CreateInputLayout(layoutDesc.data(), (UINT)layoutDesc.size(),
+				shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), layout)
+		);
+	}
+
 	inline void CreateShaderFromFile(LPWSTR filePath, LPSTR profile,
 		ID3D11Device * device, ID3DBlob ** ShaderBlob, ID3D11DeviceChild ** Shader)
 	{

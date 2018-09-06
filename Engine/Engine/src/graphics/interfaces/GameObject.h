@@ -150,8 +150,11 @@ inline void IGameObject::Render(ICamera * cam) const
 	}
 	else
 	{
-		static_assert(false,
-			"Can't render a game object using this shader");
+		auto shader = Shader::Get();
+		PrepareIA(shader->GetPreferedPipelineType());
+		shader->RenderGameObject(this, cam);
+		//static_assert(false,
+			//"Can't render a game object using this shader");
 	}
 
 	DrawIndexedInstanced(cam);

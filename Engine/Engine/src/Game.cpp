@@ -540,8 +540,6 @@ void Game::Render()
 
 	Begin();
 
-	m_demo->Render();
-
 	auto graphicsDebugDrawer = GraphicsDebugDraw::Get();
 	if (g_isDeveloper)
 	{
@@ -549,6 +547,8 @@ void Game::Render()
 		graphicsDebugDrawer->Begin();
 		btDebugDraw::Get()->Render();
 	}
+
+	m_demo->Render();
 
 	IGameObject::BindStaticVertexBuffer();
 	

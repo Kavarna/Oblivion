@@ -15,7 +15,7 @@ Texture::Texture(float width, float height, bool hasUAV)
 	if (hasUAV)
 		flags |= D3D11_BIND_FLAG::D3D11_BIND_UNORDERED_ACCESS;
 	TextureUtilities::CreateTexture(m_d3d11Device.Get(),
-		&mTexture, width, height, flags,
+		&mTexture, (UINT)width, (UINT)height, flags,
 		DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT,
 		1, 0);
 

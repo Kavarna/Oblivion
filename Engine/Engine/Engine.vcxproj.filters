@@ -109,6 +109,8 @@
     <FxCompile Include="src\shaders\TextureBatchVertexShader.hlsl" />
     <FxCompile Include="src\shaders\TextureBatchPixelShader.hlsl" />
     <FxCompile Include="src\shaders\BuildShadowMapComputeShader.hlsl" />
+    <FxCompile Include="src\shaders\ShadowMapVertexShader.hlsl" />
+    <FxCompile Include="src\shaders\ShadowMapPixelShader.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\Lights.hlsli" />
