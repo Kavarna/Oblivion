@@ -389,7 +389,7 @@ void Model::DrawIndexedInstanced(ICamera * cam) const
 			g_drawCalls++;
 		}
 	}
-	renderer->OMDefault();
+	renderer->OMDefaultBlend();
 
 
 	if (g_isDeveloper)

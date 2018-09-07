@@ -551,6 +551,7 @@ void Game::Render()
 	m_demo->Render();
 
 	IGameObject::BindStaticVertexBuffer();
+
 	
 #if DEBUG || _DEBUG
 	m_debugSquare->Render<TextureShader>(g_screen.get());

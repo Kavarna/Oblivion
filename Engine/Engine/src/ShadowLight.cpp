@@ -106,8 +106,8 @@ ShadowLight::ShadowLight() :
 	m_lights.emplace_back();
 	m_lights.back().color = DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
 	m_lights.back().position = DirectX::XMFLOAT2(0.0f, 0.0f);
-	m_lights.back().quality = 4096.f;
-	m_lights.back().range = 512.f;
+	m_lights.back().quality = 1024.f;
+	m_lights.back().range = 256.f;
 	m_lights.back().proj.m_farZ = Game::GetInstance()->GetFarZ();
 	m_lights.back().proj.m_nearZ = Game::GetInstance()->GetNearZ();
 	m_lights.back().proj.m_width = m_lights.back().range;

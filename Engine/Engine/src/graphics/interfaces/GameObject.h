@@ -75,7 +75,7 @@ protected:
 public:
 	virtual			uint32_t						AddInstance(DirectX::FXMMATRIX const& mat = DirectX::XMMatrixIdentity());
 	virtual			uint32_t						AddInstance(uint32_t number);
-	virtual			uint32_t						GetNumInstances() const { return m_objectWorld.size(); };
+	virtual			uint32_t						GetNumInstances() const { return (uint32_t)m_objectWorld.size(); };
 	virtual			void							ClearInstances() { m_objectWorld.clear(); };
 	virtual			void							RemoveInstance(int ID);
 	virtual			void							RemoveInstance(CommonTypes::Range const& range);

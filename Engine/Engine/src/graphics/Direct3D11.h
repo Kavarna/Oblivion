@@ -38,7 +38,7 @@ public:
 	void										DepthEnableLess();
 	void										DepthDisable();
 	void										OMTransparency(float blendFactor);
-	void										OMDefault();
+	void										OMDefaultBlend();
 
 	void										DefaultStates();
 

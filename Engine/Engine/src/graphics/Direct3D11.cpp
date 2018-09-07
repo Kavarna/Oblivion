@@ -74,7 +74,7 @@ void Direct3D11::DefaultStates()
 {
 	RSSolidRender();
 	DepthEnableLess();
-	OMDefault();
+	OMDefaultBlend();
 }
 
 void Direct3D11::OnResize(HWND hWnd, uint32_t width, uint32_t height)
@@ -355,7 +355,7 @@ void Direct3D11::OMTransparency(float blendFactor)
 	m_d3d11Context->OMSetBlendState(m_transparencyBlendState.Get(), blendFactorArr, 0xffffffff);
 }
 
-void Direct3D11::OMDefault()
+void Direct3D11::OMDefaultBlend()
 {
 	m_d3d11Context->OMSetBlendState(nullptr, nullptr, 0xffffffff);
 }
