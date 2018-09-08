@@ -24,10 +24,12 @@ public:
 	const Pipeline GetPipelineType() const override;
 
 	void SetCameraInformations(SCameraInfo const& camInfo);
+	void SetAdditionalColor(const DirectX::XMFLOAT4& color);
 
 private:
 	std::array<MicrosoftPointer<ID3DBlob>, 2>	m_shaderBlobs;
 
 	MicrosoftPointer<ID3D11Buffer>				m_cameraBuffer; // dynamic buffer
+	MicrosoftPointer<ID3D11Buffer>				m_additionalColorBuffer;
 };
 

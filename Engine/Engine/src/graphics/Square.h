@@ -14,6 +14,7 @@ public:
 
 	// Inherited via IGameObject
 			void						Create(std::string const &) override;
+			void						Create(LPWSTR);
 			void						Create() override;
 			void						Update(float frameTime) override;
 			void						Destroy() override;

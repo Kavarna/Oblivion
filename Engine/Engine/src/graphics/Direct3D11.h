@@ -39,6 +39,8 @@ public:
 	void										DepthDisable();
 	void										OMTransparency(float blendFactor);
 	void										OMDefaultBlend();
+	void										Light2DBlend();
+	void										Render2DBlend();
 
 	void										DefaultStates();
 
@@ -69,6 +71,8 @@ private: // States
 	MicrosoftPointer<ID3D11RasterizerState>		m_solidNoCulling			= nullptr;
 	// Blend
 	MicrosoftPointer<ID3D11BlendState>			m_transparencyBlendState	= nullptr;
+	MicrosoftPointer<ID3D11BlendState>			m_2dLightBlendState			= nullptr;
+	MicrosoftPointer<ID3D11BlendState>			m_2dRenderBlendState		= nullptr;
 	// Depth
 	MicrosoftPointer<ID3D11DepthStencilState>	m_depthEnabledLess			= nullptr;
 	MicrosoftPointer<ID3D11DepthStencilState>	m_depthDisabled				= nullptr;

@@ -28,6 +28,12 @@ void Square::Create(std::string const & texture)
 	m_material.diffuseTexture = std::make_unique<Texture>((LPSTR)texture.c_str());
 }
 
+void Square::Create(LPWSTR path)
+{
+	m_material.hasTexture = TRUE;
+	m_material.diffuseTexture = std::make_unique<Texture>(path);
+}
+
 void Square::Create()
 {
 	m_material.hasTexture = FALSE;

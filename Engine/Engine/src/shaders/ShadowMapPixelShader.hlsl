@@ -53,7 +53,7 @@ float4 main(PSIn input) : SV_TARGET
 	//return float4(1.0f,1.0f,1.0f,1.0f);
 	float lightIntensity = sum * lerp(1.0f, 0.0f, r);
 	float4 color = g_lightColor * float4(lightIntensity, lightIntensity, lightIntensity, lightIntensity);
-	clip(color.a - 0.01f);
+	clip(color.a - 0.05f);
 	return color;
 
 }

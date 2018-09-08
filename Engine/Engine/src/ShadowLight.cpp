@@ -104,7 +104,7 @@ ShadowLight::ShadowLight() :
 		m_d3d11Device.Get(), &m_buildShadowMapCSBlob, reinterpret_cast<ID3D11DeviceChild**>(CS));
 
 	m_lights.emplace_back();
-	m_lights.back().color = DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
+	m_lights.back().color = DirectX::XMFLOAT4(0.8f, 0.8f, 0.0f, 1.0f);
 	m_lights.back().position = DirectX::XMFLOAT2(0.0f, 0.0f);
 	m_lights.back().quality = 1024.f;
 	m_lights.back().range = 256.f;
@@ -124,31 +124,23 @@ ShadowLight::ShadowLight() :
 		light.shadowMap = std::make_shared<Texture>(light.quality, 1.f, true); // light.quality x 1 with UAV
 	}
 
-	m_heartSprites = std::make_unique<Square>();
-	m_heartSprites->Create("Resources/heart.png");
+	m_mainSprite = std::make_unique<Square>();
+	m_mainSprite->Create("Resources/Main.dds");
 
-	m_gridSprites = std::make_unique<Square>();
-	m_gridSprites->Create("Resources/grid.png");
+	m_secondarySprite = std::make_unique<Square>();
+	m_secondarySprite->Create("Resources/Secondary.dds");
 
-	m_grid2Sprites = std::make_unique<Square>();
-	m_grid2Sprites->Create("Resources/grid2.png");
-
-	m_occluders.push_back(m_heartSprites.get());
-	m_occluders.push_back(m_gridSprites.get());
-	m_occluders.push_back(m_grid2Sprites.get());
-
-	m_debugSquare = std::make_unique<Square>();
-	m_debugSquare->Create();
-	m_debugSquare->AddInstance();
-	m_debugSquare->SetTexture(m_lights[0].occlusionMap->GetOblivionTexture());
-
-	m_shadowMapDebugSquare = std::make_unique<Square>();
-	m_shadowMapDebugSquare->Create();
-	m_shadowMapDebugSquare->AddInstance();
-	m_shadowMapDebugSquare->SetTexture(m_lights[0].shadowMap);
+	m_occluders.push_back(m_mainSprite.get());
+	//m_occluders.push_back(m_grid2Sprites.get());
 
 	m_batchRenderer = std::make_unique<TextureBatchRenderer>();
 	m_batchRenderer->Create();
+
+	m_finalTexture = std::make_unique<RenderTexture>((uint32_t)g_screen->m_width, (uint32_t)g_screen->m_height);
+	
+	m_textureRenderer = std::make_unique<Square>();
+	m_textureRenderer->Create();
+	m_textureRenderer->AddInstance();
 }
 
 ShadowLight::~ShadowLight()
@@ -158,6 +150,7 @@ ShadowLight::~ShadowLight()
 void ShadowLight::Update(float frameTime)
 {
 	static auto renderer = Direct3D11::Get();
+	TextureShader::Get()->SetAdditionalColor(DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
 	for (auto & light : m_lights)
 	{
 		light.occlusionMap->SetRenderTarget();
@@ -205,14 +198,17 @@ void ShadowLight::Update(float frameTime)
 
 void ShadowLight::Render()
 {
+	m_finalTexture->SetRenderTarget();
+	m_finalTexture->ClearTexture();
 	Direct3D11::Get()->DepthDisable();
-	//m_debugSquare->Render<TextureShader>(g_screen.get());
-	//m_shadowMapDebugSquare->Render<TextureShader>(g_screen.get());
 
-	m_heartSprites->Render<TextureShader>(g_screen.get());
-	m_gridSprites->Render<TextureShader>(g_screen.get());
-	m_grid2Sprites->Render<TextureShader>(g_screen.get());
+	TextureShader::Get()->SetAdditionalColor(DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+	m_mainSprite->Render<TextureShader>(g_screen.get());
 
+	TextureShader::Get()->SetAdditionalColor(DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 0.0f));
+	m_secondarySprite->Render<TextureShader>(g_screen.get());
+
+	Direct3D11::Get()->Light2DBlend();
 	auto shader = ShadowmapShader::Get();
 	for (auto & light : m_lights)
 	{
@@ -251,9 +247,15 @@ void ShadowLight::Render()
 		m_batchRenderer->End<ShadowmapShader>(light.shadowMap.get());
 	}
 
-	Direct3D11::Get()->DepthEnableLess();
+	Direct3D11::Get()->Render2DBlend();
 
-	m_lights.back().proj.RenderDebug();
+	Direct3D11::Get()->SetRenderTargetAndDepth();
+	TextureShader::Get()->SetAdditionalColor(DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+	Square::BindStaticVertexBuffer();
+	m_textureRenderer->Render<TextureShader>(g_screen.get());
+
+	Direct3D11::Get()->OMDefaultBlend();
+	Direct3D11::Get()->DepthEnableLess();
 }
 
 void ShadowLight::OnMouseMove(float x, float y)
@@ -267,9 +269,9 @@ void ShadowLight::OnMouseMove(float x, float y)
 
 void ShadowLight::OnSize(float width, float height)
 {
-	m_heartSprites->ClearInstances();
-	m_gridSprites->ClearInstances();
-	m_grid2Sprites->ClearInstances();
+	m_mainSprite->ClearInstances();
+	m_secondarySprite->ClearInstances();
+	//m_grid2Sprites->ClearInstances();
 	float scaleX = width / 1000.0f;
 	float scaleY = height / 1000.0f;
 
@@ -278,38 +280,20 @@ void ShadowLight::OnSize(float width, float height)
 		m_lights[i].proj.SetWindowInfo(width, height);
 	}
 
-	m_heartSprites->AddInstance();
-	m_heartSprites->SetWindowInfo(width, height);
-	m_heartSprites->Scale(50.0f, 50.0f);
-	m_heartSprites->TranslateTo(500.f * scaleX, 500.f * scaleY);
-	m_heartSprites->AddInstance();
-	m_heartSprites->Scale(50.0f, 50.0f, 1.0f, 1);
-	m_heartSprites->TranslateTo(100.f * scaleX, 100.f * scaleY, 1);
-	m_heartSprites->AddInstance();
-	m_heartSprites->Scale(50.0f, 50.0f, 1.0f, 2);
-	m_heartSprites->TranslateTo(231.f * scaleX, 570.f * scaleY, 2);
+	m_mainSprite->AddInstance();
+	m_mainSprite->SetWindowInfo(width, height);
+	m_mainSprite->Scale(380.f, 200.0f);
+	m_mainSprite->TranslateTo(250.f * scaleX, 210.f * scaleY);
 
-	m_gridSprites->AddInstance();
-	m_gridSprites->SetWindowInfo(width, height);
-	m_gridSprites->Scale(50.f, 50.f);
-	m_gridSprites->TranslateTo(300.f * scaleX, 500.f * scaleY);
+	m_secondarySprite->AddInstance();
+	m_secondarySprite->SetWindowInfo(width, height);
+	m_secondarySprite->Scale(380.f, 72.f);
+	m_secondarySprite->TranslateTo(250.f * scaleX, 520.f * scaleY);
 
-	m_grid2Sprites->AddInstance();
-	m_grid2Sprites->SetWindowInfo(width, height);
-	m_grid2Sprites->Scale(50.f, 50.f);
-	m_grid2Sprites->TranslateTo(700.f * scaleX, 500.f * scaleY);
-	m_grid2Sprites->AddInstance();
-	m_grid2Sprites->Identity(1);
-	m_grid2Sprites->Scale(50.f, 50.f, 1.f, 1);
-	m_grid2Sprites->TranslateTo(0.0f, 0.0f, 1);
+	m_finalTexture->Reset((uint32_t)width, (uint32_t)height);
 
-	m_debugSquare->SetWindowInfo(width, height);
-	m_debugSquare->Identity();
-	m_debugSquare->Scale(256.f, 256.f);
-	m_debugSquare->TranslateTo(width - 300.0f, height - 300.0f);
-
-	m_shadowMapDebugSquare->SetWindowInfo(width, height);
-	m_shadowMapDebugSquare->Identity();
-	m_shadowMapDebugSquare->Scale(3 * 256.f, 10.f);
-	m_shadowMapDebugSquare->TranslateTo(0, height - 30.f);
+	m_textureRenderer->SetWindowInfo(width, height);
+	m_textureRenderer->Scale(width, height);
+	m_textureRenderer->TranslateTo(0, 0);
+	m_textureRenderer->SetTexture(m_finalTexture->GetOblivionTexture());
 }

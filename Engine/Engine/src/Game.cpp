@@ -131,7 +131,8 @@ void Game::InitWindow()
 	RegisterClassEx(&wndClass);
 
 	CreateWindowEx(WS_EX_CLIENTEDGE, ENGINE_NAME, ENGINE_NAME,
-		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
+		WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME ^ WS_MAXIMIZEBOX,
+		CW_USEDEFAULT, CW_USEDEFAULT,
 		m_windowWidth, m_windowHeight, nullptr, nullptr,
 		m_windowInstance, nullptr);
 
@@ -437,7 +438,9 @@ void Game::End()
 				physicsDebugDrawer->ToggleFlag(btDebugDraw::DBG_MAX_DEBUG_DRAW_MODE);
 
 			if (ImGui::Button("Toggle Physics debug drawing"))
+			{
 				physicsDebugDrawer->ToggleDebug();
+			}
 
 
 			ImGui::Separator();
@@ -459,6 +462,7 @@ void Game::End()
 			m_selectedObject->ImGuiChangeMaterial();
 		}
 	}
+
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	renderer->End();

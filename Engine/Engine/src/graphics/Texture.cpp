@@ -11,6 +11,7 @@ Texture::Texture(std::string path)
 
 Texture::Texture(float width, float height, bool hasUAV)
 {
+	mHasUAV = hasUAV;
 	UINT flags = D3D11_BIND_FLAG::D3D11_BIND_SHADER_RESOURCE;
 	if (hasUAV)
 		flags |= D3D11_BIND_FLAG::D3D11_BIND_UNORDERED_ACCESS;

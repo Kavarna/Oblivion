@@ -279,6 +279,34 @@ void Direct3D11::InitializeStates()
 	ThrowIfFailed(
 		m_d3d11Device->CreateBlendState(&blendDesc, &m_transparencyBlendState)
 	);
+	ZeroVariable(blendDesc);
+	blendDesc.AlphaToCoverageEnable = FALSE;
+	blendDesc.IndependentBlendEnable = FALSE;
+	blendDesc.RenderTarget[0].BlendEnable = TRUE;
+	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP::D3D11_BLEND_OP_MAX;
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND::D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND::D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND::D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND::D3D11_BLEND_SRC_ALPHA;
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE::D3D11_COLOR_WRITE_ENABLE_ALL;
+	ThrowIfFailed(
+		m_d3d11Device->CreateBlendState(&blendDesc, &m_2dLightBlendState)
+	);
+	ZeroVariable(blendDesc);
+	blendDesc.AlphaToCoverageEnable = FALSE;
+	blendDesc.IndependentBlendEnable = FALSE;
+	blendDesc.RenderTarget[0].BlendEnable = TRUE;
+	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP::D3D11_BLEND_OP_MAX;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP::D3D11_BLEND_OP_MIN;
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND::D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND::D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND::D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND::D3D11_BLEND_SRC_ALPHA;
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE::D3D11_COLOR_WRITE_ENABLE_ALL;
+	ThrowIfFailed(
+		m_d3d11Device->CreateBlendState(&blendDesc, &m_2dRenderBlendState)
+	);
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~DEPTH STATES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	ZeroMemoryAndDeclare(D3D11_DEPTH_STENCIL_DESC, depthDesc);
@@ -358,4 +386,14 @@ void Direct3D11::OMTransparency(float blendFactor)
 void Direct3D11::OMDefaultBlend()
 {
 	m_d3d11Context->OMSetBlendState(nullptr, nullptr, 0xffffffff);
+}
+
+void Direct3D11::Light2DBlend()
+{
+	m_d3d11Context->OMSetBlendState(m_2dLightBlendState.Get(), nullptr, 0xffffffff);
+}
+
+void Direct3D11::Render2DBlend()
+{
+	m_d3d11Context->OMSetBlendState(m_2dRenderBlendState.Get(), nullptr, 0xffffffff);
 }
