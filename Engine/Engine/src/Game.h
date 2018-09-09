@@ -1,13 +1,11 @@
 #pragma once
 
 #include "OblivionInclude.h"
-#include "ShadowLight.h"
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 class Game sealed
 {
-	friend struct SAnimation;
 	friend LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 public:
 	static Game* GetInstance();
@@ -67,14 +65,9 @@ private:
 	bool												m_selectObjects = false;
 
 private:
-#if DEBUG || _DEBUG
-	std::unique_ptr<Square>								m_debugSquare;
-#endif
-	//std::unique_ptr<CollisionObject>					m_ground;
-	//std::unique_ptr<CollisionObject>					m_sphere;
-	//std::unique_ptr<CollisionObject>					m_tree;
-
-	std::unique_ptr<ShadowLight>						m_demo;
+	std::unique_ptr<CollisionObject>					m_ground;
+	std::unique_ptr<CollisionObject>					m_sphere;
+	std::unique_ptr<CollisionObject>					m_tree;
 
 	std::vector<Model*>									m_models;
 	Model*												m_selectedObject;

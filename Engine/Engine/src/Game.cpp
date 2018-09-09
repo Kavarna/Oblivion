@@ -131,7 +131,7 @@ void Game::InitWindow()
 	RegisterClassEx(&wndClass);
 
 	CreateWindowEx(WS_EX_CLIENTEDGE, ENGINE_NAME, ENGINE_NAME,
-		WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME ^ WS_MAXIMIZEBOX,
+		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		m_windowWidth, m_windowHeight, nullptr, nullptr,
 		m_windowInstance, nullptr);
@@ -177,28 +177,27 @@ void Game::InitImGui()
 
 void Game::Init2D()
 {
-	m_demo = std::make_unique<ShadowLight>();
 }
 
 void Game::Init3D()
 {
 	BulletWorld::Get()->CreateDefaultWorld();
 
-	//m_ground = std::make_unique<CollisionObject>();
-	//m_ground->Create(EDefaultObject::Grid);
-	//m_ground->AddInstance();
+	m_ground = std::make_unique<CollisionObject>();
+	m_ground->Create(EDefaultObject::Grid);
+	m_ground->AddInstance();
 
-	//m_sphere = std::make_unique<CollisionObject>();
-	//m_sphere->Create(EDefaultObject::Sphere);
-	//m_sphere->AddInstance(DirectX::XMMatrixTranslation(0.f, 30.f, 0.f));
+	m_sphere = std::make_unique<CollisionObject>();
+	m_sphere->Create(EDefaultObject::Sphere);
+	m_sphere->AddInstance(DirectX::XMMatrixTranslation(0.f, 30.f, 0.f));
 
-	//m_tree = std::make_unique<CollisionObject>();
-	//m_tree->Create("Resources/LowPolyTree");
-	//m_tree->AddInstance();
+	m_tree = std::make_unique<CollisionObject>();
+	m_tree->Create("Resources/LowPolyTree");
+	m_tree->AddInstance();
 
-	//m_models.push_back(m_ground.get());
-	//m_models.push_back(m_sphere.get());
-	//m_models.push_back(m_tree.get());
+	m_models.push_back(m_ground.get());
+	m_models.push_back(m_sphere.get());
+	m_models.push_back(m_tree.get());
 }
 
 void Game::InitSizeDependent()
@@ -227,19 +226,6 @@ void Game::InitSizeDependent()
 	g_screen->m_nearZ = nearZ;
 	g_screen->m_farZ = farZ;
 	g_screen->Construct();
-	auto renderer = Direct3D11::Get();
-	if (renderer->Available())
-	{
-#if DEBUG || _DEBUG
-		m_debugSquare = std::make_unique<Square>();
-		m_debugSquare->Create();
-		m_debugSquare->AddInstance();
-		m_debugSquare->SetWindowInfo((float)m_windowWidth, (float)m_windowHeight);
-		m_debugSquare->Scale(100.0f, 100.0f);
-		m_debugSquare->TranslateTo(m_windowWidth - 76.0f, m_windowHeight - 76.0f);
-		m_debugSquare->SetName("Debug square");
-#endif
-	}
 }
 
 void Game::Run()
@@ -358,8 +344,6 @@ void Game::Update()
 	{
 		model->Update(frameTime);
 	}
-
-	m_demo->Update(frameTime);
 }
 
 void Game::Begin()
@@ -552,14 +536,8 @@ void Game::Render()
 		btDebugDraw::Get()->Render();
 	}
 
-	m_demo->Render();
-
 	IGameObject::BindStaticVertexBuffer();
 
-	
-#if DEBUG || _DEBUG
-	m_debugSquare->Render<TextureShader>(g_screen.get());
-#endif
 
 	for (const auto & model : m_models)
 	{
@@ -587,7 +565,6 @@ void Game::OnSize(uint32_t width, uint32_t height)
 	InitSizeDependent();
 
 	Direct3D11::Get()->OnResize(m_windowHandle, m_windowWidth, m_windowHeight);
-	m_demo->OnSize(m_windowWidth, m_windowHeight);
 
 	ImGui_ImplDX11_InvalidateDeviceObjects();
 	ImGui_ImplDX11_CreateDeviceObjects();
@@ -596,7 +573,6 @@ void Game::OnSize(uint32_t width, uint32_t height)
 void Game::OnMouseMove()
 {
 	auto mouse = m_mouse->GetState();
-	m_demo->OnMouseMove(mouse.x, mouse.y);
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
@@ -614,9 +590,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 	break;
 
 	case WM_MOUSEMOVE:
-	DirectX::Mouse::ProcessMessage(Message, wParam, lParam);
-	Game::GetInstance()->OnMouseMove();
-	break;
+	//DirectX::Mouse::ProcessMessage(Message, wParam, lParam);
+	//Game::GetInstance()->OnMouseMove();
+	//break;
 	case WM_INPUT:
 	case WM_LBUTTONDOWN:
 	case WM_LBUTTONUP:
