@@ -2,13 +2,13 @@
 
 
 #include "../interfaces/Shader.h"
-#include "../interfaces/Object.h"
+#include "../interfaces/GraphicsObject.h"
 #include "../interfaces/ICamera.h"
 #include "../Shaders/BatchShader.h"
 #include "../Texture.h"
 
 
-class BatchRenderer : public IObject
+class BatchRenderer : public IGraphicsObject
 {
 public:
 	BatchRenderer();
@@ -34,7 +34,7 @@ private:
 	BatchShader::SVertex*			m_bufferData;
 };
 
-class TextureBatchRenderer : public IObject
+class TextureBatchRenderer : public IGraphicsObject
 {
 public:
 	TextureBatchRenderer();

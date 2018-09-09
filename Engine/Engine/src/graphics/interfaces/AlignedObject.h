@@ -4,7 +4,7 @@
 #include "../../common/common.h"
 
 
-__declspec(align(16)) class AlignedObject
+__declspec(align(16)) class IAlignedObject
 {
 public:
 	inline void* operator new( size_t size )

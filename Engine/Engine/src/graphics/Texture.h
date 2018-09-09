@@ -4,12 +4,12 @@
 #include "DDSTextureLoader.h"
 #include "Helpers/TextureUtilities.h"
 #include "../common/common.h"
-#include "interfaces/Object.h"
+#include "interfaces/GraphicsObject.h"
 
 
 
 
-class Texture : public IObject
+class Texture : public IGraphicsObject
 {
 private:
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> mTexture;

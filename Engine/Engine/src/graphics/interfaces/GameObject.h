@@ -7,7 +7,7 @@
 #include "ICamera.h"
 #include "AlignedObject.h"
 #include "Shader.h"
-#include "Object.h"
+#include "GraphicsObject.h"
 
 #include "../Shaders/BasicShader.h"
 #include "../Shaders/TextureLightShader.h"
@@ -40,7 +40,7 @@ namespace Rendering
 	} SMaterial, Material;
 }
 
-class IGameObject : public AlignedObject, public IObject
+class IGameObject : public IAlignedObject, public IGraphicsObject
 {
 	friend class Entity;
 public:

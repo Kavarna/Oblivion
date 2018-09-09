@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../common/common.h"
-#include "../interfaces/Object.h"
+#include "../interfaces/GraphicsObject.h"
 #include "../Helpers/ShaderHelper.h"
 #include "../Direct3D11.h"
 
@@ -35,7 +35,7 @@ enum Pipeline
 	PipelineCompute2D = 5,
 };
 
-class IShader : public IObject
+class IShader : public IGraphicsObject
 {
 public:
 	struct SVertex; // For consistency

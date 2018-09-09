@@ -3,16 +3,16 @@
 #include "../Direct3D11.h"
 #include "../../common/Globals.h"
 
-class IObject
+class IGraphicsObject
 {
 public:
-	IObject()
+	IGraphicsObject()
 	{
 		auto renderer = Direct3D11::Get();
 		m_d3d11Device = renderer->getDevice();
 		m_d3d11Context = renderer->getContext();
 	}
-	virtual ~IObject()
+	virtual ~IGraphicsObject()
 	{
 		m_d3d11Device.Reset();
 		m_d3d11Context.Reset();

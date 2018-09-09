@@ -1,13 +1,13 @@
 #pragma once
 
 
-#include "interfaces/Object.h"
+#include "interfaces/GraphicsObject.h"
 #include "Helpers/TextureUtilities.h"
 #include "Texture.h"
 
 
 class RenderTexture :
-	public IObject
+	public IGraphicsObject
 {
 public:
 	RenderTexture() = default;

@@ -7,7 +7,7 @@
 
 
 class Projection :
-	public ICamera, public AlignedObject, public I2DTransforms
+	public ICamera, public IAlignedObject, public I2DTransforms
 {
 public:
 	Projection();

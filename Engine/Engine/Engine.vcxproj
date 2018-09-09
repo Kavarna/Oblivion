@@ -121,7 +121,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Bullet Physics\src;$(SolutionDir)External Libraries\Lua\LuaBridge;$(SolutionDir)External Libraries\Lua\include;$(SolutionDir)SharedTypes;$(SolutionDir)External Libraries\boost</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Bullet Physics\src;$(SolutionDir)SharedTypes;$(SolutionDir)External Libraries\boost</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -139,7 +139,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Bullet Physics\src;$(SolutionDir)External Libraries\Lua\LuaBridge;$(SolutionDir)External Libraries\Lua\include;$(SolutionDir)SharedTypes;$(SolutionDir)External Libraries\boost</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Bullet Physics\src;$(SolutionDir)SharedTypes;$(SolutionDir)External Libraries\boost</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -206,7 +206,7 @@
     <ClInclude Include="src\graphics\RenderTexture.h" />
     <ClInclude Include="src\graphics\Helpers\BatchRenderer.h" />
     <ClInclude Include="src\graphics\Helpers\RenderHelper.h" />
-    <ClInclude Include="src\graphics\interfaces\Object.h" />
+    <ClInclude Include="src\graphics\interfaces\GraphicsObject.h" />
     <ClInclude Include="src\graphics\Shaders\BatchShader.h" />
     <ClInclude Include="src\common\commontypes.h" />
     <ClInclude Include="src\Game.h" />
