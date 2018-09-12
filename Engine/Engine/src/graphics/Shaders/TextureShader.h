@@ -22,6 +22,7 @@ public:
 public:
 	void Create() override;
 	const Pipeline GetPipelineType() const override;
+	void bind() const override;
 
 	void SetCameraInformations(SCameraInfo const& camInfo);
 	void SetAdditionalColor(const DirectX::XMFLOAT4& color);
@@ -31,5 +32,7 @@ private:
 
 	MicrosoftPointer<ID3D11Buffer>				m_cameraBuffer; // dynamic buffer
 	MicrosoftPointer<ID3D11Buffer>				m_additionalColorBuffer;
+
+	DirectX::XMFLOAT4							m_lastColor;
 };
 

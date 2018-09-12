@@ -55,6 +55,12 @@ public:
 	{
 		mDirection = direction;
 	};
+	inline void SetCamRotation(const DirectX::XMFLOAT3& rotation)
+	{
+		mPitch = rotation.x;
+		mYaw = rotation.y;
+		mRoll = rotation.z;
+	}
 
 private:
 	DirectX::XMVECTOR mDirection = Forward;

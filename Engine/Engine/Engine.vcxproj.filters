@@ -38,6 +38,9 @@
     <ClCompile Include="src\physics\PhysicsDebugDraw.cpp" />
     <ClCompile Include="src\graphics\Helpers\GraphicsDebugDraw.cpp" />
     <ClCompile Include="src\common\Bezier\BezierEasing.cpp" />
+    <ClCompile Include="src\graphics\Font.cpp" />
+    <ClCompile Include="src\graphics\Text.cpp" />
+    <ClCompile Include="src\graphics\Shaders\SimpleTextureShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\commonmath.h" />
@@ -90,6 +93,9 @@
     <ClInclude Include="src\common\Bezier\BezierEasing.h" />
     <ClInclude Include="src\graphics\interfaces\I2DTransforms.h" />
     <ClInclude Include="src\graphics\interfaces\GraphicsObject.h" />
+    <ClInclude Include="src\graphics\Font.h" />
+    <ClInclude Include="src\graphics\Text.h" />
+    <ClInclude Include="src\graphics\Shaders\SimpleTextureShader.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\BasicVertexShader.hlsl" />
@@ -106,9 +112,8 @@
     <FxCompile Include="src\shaders\DisplacementMappingDomainShader.hlsl" />
     <FxCompile Include="src\shaders\TextureBatchVertexShader.hlsl" />
     <FxCompile Include="src\shaders\TextureBatchPixelShader.hlsl" />
-    <FxCompile Include="src\shaders\BuildShadowMapComputeShader.hlsl" />
-    <FxCompile Include="src\shaders\ShadowMapVertexShader.hlsl" />
-    <FxCompile Include="src\shaders\ShadowMapPixelShader.hlsl" />
+    <FxCompile Include="src\shaders\SimpleTexturePixelShader.hlsl" />
+    <FxCompile Include="src\shaders\SimpleTextureVertexShader.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\Lights.hlsli" />

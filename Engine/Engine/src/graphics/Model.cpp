@@ -307,7 +307,7 @@ void Model::WriteMaterials()
 		else
 		{
 			std::stringstream color;
-			color << material.diffuseColor.x << ' ' << material.diffuseColor.y
+			color << material.diffuseColor.x << ' ' << material.diffuseColor.y << ' '
 				<< material.diffuseColor.z << ' ' << material.diffuseColor.w;
 			currentMaterialTree.put("Color", color.str());
 		}

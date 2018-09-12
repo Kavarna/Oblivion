@@ -81,15 +81,14 @@ void TextureShader::Create()
 			D3D11_BIND_FLAG::D3D11_BIND_CONSTANT_BUFFER,
 			sizeof(SCameraInfo), D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE
 		);
-		DirectX::XMFLOAT4 color(1.0f, 1.0f, 1.0f, 1.0f);
+		//DirectX::XMFLOAT4 color(1.0f, 1.0f, 1.0f, 1.0f);
 		ShaderHelper::CreateBuffer(
 			m_d3d11Device.Get(), &m_additionalColorBuffer,
 			D3D11_USAGE::D3D11_USAGE_DEFAULT,
 			D3D11_BIND_FLAG::D3D11_BIND_CONSTANT_BUFFER,
-			sizeof(DirectX::XMFLOAT4), 0,
-			&color
+			sizeof(DirectX::XMFLOAT4), 0
 		);
-
+		SetAdditionalColor(DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
 	}
 	CATCH;
 }
@@ -97,6 +96,13 @@ void TextureShader::Create()
 const Pipeline TextureShader::GetPipelineType() const
 {
 	return Pipeline::PipelineTexture;
+}
+
+void TextureShader::bind() const
+{
+	m_d3d11Context->UpdateSubresource(m_additionalColorBuffer.Get(), 0, nullptr, &m_lastColor, 0, 0);
+	m_d3d11Context->PSSetConstantBuffers(13, 1, m_additionalColorBuffer.GetAddressOf());
+	IShader::bind();
 }
 
 void TextureShader::SetCameraInformations(SCameraInfo const & camInfo)
@@ -108,6 +114,7 @@ void TextureShader::SetCameraInformations(SCameraInfo const & camInfo)
 
 void TextureShader::SetAdditionalColor(const DirectX::XMFLOAT4 & color)
 {
+	m_lastColor = color;
 	m_d3d11Context->UpdateSubresource(m_additionalColorBuffer.Get(), 0, nullptr, &color, 0, 0);
-	m_d3d11Context->PSSetConstantBuffers(7, 1, m_additionalColorBuffer.GetAddressOf());
+	m_d3d11Context->PSSetConstantBuffers(13, 1, m_additionalColorBuffer.GetAddressOf());
 }

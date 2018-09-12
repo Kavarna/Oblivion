@@ -7,13 +7,6 @@
 std::once_flag			Game::m_gameFlag;
 std::unique_ptr<Game>	Game::m_gameInstance = nullptr;
 
-#if DEBUG || _DEBUG
-#define INCREASE_DEBUG_VAR(var, value) var += value;
-#else
-#define INCREASE_DEBU_VAR(var, value)
-#endif
-
-
 Game* Game::GetInstance()
 {
 	std::call_once(m_gameFlag, [&] { m_gameInstance = std::make_unique<Game>(); });
@@ -56,8 +49,8 @@ void Game::Create(HWND hWnd)
 	InitDirect3D();
 	InitInput();
 	InitImGui();
-	InitSizeDependent();
 	Init2D();
+	InitSizeDependent();
 	Init3D();
 	InitSettings();
 }
@@ -177,6 +170,7 @@ void Game::InitImGui()
 
 void Game::Init2D()
 {
+	m_32SegoeScriptExtended = std::make_shared<CFont>("Resources/Fonts/32SegoeScriptExtented.fnt");
 }
 
 void Game::Init3D()
@@ -209,11 +203,14 @@ void Game::InitSizeDependent()
 	if (g_camera)
 	{
 		Camera * cam = new Camera(FOV, HByW, nearZ, farZ);
-		auto camDir = g_camera->GetDirection();
-		cam->SetDirection({ camDir.x,camDir.y,camDir.z,1.0f });
+		//auto camDir = g_camera->GetDirection();
+		//cam->SetDirection({ camDir.x,camDir.y,camDir.z,1.0f });
+		auto camRotation = g_camera->GetCamRotation();
+		cam->SetCamRotation(camRotation);
 		auto camPos = g_camera->GetPosition();
 		cam->SetPosition({ camPos.x,camPos.y,camPos.z,1.0f });
 		g_camera.reset(cam);
+		g_camera->Construct();
 	}
 	else
 	{
@@ -226,6 +223,9 @@ void Game::InitSizeDependent()
 	g_screen->m_nearZ = nearZ;
 	g_screen->m_farZ = farZ;
 	g_screen->Construct();
+
+	m_testText.reset(new Text(m_32SegoeScriptExtended, m_windowWidth, m_windowHeight));
+	m_testText->ForceUpdate();
 }
 
 void Game::Run()
@@ -543,6 +543,9 @@ void Game::Render()
 	{
 		model->Render<DisplacementShader>(g_camera.get());
 	}
+
+	m_testText->Render(g_screen.get(), L"Hello world!",
+		0, 400, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
 
 	EmptyShader::Get()->bind(); // Clear the pipeline
 

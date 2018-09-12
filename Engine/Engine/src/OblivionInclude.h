@@ -20,6 +20,8 @@
 #include "graphics/Model.h"
 #include "graphics/RenderTexture.h"
 #include "graphics/Square.h"
+#include "graphics/Font.h"
+#include "graphics/Text.h"
 
 #include "physics/World.h"
 #include "physics/CollisionObject.h"

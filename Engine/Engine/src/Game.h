@@ -69,6 +69,10 @@ private:
 	std::unique_ptr<CollisionObject>					m_sphere;
 	std::unique_ptr<CollisionObject>					m_tree;
 
+	std::shared_ptr<CFont>								m_32SegoeScriptExtended;
+
+	std::unique_ptr<Text>								m_testText;
+
 	std::vector<Model*>									m_models;
 	Model*												m_selectedObject;
 

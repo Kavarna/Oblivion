@@ -13,7 +13,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		Game* joc = Game::GetInstance();
 		joc->Create(hInstance);
 		joc->Run();
-		//joc->Destroy();
 		COM::UninitializeComObjects();
 		CoUninitialize();
 	}

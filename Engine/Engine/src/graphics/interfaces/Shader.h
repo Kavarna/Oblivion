@@ -27,12 +27,13 @@ enum Pipeline
 	PipelineNone = 0,
 	PipelineBatchShader = -1,
 	PipelineTextureBatchShader = -2,
-	PipelineCustom = -3,
+	PipelineSimpleTexture = -3,
 	PipelineBasic = 1,
 	PipelineTexture = 2,
 	PipelineTextureLight = 3,
 	PipelineDisplacementTextureLight = 4,
 	PipelineCompute2D = 5,
+	PipelineCustom = INT_MAX
 };
 
 class IShader : public IGraphicsObject
@@ -68,7 +69,7 @@ protected:
 
 public:
 	virtual void							Create()		= 0;
-	void									bind() const
+	virtual void							bind() const
 	{
 		auto p = GetPipelineType();
 		if (shouldBind(p))
