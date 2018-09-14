@@ -70,6 +70,7 @@ private:
 	inline	btVector3							CalculateLocalIntertia(float mass);
 			btCollisionShape*					CreateStaticCollisionShape();
 			btCollisionShape*					CreateHullCollisionShape();
+			btCollisionShape*					CreateCompoundCollisionShape();
 	inline	void								InitDefaultProperties(ECollisionObjectType = ECollisionObjectType::eDynamic);
 	inline	void								InitBodyWithProperties(btRigidBody*);
 

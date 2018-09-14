@@ -7,6 +7,8 @@
 #include "boost/property_tree/json_parser.hpp"
 #include "boost/algorithm/string.hpp"
 
+uint32_t Model::m_advancedCheckMinimum = 50;
+
 /*
 * Appends path (except last directory) to relative
 */
@@ -351,6 +353,25 @@ void Model::DrawIndexedInstanced(ICamera * cam) const
 		}
 		
 	};
+	std::function<bool(const Model::Mesh&, uint32_t)> shouldRenderMesh;
+	if (m_meshes.size() > m_advancedCheckMinimum)
+	{
+		shouldRenderMesh = [&](const Model::Mesh& m, uint32_t instanceID)->bool const
+		{
+			auto frustum = cam->GetFrustum();
+			DirectX::BoundingBox toRender;
+			m.m_boundingBox.Transform(toRender, m_objectWorld[instanceID]);
+			return frustum.Contains(toRender);
+		};
+	
+	}
+	else
+	{
+		shouldRenderMesh = [&](const Model::Mesh& m, uint32_t instanceID)->bool const
+		{
+			return true;
+		};
+	}
 	uint32_t renderInstances = PrepareInstances(f1);
 	ID3D11Buffer * instances[] =
 	{
@@ -362,31 +383,43 @@ void Model::DrawIndexedInstanced(ICamera * cam) const
 	if (renderInstances == 0)
 		return;
 	
-	for (auto & mesh : m_meshes)
+	for (uint32_t i = 0; i < m_drawnInstances.size(); ++i)
 	{
-		if (m_materials[mesh.m_materialIndex].opacity != 1.0f)
-			continue;
-		BindMaterial(m_materials[mesh.m_materialIndex], m_bindMaterialToShader);
-		m_d3d11Context->DrawIndexedInstanced((UINT)(mesh.m_indexRange.end - mesh.m_indexRange.begin),
-			(UINT)renderInstances, (UINT)mesh.m_indexRange.begin,
-			(UINT)mesh.m_vertexRange.begin, 0);
-		if (g_isDeveloper)
-			g_drawCalls++;
+		for (auto & mesh : m_meshes)
+		{
+			if (m_materials[mesh.m_materialIndex].opacity != 1.0f)
+				continue;
+			if (shouldRenderMesh(mesh, m_drawnInstances[i]))
+			{
+				BindMaterial(m_materials[mesh.m_materialIndex], m_bindMaterialToShader);
+				m_d3d11Context->DrawIndexedInstanced((UINT)(mesh.m_indexRange.end - mesh.m_indexRange.begin),
+					(UINT)renderInstances, (UINT)mesh.m_indexRange.begin,
+					(UINT)mesh.m_vertexRange.begin, 0);
+				if (g_isDeveloper)
+					g_drawCalls++;
+			}
+		}
 	}
 	auto renderer = Direct3D11::Get();
-	for (auto & mesh : m_meshes)
+	for (uint32_t i = 0; i < m_drawnInstances.size(); ++i)
 	{
-		float opacity = m_materials[mesh.m_materialIndex].opacity;
-		if (opacity == 1.0f)
-			continue;
-		renderer->OMTransparency(opacity);
-		BindMaterial(m_materials[mesh.m_materialIndex], m_bindMaterialToShader);
-		m_d3d11Context->DrawIndexedInstanced((UINT)(mesh.m_indexRange.end - mesh.m_indexRange.begin),
-			(UINT)renderInstances, (UINT)mesh.m_indexRange.begin,
-			(UINT)mesh.m_vertexRange.begin, 0);
-		if (g_isDeveloper)
+		for (auto & mesh : m_meshes)
 		{
-			g_drawCalls++;
+			float opacity = m_materials[mesh.m_materialIndex].opacity;
+			if (opacity == 1.0f)
+				continue;
+			if (shouldRenderMesh(mesh, m_drawnInstances[i]))
+			{
+				renderer->OMTransparency(opacity);
+				BindMaterial(m_materials[mesh.m_materialIndex], m_bindMaterialToShader);
+				m_d3d11Context->DrawIndexedInstanced((UINT)(mesh.m_indexRange.end - mesh.m_indexRange.begin),
+					(UINT)renderInstances, (UINT)mesh.m_indexRange.begin,
+					(UINT)mesh.m_vertexRange.begin, 0);
+				if (g_isDeveloper)
+				{
+					g_drawCalls++;
+				}
+			}
 		}
 	}
 	renderer->OMDefaultBlend();
@@ -394,13 +427,23 @@ void Model::DrawIndexedInstanced(ICamera * cam) const
 
 	if (g_isDeveloper)
 	{
-		DirectX::BoundingBox toRender;
 		auto GraphicsDebugDrawer = GraphicsDebugDraw::Get();
-		for (uint32_t i = 0; i < m_objectWorld.size(); ++i)
+		if (GraphicsDebugDrawer->GetDebugFlags() & DBG_DRAW_BOUNDING_BOX)
 		{
-			//toRender = m_boundingBox;
-			m_boundingBox.Transform(toRender, m_objectWorld[i]);
-			GraphicsDebugDrawer->RenderBoundingBox(toRender);
+			DirectX::BoundingBox toRender;
+			for (uint32_t i = 0; i < m_objectWorld.size(); ++i)
+			{
+				m_boundingBox.Transform(toRender, m_objectWorld[i]);
+				GraphicsDebugDrawer->RenderBoundingBox(toRender);
+			}
+			for (uint32_t i = 0; i < m_objectWorld.size(); ++i)
+			{
+				for (uint32_t j = 0; j < m_meshes.size(); ++j)
+				{
+					m_meshes[j].m_boundingBox.Transform(toRender, m_objectWorld[i]);
+					GraphicsDebugDrawer->RenderBoundingBox(toRender);
+				}
+			}
 		}
 	}
 
@@ -538,8 +581,8 @@ void Model::Create(std::string const& filename)
 		getline(fin, check);
 
 		// Kinda useless
-		/*DirectX::XMFLOAT3 localMin(FLT_MAX, FLT_MAX, FLT_MAX);
-		DirectX::XMFLOAT3 localMax(-FLT_MAX, -FLT_MAX, -FLT_MAX);*/
+		DirectX::XMFLOAT3 localMin(FLT_MAX, FLT_MAX, FLT_MAX);
+		DirectX::XMFLOAT3 localMax(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
 		for (int j = 0; j < numVertices; ++j)
 		{
@@ -552,9 +595,9 @@ void Model::Create(std::string const& filename)
 			checkAndSwapSmallest(globalMin.z, z); checkAndSwapLargest(globalMax.z, z);
 
 			// Kinda useless
-			/*checkAndSwapSmallest(localMin.x, x); checkAndSwapLargest(localMax.x, x);
+			checkAndSwapSmallest(localMin.x, x); checkAndSwapLargest(localMax.x, x);
 			checkAndSwapSmallest(localMin.y, y); checkAndSwapLargest(localMax.y, y);
-			checkAndSwapSmallest(localMin.z, z); checkAndSwapLargest(localMax.z, z);*/
+			checkAndSwapSmallest(localMin.z, z); checkAndSwapLargest(localMax.z, z);
 			
 			if (hasTexture)
 			{
@@ -570,10 +613,14 @@ void Model::Create(std::string const& filename)
 			if (hasOther)
 			{ 
 				fin >> x >> y >> z;
-				assert(!(x == 0 && y == 0 && z == 0));
+				//assert(!(x == 0 && y == 0 && z == 0));
+				if (x == 0 && y == 0 && z == 0)
+					x = 1.0f, y = 0.0f, z = 0.0f;
 				vertices.back().TangentU = { x,y,z };
 				fin >> x >> y >> z;
-				assert(!(x == 0 && y == 0 && z == 0));
+				//assert(!(x == 0 && y == 0 && z == 0));
+				if (x == 0 && y == 0 && z == 0)
+					x = 0.0f, y = 0.0f, z = 1.0f;
 				vertices.back().Binormal = { x,y,z };
 			}
 		}
@@ -582,7 +629,7 @@ void Model::Create(std::string const& filename)
 		m_meshes[i].m_vertexRange = AddVertices(vertices, startVertices, (int)vertices.size());
 
 		// Kinda useless
-		/*DirectX::XMFLOAT3 center, offset;
+		DirectX::XMFLOAT3 center, offset;
 		center = DirectX::XMFLOAT3(
 			(localMax.x + localMin.x) / 2.f,
 			(localMax.y + localMin.y) / 2.f,
@@ -595,7 +642,7 @@ void Model::Create(std::string const& filename)
 		);
 		m_meshes[i].m_boundingBox = DirectX::BoundingBox(
 			center, offset
-		);*/
+		);
 
 #pragma endregion
 

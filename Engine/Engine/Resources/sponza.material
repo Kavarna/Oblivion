@@ -1,0 +1,292 @@
+{
+    "DefaultMaterial": {
+        "Color": "0.600000024 0.600000024 0.600000024 1",
+        "Shininess": "0",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "leaf": {
+        "Texture": "textures\\sponza_thorn_diff.png",
+        "Bump": "textures\\sponza_thorn_ddn.png",
+        "Shininess": "40",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "vase_round": {
+        "Texture": "textures\\vase_round.png",
+        "Bump": "textures\\vase_round_ddn.png",
+        "Shininess": "40",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "VasePlant": {
+        "Texture": "textures\\vase_plant.png",
+        "Bump": "textures\\vase_plant_NRM.png",
+        "Shininess": "40",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "Material__57": {
+        "Texture": "textures\\vase_plant.png",
+        "Shininess": "40",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "Material__298": {
+        "Texture": "textures\\background.png",
+        "Bump": "textures\\background_ddn.png",
+        "Shininess": "40",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "16___Default": {
+        "Texture": "textures\\gi_flag.png",
+        "Shininess": "40",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "bricks": {
+        "Texture": "textures\\spnza_bricks_a_diff.png",
+        "Bump": "textures\\spnza_bricks_a_diff.png",
+        "Shininess": "40",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "arch": {
+        "Texture": "textures\\sponza_arch_diff.png",
+        "Shininess": "40",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "ceiling": {
+        "Texture": "textures\\sponza_ceiling_a_diff.png",
+        "Shininess": "40",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "column_a": {
+        "Texture": "textures\\sponza_column_a_diff.png",
+        "Bump": "textures\\sponza_column_a_ddn.png",
+        "Shininess": "40",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "floor": {
+        "Texture": "textures\\sponza_floor_a_diff.png",
+        "Shininess": "40",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "column_c": {
+        "Texture": "textures\\sponza_column_c_diff.png",
+        "Bump": "textures\\sponza_column_c_ddn.png",
+        "Shininess": "40",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "details": {
+        "Texture": "textures\\sponza_details_diff.png",
+        "Shininess": "40",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "column_b": {
+        "Texture": "textures\\sponza_column_b_diff.png",
+        "Bump": "textures\\sponza_column_b_ddn.png",
+        "Shininess": "40",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "Material__47": {
+        "Color": "0.588 0.588 0.588 1",
+        "Shininess": "40",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "flagpole": {
+        "Texture": "textures\\sponza_flagpole_diff.png",
+        "Shininess": "40",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "fabric_e": {
+        "Texture": "textures\\sponza_fabric_green_diff.png",
+        "Shininess": "40",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "fabric_d": {
+        "Texture": "textures\\sponza_fabric_blue_diff.png",
+        "Shininess": "40",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "fabric_a": {
+        "Texture": "textures\\sponza_fabric_diff.png",
+        "Shininess": "40",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "fabric_g": {
+        "Texture": "textures\\sponza_curtain_blue_diff.png",
+        "Shininess": "40",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "fabric_c": {
+        "Texture": "textures\\sponza_curtain_diff.png",
+        "Shininess": "40",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "fabric_f": {
+        "Texture": "textures\\sponza_curtain_green_diff.png",
+        "Shininess": "40",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "chain": {
+        "Texture": "textures\\chain_texture.png",
+        "Bump": "textures\\chain_texture_ddn.png",
+        "Shininess": "40",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "vase_hanging": {
+        "Texture": "textures\\vase_hanging.png",
+        "Shininess": "40",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "vase": {
+        "Texture": "textures\\vase_dif.png",
+        "Shininess": "40",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "Material__25": {
+        "Texture": "textures\\lion.png",
+        "Bump": "textures\\lion_ddn.png",
+        "Shininess": "40",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "roof": {
+        "Texture": "textures\\sponza_roof_diff.png",
+        "Shininess": "40",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    }
+}

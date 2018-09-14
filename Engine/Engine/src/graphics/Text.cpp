@@ -92,21 +92,15 @@ void Text::Render(ICamera * cam, const DirectX::XMFLOAT4& color)
 		nullptr
 	};
 
-	// New toys
-	//mContext->RSSetState(DX::NoCulling.Get());
-	renderer->RSCullNone();
 	m_d3d11Context->IASetVertexBuffers(0, 2, vertexBuffers, &Stride, &Offset);
 	m_d3d11Context->IASetIndexBuffer(mIndexBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
 	m_d3d11Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	shader->bind();
-	//camInfo.View = DirectX::XMMatrixTranspose(cam->GetView());
-	//camInfo.Projection = DirectX::XMMatrixTranspose(cam->GetProjection());
 	static DirectX::XMMATRIX WVP;
 	WVP = cam->GetView() * cam->GetProjection();
 	WVP = DirectX::XMMatrixTranspose(WVP);
 	shader->SetCameraInfo(WVP);
 	shader->SetColor(color);
-	renderer->RSSolidRender();
 
 	ID3D11ShaderResourceView * SRVs[] = 
 	{

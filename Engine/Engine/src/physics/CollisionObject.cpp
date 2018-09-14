@@ -309,6 +309,11 @@ btCollisionShape * CollisionObject::CreateHullCollisionShape()
 	return hullShape;
 }
 
+btCollisionShape * CollisionObject::CreateCompoundCollisionShape()
+{
+	return nullptr;
+}
+
 inline void CollisionObject::InitDefaultProperties(ECollisionObjectType shapeType)
 {
 	if (shapeType == ECollisionObjectType::eDynamic)

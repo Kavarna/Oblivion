@@ -38,7 +38,9 @@ void BatchRenderer::Vertex(DirectX::XMFLOAT3 const & pos, DirectX::XMFLOAT4 cons
 	m_bufferData[m_currentIndex].Position = pos;
 	m_bufferData[m_currentIndex].Color = color;
 	m_currentIndex++;
-	assert(m_currentIndex < m_numMaxVertices);
+	//assert(m_currentIndex < m_numMaxVertices);
+	if (m_currentIndex >= m_numMaxVertices)
+		ReconstructAndCopy(m_numMaxVertices * 10);
 }
 
 void BatchRenderer::End(ICamera * cam, D3D11_PRIMITIVE_TOPOLOGY topology)
@@ -63,6 +65,24 @@ void BatchRenderer::End(ICamera * cam, D3D11_PRIMITIVE_TOPOLOGY topology)
 		if (g_isDeveloper)
 			g_drawCalls++;
 	}
+	m_bufferData = nullptr;
+}
+
+void BatchRenderer::ReconstructAndCopy(uint32_t newSize)
+{
+	if (m_bufferData)
+	{
+		ShaderHelper::UnmapBuffer(m_d3d11Context.Get(), m_vertexBuffer.Get());
+		std::vector<BatchShader::SVertex> vertices((BatchShader::SVertex*)m_bufferData, (BatchShader::SVertex*)m_bufferData + m_numMaxVertices);
+		Reconstruct(newSize);
+		m_bufferData = (BatchShader::SVertex*)ShaderHelper::MapBuffer(m_d3d11Context.Get(), m_vertexBuffer.Get());
+		for (size_t i = 0; i < vertices.size(); ++i)
+			m_bufferData[i] = vertices[i];
+		
+	}
+	else
+		Reconstruct(newSize);
+
 }
 
 TextureBatchRenderer::TextureBatchRenderer()

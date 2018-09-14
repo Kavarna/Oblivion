@@ -43,7 +43,6 @@ protected:
 			void							DrawIndexedInstanced(ICamera * cam) const override;
 			bool							PrepareIA(const Pipeline& p) const override;
 
-
 private:
 	virtual	bool							ShouldRenderInstance(ICamera * cam, uint32_t id) const;
 
@@ -53,7 +52,7 @@ private:
 		CommonTypes::Range					m_vertexRange;
 		CommonTypes::Range					m_indexRange;
 		int									m_materialIndex;
-		// DirectX::BoundingBox				m_boundingBox; /// kinda useless
+		DirectX::BoundingBox				m_boundingBox; /// kinda useless
 	};
 private:
 	MicrosoftPointer<ID3D11Buffer>			m_indexBuffer;
@@ -69,5 +68,9 @@ protected:
 	std::vector<Mesh>						m_meshes;
 	std::vector<Rendering::Material>		m_materials;
 	std::vector<uint32_t>					m_indices;
+
+public:
+	/// If a model has more meshes that this value; it will be feasible for advanced frustum culling
+	static uint32_t							m_advancedCheckMinimum;
 };
 

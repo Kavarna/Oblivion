@@ -49,9 +49,6 @@ void Game::Create(HWND hWnd)
 	InitDirect3D();
 	InitInput();
 	InitImGui();
-	Init2D();
-	InitSizeDependent();
-	Init3D();
 	InitSettings();
 }
 
@@ -84,6 +81,7 @@ void Game::InitSettings()
 
 	m_mouseSensivity = pt.get_child("Gameplay.Mouse sensivity").get_value<float>();
 	g_isDeveloper = pt.get_child("Gameplay.Developer").get_value<bool>();
+	Model::m_advancedCheckMinimum = pt.get_child("Graphics.Model.Advanced check").get_value<int>();
 
 	if (g_isDeveloper)
 	{
@@ -149,9 +147,9 @@ void Game::InitDirect3D()
 	d3d->Create(m_windowHandle);
 	d3d->OnResize(m_windowHandle, m_windowWidth, m_windowHeight);
 	Sun sunLight{
-		{ 0.5f,-0.5f,0.0f,1.0f },
+		{ 0.0f,-1.0f,0.0f,1.0f },
 		{ 1.0f,1.0f,1.0f,1.0f },
-		{ 0.2f,0.2f,0.2f,1.0f }
+		{ 0.1f,0.1f,0.1f,1.0f }
 	};
 	TextureLightShader::Get()->SetLightInformations(sunLight);
 }
@@ -170,28 +168,32 @@ void Game::InitImGui()
 
 void Game::Init2D()
 {
-	m_32SegoeScriptExtended = std::make_shared<CFont>("Resources/Fonts/32SegoeScriptExtented.fnt");
 }
 
 void Game::Init3D()
 {
 	BulletWorld::Get()->CreateDefaultWorld();
 
-	m_ground = std::make_unique<CollisionObject>();
-	m_ground->Create(EDefaultObject::Grid);
-	m_ground->AddInstance();
+	//m_ground = std::make_unique<CollisionObject>();
+	//m_ground->Create(EDefaultObject::Grid);
+	//m_ground->AddInstance();
 
-	m_sphere = std::make_unique<CollisionObject>();
-	m_sphere->Create(EDefaultObject::Sphere);
-	m_sphere->AddInstance(DirectX::XMMatrixTranslation(0.f, 30.f, 0.f));
+	//m_sphere = std::make_unique<CollisionObject>();
+	//m_sphere->Create(EDefaultObject::Sphere);
+	//m_sphere->AddInstance(DirectX::XMMatrixTranslation(0.f, 30.f, 0.f));
 
-	m_tree = std::make_unique<CollisionObject>();
-	m_tree->Create("Resources/LowPolyTree");
-	m_tree->AddInstance();
+	//m_tree = std::make_unique<CollisionObject>();
+	//m_tree->Create("Resources/LowPolyTree");
+	//m_tree->AddInstance();
+	
+	m_sponza = std::make_unique<CollisionObject>();
+	m_sponza->Create("Resources/Sponza");
+	m_sponza->AddInstance();
 
-	m_models.push_back(m_ground.get());
-	m_models.push_back(m_sphere.get());
-	m_models.push_back(m_tree.get());
+	//m_models.push_back(m_ground.get());
+	//m_models.push_back(m_sphere.get());
+	//m_models.push_back(m_tree.get());
+	m_models.push_back(m_sponza.get());
 }
 
 void Game::InitSizeDependent()
@@ -224,12 +226,13 @@ void Game::InitSizeDependent()
 	g_screen->m_farZ = farZ;
 	g_screen->Construct();
 
-	m_testText.reset(new Text(m_32SegoeScriptExtended, m_windowWidth, m_windowHeight));
-	m_testText->ForceUpdate();
 }
 
 void Game::Run()
 {
+	Init2D();
+	InitSizeDependent();
+	Init3D();
 	MSG message;
 	Update();
 	while (true)
@@ -328,12 +331,12 @@ void Game::Update()
 		if (m_menuActive)
 		{
 			m_mouse->SetMode(DirectX::Mouse::Mode::MODE_RELATIVE);
-			ShowCursor(FALSE);
+			while (ShowCursor(FALSE) > 0);
 		}
 		else
 		{
 			m_mouse->SetMode(DirectX::Mouse::Mode::MODE_ABSOLUTE);
-			ShowCursor(TRUE);
+			while (ShowCursor(TRUE) <= 0);
 		}
 		m_menuActive = !m_menuActive;
 	}
@@ -403,6 +406,8 @@ void Game::End()
 			{
 				graphicsDebugDrawer->ToggleFlag(DBG_DRAW_BOUNDING_FRUSTUM);
 			}
+
+			ImGui::SliderInt("Model advanced check minimum", (int*)&Model::m_advancedCheckMinimum, 1, 1000);
 		}
 		ImGui::Separator();
 		{
@@ -458,11 +463,10 @@ void Game::WriteSettings()
 
 	pt.put("Graphics.VSync", Direct3D11::Get()->m_hasVerticalSync);
 	pt.put("Graphics.MSAA", Direct3D11::Get()->m_hasMSAA);
+	pt.put("Graphics.Model.Advanced check", Model::m_advancedCheckMinimum);
 
 	pt.put("Gameplay.Mouse sensivity", m_mouseSensivity);
 	pt.put("Gameplay.Developer", g_isDeveloper);
-
-	//pt.put("Physics.Debug flags", )
 
 	auto graphicsDebugDrawer = GraphicsDebugDraw::Get();
 	pt.put("Developer.Draw AABB", graphicsDebugDrawer->RenderBoundingBox());
@@ -539,13 +543,11 @@ void Game::Render()
 	IGameObject::BindStaticVertexBuffer();
 
 
-	for (const auto & model : m_models)
+	/*for (const auto & model : m_models)
 	{
 		model->Render<DisplacementShader>(g_camera.get());
-	}
-
-	m_testText->Render(g_screen.get(), L"Hello world!",
-		0, 400, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	}*/
+	m_sponza->Render<TextureLightShader>(g_camera.get());
 
 	EmptyShader::Get()->bind(); // Clear the pipeline
 

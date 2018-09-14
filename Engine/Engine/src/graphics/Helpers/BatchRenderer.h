@@ -26,6 +26,9 @@ public:
 	/// <summary>Shader should have everything set up</summary>
 	template <class Shader>
 	void End(D3D11_PRIMITIVE_TOPOLOGY = D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	
+private:
+	void ReconstructAndCopy(uint32_t newSize);
 
 private:
 	MicrosoftPointer<ID3D11Buffer>	m_vertexBuffer;

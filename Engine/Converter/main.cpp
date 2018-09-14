@@ -460,15 +460,15 @@ void ConvertFile(std::string const& from, std::string & to, unsigned int flags)
 	const aiScene * pScene = importer.ReadFile(from.c_str(), flags);
 	if (!pScene)
 		std::cout << "Can't convert that file";
-	//PrintFromScene(pScene, to);
-	std::vector<SModel> models;
+	PrintFromScene(pScene, to);
+	/*std::vector<SModel> models;
 	CreateModels(pScene, models);
 
 	WriteModels(models, pScene, to);
 
 	std::string materialFile;
 	materialFile = to + ".material";
-	WriteMaterial(pScene, materialFile);
+	WriteMaterial(pScene, materialFile);*/
 }
 
 int main(int argc, char* argv[])
