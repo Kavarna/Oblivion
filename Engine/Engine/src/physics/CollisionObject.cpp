@@ -19,7 +19,7 @@ void CollisionObject::Create(std::string const & filename)
 
 	if (m_shapeType != EShapeType::eDefaultMesh)
 	{
-		ReadPhysicsFile(filename + ".physics.json");
+		ReadPhysicsFile(filename + ".physics");
 		switch (m_shapeType)
 		{
 		case EShapeType::eGImpactMesh:
@@ -73,8 +73,15 @@ void CollisionObject::Destroy()
 		delete it->second->m_body;
 		delete it->second;
 	}
-
 	m_rigidBodies.clear();
+
+	for (auto it = m_usedShapes.begin(); it != m_usedShapes.end(); ++it)
+		delete (*it);
+	m_usedShapes.clear();
+
+	for (auto it = m_usedMeshes.begin(); it != m_usedMeshes.end(); ++it)
+		delete (*it);
+	m_usedMeshes.clear();
 
 	if (m_collisionShape)
 		delete m_collisionShape;
@@ -172,6 +179,9 @@ inline void CollisionObject::ReadPhysicsFile(const std::string & filename)
 		m_shapeType = EShapeType::eGImpactMesh;
 	else if (to_lower_copy(collisionShape) == "edefaultmesh")
 		m_shapeType = EShapeType::eHullMesh;
+
+	m_compound = DX::GetAttributeOrValue<bool, decltype(m_properties)>
+		(m_properties, "Physics.Collision Shape.Compound", false);
 }
 
 void CollisionObject::SavePhysics()
@@ -241,7 +251,7 @@ inline void CollisionObject::RotateZ(float theta, int instanceID)
 
 inline void CollisionObject::Scale(float Sx, float Sy, float Sz, int instanceID)
 {
-	THROW_ERROR("Scaling not available for physics-basec objects");
+	THROW_ERROR("Scaling not available for physics-based objects");
 	/*if (m_rigidBodies[instanceID]->m_collisionShape)
 	{
 		m_collisionShape->setLocalScaling(btVector3(Sx, Sy, Sz));
@@ -275,43 +285,82 @@ btCollisionShape * CollisionObject::CreateStaticCollisionShape()
 		DirectX::XMFLOAT3 pos = m_staticVertices[id].Position;
 		return btVector3(pos.x, pos.y, pos.z);
 	};
-	btTriangleMesh * mesh = new btTriangleMesh(true, false);
-	for (uint32_t i = 0; i < m_meshes.size(); ++i)
+	btCollisionShape * shape = nullptr;
+	if (m_compound)
 	{
-		for (uint32_t j = m_meshes[i].m_indexRange.begin; j < m_meshes[i].m_indexRange.end; j += 3)
+		//THROW_ERROR("Compound static mesh unavailable");
+		btCompoundShape * compoundShape = new btCompoundShape(true, (int)m_meshes.size());
+		for (uint32_t i = 0; i < m_meshes.size(); ++i)
 		{
-			btVector3 v0, v1, v2;
-			v0 = getVertexID(i, m_indices[j]);
-			v1 = getVertexID(i, m_indices[j + 1]);
-			v2 = getVertexID(i, m_indices[j + 2]);
-			mesh->addTriangle(v0, v1, v2);
+			btTriangleMesh * mesh = new btTriangleMesh(true, false);
+			for (uint32_t j = m_meshes[i].m_indexRange.begin; j < m_meshes[i].m_indexRange.end; j += 3)
+			{
+				btVector3 v0, v1, v2;
+				v0 = getVertexID(i, m_indices[j]);
+				v1 = getVertexID(i, m_indices[j + 1]);
+				v2 = getVertexID(i, m_indices[j + 2]);
+				mesh->addTriangle(v0, v1, v2);
+			}
+			m_usedMeshes.push_back(mesh);
+			compoundShape->addChildShape(btTransform(btQuaternion(0, 0, 0, 1)), new btBvhTriangleMeshShape(mesh, false));
 		}
+		shape = compoundShape;
 	}
-	btCollisionShape * shape = new btBvhTriangleMeshShape(mesh, true);
+	else
+	{
+		btTriangleMesh * mesh = new btTriangleMesh(true, false);
+		for (uint32_t i = 0; i < m_meshes.size(); ++i)
+		{
+			for (uint32_t j = m_meshes[i].m_indexRange.begin; j < m_meshes[i].m_indexRange.end; j += 3)
+			{
+				btVector3 v0, v1, v2;
+				v0 = getVertexID(i, m_indices[j]);
+				v1 = getVertexID(i, m_indices[j + 1]);
+				v2 = getVertexID(i, m_indices[j + 2]);
+				mesh->addTriangle(v0, v1, v2);
+			}
+		}
+		m_usedMeshes.push_back(mesh);
+		shape = new btBvhTriangleMeshShape(mesh, true);
+	}
 	return shape;
 }
 
 btCollisionShape * CollisionObject::CreateHullCollisionShape()
 {
-	uint32_t startIndex = INT_MAX, endIndex = 0;
-	for (auto & mesh : m_meshes)
+	btCollisionShape * shape = nullptr;;
+	if (m_compound)
 	{
-		if (mesh.m_vertexRange.begin < startIndex)
-			startIndex = mesh.m_vertexRange.begin;
-		if (mesh.m_vertexRange.end > endIndex)
-			endIndex = mesh.m_vertexRange.end;
+		btCompoundShape * compoundShape = new btCompoundShape(true, (int)m_meshes.size());
+		for (auto & mesh : m_meshes)
+		{
+			btConvexHullShape * hullShape = new btConvexHullShape(
+				(btScalar*)&m_staticVertices[mesh.m_vertexRange.begin],
+				mesh.m_vertexRange.end - mesh.m_vertexRange.begin,
+				sizeof(Oblivion::Vertex)
+			);
+			m_usedShapes.push_back(hullShape);
+			compoundShape->addChildShape(btTransform(btQuaternion(0, 0, 0, 1)), hullShape);
+		}
+		shape = compoundShape;
 	}
-	btConvexHullShape * hullShape = new btConvexHullShape(
-		(btScalar*)&m_staticVertices[startIndex],
-		endIndex - startIndex,
-		sizeof(Oblivion::Vertex)
-	);
-	return hullShape;
-}
-
-btCollisionShape * CollisionObject::CreateCompoundCollisionShape()
-{
-	return nullptr;
+	else
+	{
+		uint32_t startIndex = INT_MAX, endIndex = 0;
+		for (auto & mesh : m_meshes)
+		{
+			if (mesh.m_vertexRange.begin < startIndex)
+				startIndex = mesh.m_vertexRange.begin;
+			if (mesh.m_vertexRange.end > endIndex)
+				endIndex = mesh.m_vertexRange.end;
+		}
+		shape = new btConvexHullShape(
+			(btScalar*)&m_staticVertices[startIndex],
+			endIndex - startIndex,
+			sizeof(Oblivion::Vertex)
+		);
+	}
+	return shape;
 }
 
 inline void CollisionObject::InitDefaultProperties(ECollisionObjectType shapeType)
@@ -325,6 +374,7 @@ inline void CollisionObject::InitDefaultProperties(ECollisionObjectType shapeTyp
 		m_properties.put("Physics.Rolling friction", 0.2f);
 		m_properties.put("Physics.Collision Shape.Dynamics", "eDynamic");
 		m_properties.put("Physics.Collision Shape.Type", "eDontCare");
+		m_properties.put("Physics.Collision Shape.Compound", m_compound);
 		m_mass = 1.0f;
 		m_collisionType = ECollisionObjectType::eDynamic;
 		m_collisionType = ECollisionObjectType::eDontCare;
@@ -338,6 +388,7 @@ inline void CollisionObject::InitDefaultProperties(ECollisionObjectType shapeTyp
 		m_properties.put("Physics.Rolling friction", 0.2f);
 		m_properties.put("Physics.Dynamics", "eStatic");
 		m_properties.put("Physics.Collision Shape.Type", "eDontCare");
+		m_properties.put("Physics.Collision Shape.Compound", m_compound);
 		m_mass = 0.0f;
 		m_collisionType = ECollisionObjectType::eStatic;
 		m_collisionType = ECollisionObjectType::eDontCare;

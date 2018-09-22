@@ -152,6 +152,7 @@ void Game::InitDirect3D()
 		{ 0.1f,0.1f,0.1f,1.0f }
 	};
 	TextureLightShader::Get()->SetLightInformations(sunLight);
+	BulletWorld::Get()->CreateDefaultWorld();
 }
 
 void Game::InitImGui()
@@ -172,15 +173,12 @@ void Game::Init2D()
 
 void Game::Init3D()
 {
-	BulletWorld::Get()->CreateDefaultWorld();
-
 	//m_ground = std::make_unique<CollisionObject>();
 	//m_ground->Create(EDefaultObject::Grid);
 	//m_ground->AddInstance();
 
-	//m_sphere = std::make_unique<CollisionObject>();
-	//m_sphere->Create(EDefaultObject::Sphere);
-	//m_sphere->AddInstance(DirectX::XMMatrixTranslation(0.f, 30.f, 0.f));
+	m_sphere = std::make_unique<CollisionObject>();
+	m_sphere->Create(EDefaultObject::Sphere);
 
 	//m_tree = std::make_unique<CollisionObject>();
 	//m_tree->Create("Resources/LowPolyTree");
@@ -191,7 +189,7 @@ void Game::Init3D()
 	m_sponza->AddInstance();
 
 	//m_models.push_back(m_ground.get());
-	//m_models.push_back(m_sphere.get());
+	m_models.push_back(m_sphere.get());
 	//m_models.push_back(m_tree.get());
 	m_models.push_back(m_sponza.get());
 }
@@ -253,6 +251,8 @@ void Game::Run()
 	WriteSettings();
 }
 
+bool leftClickPressed = false;
+
 void Game::Update()
 {
 	auto renderer = Direct3D11::Get();
@@ -298,10 +298,10 @@ void Game::Update()
 
 		if (m_selectObjects)
 		{
-			static bool bLeftClick = false;
-			if (mouse.leftButton && !bLeftClick)
+			//static bool bLeftClick = false;
+			if (mouse.leftButton && !leftClickPressed)
 			{
-				bLeftClick = true;
+				leftClickPressed = true;
 				if (PickObject())
 				{
 					m_selectObjects = false;
@@ -310,10 +310,21 @@ void Game::Update()
 					m_selectedObject = nullptr;
 			}
 			else if (!mouse.leftButton)
-				bLeftClick = false;
+				leftClickPressed = false;
 		}
 
 	}
+
+	if (mouse.leftButton && !leftClickPressed)
+	{
+		leftClickPressed = true;
+		uint32_t instanceID = m_sphere->AddInstance();
+		auto camPos = g_camera->GetPosition();
+		m_sphere->Translate(camPos.x, camPos.y, camPos.z, instanceID);
+
+	}
+	else if (!mouse.leftButton)
+		leftClickPressed = false;
 
 	if (m_menuActive)
 		g_camera->Update(frameTime, 0.0f, 0.0f);
@@ -547,6 +558,7 @@ void Game::Render()
 	{
 		model->Render<DisplacementShader>(g_camera.get());
 	}*/
+	m_sphere->Render<DisplacementShader>(g_camera.get());
 	m_sponza->Render<TextureLightShader>(g_camera.get());
 
 	EmptyShader::Get()->bind(); // Clear the pipeline

@@ -66,7 +66,7 @@ private:
 
 private:
 	//std::unique_ptr<CollisionObject>					m_ground;
-	//std::unique_ptr<CollisionObject>					m_sphere;
+	std::unique_ptr<CollisionObject>					m_sphere;
 	//std::unique_ptr<CollisionObject>					m_tree;
 	std::unique_ptr<CollisionObject>					m_sponza;
 

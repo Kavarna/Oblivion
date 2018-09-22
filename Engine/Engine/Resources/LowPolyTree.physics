@@ -7,7 +7,8 @@
         "Rolling friction": "0.200000003",
         "Collision Shape": {
             "Dynamics": "eStatic",
-            "Type": "eDontCare"
+            "Type": "eHullMesh",
+            "Compound": "true"
         }
     }
 }

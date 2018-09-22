@@ -70,7 +70,6 @@ private:
 	inline	btVector3							CalculateLocalIntertia(float mass);
 			btCollisionShape*					CreateStaticCollisionShape();
 			btCollisionShape*					CreateHullCollisionShape();
-			btCollisionShape*					CreateCompoundCollisionShape();
 	inline	void								InitDefaultProperties(ECollisionObjectType = ECollisionObjectType::eDynamic);
 	inline	void								InitBodyWithProperties(btRigidBody*);
 
@@ -82,4 +81,8 @@ private:
 	std::map<uint32_t, RigidBodyInfo*>			m_rigidBodies;
 	boost::property_tree::ptree					m_properties;
 	std::string									m_physicsFile;
+	bool										m_compound						= false;
+
+	std::vector<btCollisionShape*>				m_usedShapes;
+	std::vector<btTriangleMesh*>				m_usedMeshes;
 };
