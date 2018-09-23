@@ -2,19 +2,17 @@
 
 
 #include "../../common/common.h"
+#include "../../common/interfaces/Singletone.h"
 #include "../Helpers/Lights.h"
 #include "../interfaces/Shader.h"
 #include "../interfaces/ICamera.h"
 
-
 class DisplacementShader :
-	public IShader
+	public IShader, public Singletone<DisplacementShader>
 {
 public:
 	DisplacementShader();
 	~DisplacementShader();
-
-	MAKE_SINGLETONE(DisplacementShader);
 
 public:
 	void Create() override;

@@ -2,9 +2,10 @@
 
 
 #include "../interfaces/Shader.h"
+#include "../../common/interfaces/Singletone.h"
 
 class BatchShader :
-	public IShader
+	public IShader, public Singletone<BatchShader>
 {
 public:
 	BatchShader();
@@ -20,8 +21,6 @@ public:
 public:
 	void Create() override;
 	const Pipeline GetPipelineType() const override;
-	
-	MAKE_SINGLETONE(BatchShader);
 
 public:
 	void SetCamera(DirectX::FXMMATRIX&);
@@ -32,7 +31,7 @@ public:
 	MicrosoftPointer<ID3D11Buffer>				m_objectBuffer;
 };
 
-class TextureBatchShader : public IShader
+class TextureBatchShader : public IShader, public Singletone<TextureBatchShader>
 {
 public:
 	TextureBatchShader();
@@ -48,8 +47,6 @@ public:
 public:
 	void Create() override;
 	const Pipeline GetPipelineType() const override;
-
-	MAKE_SINGLETONE(TextureBatchShader);
 
 
 public:

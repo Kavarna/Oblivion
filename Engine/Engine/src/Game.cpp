@@ -561,7 +561,6 @@ void Game::Render()
 	m_sphere->Render<DisplacementShader>(g_camera.get());
 	m_sponza->Render<TextureLightShader>(g_camera.get());
 
-	EmptyShader::Get()->bind(); // Clear the pipeline
 
 	if (g_isDeveloper)
 	{

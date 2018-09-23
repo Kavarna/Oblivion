@@ -2,18 +2,17 @@
 
 
 #include "../../common/common.h"
+#include "../../common/interfaces/Singletone.h"
 #include "../Helpers/Lights.h"
 #include "../interfaces/Shader.h"
 
 
 
-class TextureLightShader : public IShader
+class TextureLightShader : public IShader, public Singletone<TextureLightShader>
 {
 public:
 	TextureLightShader();
 	~TextureLightShader();
-
-	MAKE_SINGLETONE(TextureLightShader);
 
 public:
 	struct SCameraInfo

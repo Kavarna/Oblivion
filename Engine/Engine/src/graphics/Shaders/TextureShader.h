@@ -1,16 +1,15 @@
 #pragma once
 
 #include "../../common/common.h"
+#include "../../common/interfaces/Singletone.h"
 #include "../Helpers/Lights.h"
 #include "../interfaces/Shader.h"
 
-class TextureShader : public IShader
+class TextureShader : public IShader, public Singletone<TextureShader>
 {
 public:
 	TextureShader();
 	~TextureShader();
-
-	MAKE_SINGLETONE(TextureShader);
 
 public:
 	struct SCameraInfo

@@ -1,7 +1,5 @@
 #include "SimpleTextureShader.h"
 
-DECLARE_SINGLETONE(SimpleTextureShader);
-
 
 SimpleTextureShader::SimpleTextureShader()
 {

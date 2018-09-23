@@ -197,6 +197,7 @@
     <ClInclude Include="src\COM\COMManager.h" />
     <ClInclude Include="src\graphics\Font.h" />
     <ClInclude Include="src\graphics\interfaces\I2DTransforms.h" />
+    <ClInclude Include="src\common\interfaces\Singletone.h" />
     <ClInclude Include="src\graphics\Shaders\SimpleTextureShader.h" />
     <ClInclude Include="src\graphics\Text.h" />
     <ClInclude Include="src\physics\CollisionObject.h" />
@@ -223,7 +224,7 @@
     <ClInclude Include="src\graphics\Camera.h" />
     <ClInclude Include="src\graphics\Direct3D11.h" />
     <ClInclude Include="src\graphics\Helpers\GeometryGenerator.h" />
-    <ClInclude Include="src\graphics\interfaces\AlignedObject.h" />
+    <ClInclude Include="src\common\interfaces\AlignedObject.h" />
     <ClInclude Include="src\graphics\interfaces\GameObject.h" />
     <ClInclude Include="src\graphics\interfaces\ICamera.h" />
     <ClInclude Include="src\graphics\interfaces\Shader.h" />

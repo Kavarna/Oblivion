@@ -1,19 +1,19 @@
 #pragma once
 
 #include "../common/common.h"
+#include "../common/interfaces/Singletone.h"
 
 #include "btBulletCollisionCommon.h"
 #include "btBulletDynamicsCommon.h"
 
-class BulletWorld
+class BulletWorld sealed : public Singletone<BulletWorld>
 {
 	friend class btDebugDraw;
 public:
 	BulletWorld();
 	~BulletWorld();
 
-	MAKE_SINGLETONE(BulletWorld);
-
+	void Create() override;
 	void CreateDefaultWorld();
 
 	void Update(float frameTime);

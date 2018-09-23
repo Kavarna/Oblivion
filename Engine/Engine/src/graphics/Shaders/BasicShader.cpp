@@ -1,8 +1,6 @@
 #include "BasicShader.h"
 #include "../Direct3D11.h"
 
-DECLARE_SINGLETONE(BasicShader);
-
 BasicShader::BasicShader()
 { };
 

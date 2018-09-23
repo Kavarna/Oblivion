@@ -1,8 +1,6 @@
 #include "DisplacementShader.h"
 #include "../Direct3D11.h"
 
-DECLARE_SINGLETONE(DisplacementShader);
-
 
 DisplacementShader::DisplacementShader()
 {

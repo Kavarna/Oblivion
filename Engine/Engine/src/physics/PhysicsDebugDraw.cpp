@@ -1,6 +1,5 @@
 #include "PhysicsDebugDraw.h"
 
-DECLARE_SINGLETONE_WITHOUT_CREATE(btDebugDraw);
 
 btDebugDraw::btDebugDraw()
 {

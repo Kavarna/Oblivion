@@ -5,7 +5,7 @@
 #include "../../common/commontypes.h"
 #include "../Texture.h"
 #include "ICamera.h"
-#include "AlignedObject.h"
+#include "../../common/interfaces/AlignedObject.h"
 #include "Shader.h"
 #include "GraphicsObject.h"
 

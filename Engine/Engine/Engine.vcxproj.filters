@@ -62,7 +62,6 @@
     <ClInclude Include="src\imgui\stb_truetype.h" />
     <ClInclude Include="src\graphics\interfaces\Shader.h" />
     <ClInclude Include="src\graphics\interfaces\GameObject.h" />
-    <ClInclude Include="src\graphics\interfaces\AlignedObject.h" />
     <ClInclude Include="src\graphics\Camera.h" />
     <ClInclude Include="src\graphics\Model.h" />
     <ClInclude Include="src\graphics\Helpers\ShaderHelper.h" />
@@ -96,6 +95,8 @@
     <ClInclude Include="src\graphics\Font.h" />
     <ClInclude Include="src\graphics\Text.h" />
     <ClInclude Include="src\graphics\Shaders\SimpleTextureShader.h" />
+    <ClInclude Include="src\common\interfaces\Singletone.h" />
+    <ClInclude Include="src\common\interfaces\AlignedObject.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\BasicVertexShader.hlsl" />

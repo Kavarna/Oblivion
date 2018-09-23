@@ -2,8 +2,9 @@
 
 
 #include "../interfaces/Shader.h"
+#include "../../common/interfaces/Singletone.h"
 
-class BasicShader : public IShader
+class BasicShader : public IShader, public Singletone<BasicShader>
 {
 public:
 	BasicShader();
@@ -23,8 +24,6 @@ public:
 	const Pipeline GetPipelineType() const override;
 
 	void SetCameraInformations(SCameraInfo const& info) const;
-
-	MAKE_SINGLETONE(BasicShader);
 
 
 private:

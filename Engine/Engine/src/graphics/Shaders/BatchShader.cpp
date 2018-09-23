@@ -1,9 +1,6 @@
 #include "BatchShader.h"
 #include "../Direct3D11.h"
 
-DECLARE_SINGLETONE(BatchShader);
-DECLARE_SINGLETONE(TextureBatchShader);
-
 
 BatchShader::BatchShader()
 {

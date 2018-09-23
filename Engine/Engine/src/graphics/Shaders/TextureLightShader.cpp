@@ -1,8 +1,6 @@
 #include "TextureLightShader.h"
 #include "../Direct3D11.h"
 
-DECLARE_SINGLETONE(TextureLightShader);
-
 TextureLightShader::TextureLightShader()
 { };
 

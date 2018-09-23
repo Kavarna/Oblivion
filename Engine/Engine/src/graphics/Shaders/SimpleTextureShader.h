@@ -1,18 +1,18 @@
 #pragma once
 
 #include "../../common/common.h"
+#include "../../common/interfaces/Singletone.h"
 #include "../Helpers/Lights.h"
 #include "../interfaces/Shader.h"
 
 
+
 /// Used for 2d rendering without instances (e.g. text)
-class SimpleTextureShader : public IShader
+class SimpleTextureShader : public IShader, public Singletone<SimpleTextureShader>
 {
 public:
 	SimpleTextureShader();
 	~SimpleTextureShader();
-
-	MAKE_SINGLETONE(SimpleTextureShader);
 
 public:
 	void Create() override;

@@ -1,15 +1,14 @@
 #pragma once
 
 #include "../graphics/Helpers/BatchRenderer.h"
+#include "../common/interfaces/Singletone.h"
 #include "World.h"
 
-class btDebugDraw : public btIDebugDraw
+class btDebugDraw : public btIDebugDraw, public Singletone<btDebugDraw>
 {
 public:
 	btDebugDraw();
 	~btDebugDraw();
-
-	MAKE_SINGLETONE(btDebugDraw);
 
 	void Render();
 

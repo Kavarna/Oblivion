@@ -1,7 +1,5 @@
 #include "World.h"
 
-DECLARE_SINGLETONE_WITHOUT_CREATE(BulletWorld)
-
 BulletWorld::BulletWorld()
 {
 }
@@ -13,6 +11,12 @@ BulletWorld::~BulletWorld()
 	delete m_constraintSolver;
 	delete m_broadphase;
 	delete m_collisionDispatcher;
+}
+
+void BulletWorld::Create()
+{
+	DX::OutputVDebugString(L"Creating default bullet world\n");
+	CreateDefaultWorld();
 }
 
 void BulletWorld::CreateDefaultWorld()

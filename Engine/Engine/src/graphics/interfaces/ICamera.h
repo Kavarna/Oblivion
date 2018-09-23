@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AlignedObject.h"
+#include "../../common/interfaces/AlignedObject.h"
 
 
 class ICamera

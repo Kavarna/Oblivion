@@ -85,10 +85,5 @@ public:
 			m_d3d11Context->CSSetShader(m_computeShader.Get(), nullptr, 0);
 		}
 	}
-	
-	static IShader*							Get()
-	{
-		return nullptr;
-	}
 
 };
