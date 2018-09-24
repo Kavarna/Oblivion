@@ -34,25 +34,25 @@ public:
 
 			void							ReadPhysicsFile(const std::string& filename);
 			void							SavePhysics();
-	inline	void							Activate(int instanceID)
+	inline	void							Activate(int instanceID);
+	inline	void							Deactivate(int instanceID);
+	inline	void							Impulse(float x, float y, float z, uint32_t instanceID = 0)
 	{
-		m_rigidBodies[instanceID]->m_body->activate(true);
-	};
-
-	inline	void							Identity(int instanceID) override
-	{
-		Activate(instanceID);
-		m_rigidBodies[instanceID]->m_motionState->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1)));
+		if (!isIDinstance(instanceID) || m_collisionType == ECollisionObjectType::eStatic)
+			return;
+		auto body = m_rigidBodies[instanceID]->m_body;
+		body->applyImpulse(btVector3(x, y, z), btVector3(0, 0, 0));//body->getCenterOfMassPosition());
 	}
-	inline	void							Translate(float x, float y, float z, int instanceID) override 
-	{
-		Activate(instanceID);
-		m_rigidBodies[instanceID]->m_body->translate(btVector3(x, y, z));
-	}
+	inline	void							Identity(int instanceID) override;
+	inline	void							Translate(float x, float y, float z, int instanceID) override;
 	inline	void							RotateX(float theta, int instanceID = 0) override;
 	inline	void							RotateY(float theta, int instanceID = 0) override;
 	inline	void							RotateZ(float theta, int instanceID = 0) override;
 	inline	void							Scale(float Sx, float Sy, float Sz, int instanceID = 0) override;
+	inline	void							GlobalScale(float Sx, float Sy, float Sz);
+
+private:
+	inline	bool							isIDinstance(uint32_t ID);
 
 private:
 	struct RigidBodyInfo
@@ -60,6 +60,7 @@ private:
 		float				m_mass;
 		btMotionState*		m_motionState		= nullptr;
 		btRigidBody*		m_body				= nullptr;
+		bool				m_hasDifferentShape	= false;
 
 		RigidBodyInfo() = default;
 		RigidBodyInfo(float mass, btMotionState * state, btRigidBody * bd) :
@@ -78,6 +79,7 @@ private:
 	ECollisionObjectType						m_collisionType;
 	btCollisionShape*							m_collisionShape				= nullptr;
 	EShapeType									m_shapeType						= EShapeType::eDontCare;
+	EDefaultObject								m_defaultShape;
 	std::map<uint32_t, RigidBodyInfo*>			m_rigidBodies;
 	boost::property_tree::ptree					m_properties;
 	std::string									m_physicsFile;

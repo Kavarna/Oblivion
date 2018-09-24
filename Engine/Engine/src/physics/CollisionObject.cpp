@@ -41,6 +41,7 @@ void CollisionObject::Create(EDefaultObject object)
 {
 	Model::Create(object);
 	m_shapeType = EShapeType::eDefaultMesh;
+	m_defaultShape = object;
 	switch (object)
 	{
 	case EDefaultObject::Box:
@@ -69,6 +70,8 @@ void CollisionObject::Destroy()
 {
 	for (auto it = m_rigidBodies.begin(); it != m_rigidBodies.end(); ++it)
 	{
+		if (it->second->m_hasDifferentShape)
+			delete it->second->m_body->getCollisionShape();
 		delete it->second->m_motionState;
 		delete it->second->m_body;
 		delete it->second;
@@ -132,7 +135,17 @@ void CollisionObject::Update(float frameTime)
 		btTransform trans = it->second->m_body->getWorldTransform();
 		float m[16];
 		trans.getOpenGLMatrix(m);
-		m_objectWorld[it->first] = DirectX::XMMATRIX(m);
+		btVector3 globalScaling = m_collisionShape->getLocalScaling();
+		if (it->second->m_hasDifferentShape)
+		{
+			btVector3 localScaling = it->second->m_body->getCollisionShape()->getLocalScaling();
+			m_objectWorld[it->first] =
+				DirectX::XMMatrixScaling(globalScaling.x(), globalScaling.y(), globalScaling.z()) *
+				DirectX::XMMatrixScaling(localScaling.x(), localScaling.y(), localScaling.z()) *
+				DirectX::XMMATRIX(m);
+		}
+		else
+			m_objectWorld[it->first] = DirectX::XMMATRIX(m) * DirectX::XMMatrixScaling(globalScaling.x(), globalScaling.y(), globalScaling.z());
 	}
 	Model::Update(frameTime);
 }
@@ -189,12 +202,47 @@ void CollisionObject::SavePhysics()
 	boost::property_tree::write_json(m_physicsFile, m_properties);
 }
 
+inline void CollisionObject::Activate(int instanceID)
+{
+	if (!isIDinstance(instanceID))
+		return;
+	m_rigidBodies[instanceID]->m_body->activate(true);
+}
+
+inline void CollisionObject::Deactivate(int instanceID)
+{
+	if (!isIDinstance(instanceID))
+		return;
+	m_rigidBodies[instanceID]->m_body->activate(false);
+}
+
+inline void CollisionObject::Identity(int instanceID)
+{
+	if (!isIDinstance(instanceID))
+		return;
+	m_rigidBodies[instanceID]->m_body->activate(true);
+	m_rigidBodies[instanceID]->m_motionState->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1)));
+	m_rigidBodies[instanceID]->m_body->activate(false);
+}
+
+inline void CollisionObject::Translate(float x, float y, float z, int instanceID)
+{
+	if (!isIDinstance(instanceID))
+		return;
+	m_rigidBodies[instanceID]->m_body->activate(true);
+	m_rigidBodies[instanceID]->m_body->translate(btVector3(x, y, z));
+	m_rigidBodies[instanceID]->m_body->activate(false);
+}
+
 inline void CollisionObject::RotateX(float theta, int instanceID)
 {
+	if (!isIDinstance(instanceID))
+		return;
 	if (m_collisionType == ECollisionObjectType::eDynamic)
 	{
-		Activate(instanceID);
+		m_rigidBodies[instanceID]->m_body->activate(true);
 		m_rigidBodies[instanceID]->m_body->setAngularVelocity(btVector3(theta, 0, 0));
+		m_rigidBodies[instanceID]->m_body->activate(false);
 	}
 	else
 	{
@@ -211,10 +259,13 @@ inline void CollisionObject::RotateX(float theta, int instanceID)
 
 inline void CollisionObject::RotateY(float theta, int instanceID)
 {
+	if (!isIDinstance(instanceID))
+		return;
 	if (m_collisionType == ECollisionObjectType::eDynamic)
 	{
-		Activate(instanceID);
+		m_rigidBodies[instanceID]->m_body->activate(true);
 		m_rigidBodies[instanceID]->m_body->setAngularVelocity(btVector3(0, theta, 0));
+		m_rigidBodies[instanceID]->m_body->activate(false);
 	}
 	else
 	{
@@ -231,10 +282,13 @@ inline void CollisionObject::RotateY(float theta, int instanceID)
 
 inline void CollisionObject::RotateZ(float theta, int instanceID)
 {
+	if (!isIDinstance(instanceID))
+		return;
 	if (m_collisionType == ECollisionObjectType::eDynamic)
 	{
-		Activate(instanceID);
+		m_rigidBodies[instanceID]->m_body->activate(true);
 		m_rigidBodies[instanceID]->m_body->setAngularVelocity(btVector3(0, 0, theta));
+		m_rigidBodies[instanceID]->m_body->activate(false);
 	}
 	else
 	{
@@ -251,19 +305,89 @@ inline void CollisionObject::RotateZ(float theta, int instanceID)
 
 inline void CollisionObject::Scale(float Sx, float Sy, float Sz, int instanceID)
 {
-	THROW_ERROR("Scaling not available for physics-based objects");
-	/*if (m_rigidBodies[instanceID]->m_collisionShape)
+	if (!isIDinstance(instanceID))
+		return;
+	auto scaleDefaultMesh = [&](float x, float y, float z)
 	{
-		m_collisionShape->setLocalScaling(btVector3(Sx, Sy, Sz));
-	}
-	else
-	{
-		for (auto it = m_rigidBodies.begin(); it != m_rigidBodies.end(); ++it)
+		if (m_rigidBodies[instanceID]->m_hasDifferentShape)
 		{
-			RigidBodyInfo* object = it->second;
-			
+			btVector3 localScaling = m_rigidBodies[instanceID]->m_body->getCollisionShape()->getLocalScaling();
+			x *= localScaling.x();
+			y *= localScaling.y();
+			z *= localScaling.z();
+			delete m_rigidBodies[instanceID]->m_body->getCollisionShape();
 		}
-	}*/
+		btCollisionShape *shape = nullptr;
+		switch (m_defaultShape)
+		{
+		case EDefaultObject::Box:
+			shape = new btBoxShape(btVector3(x, y, z));
+			break;
+		case EDefaultObject::Sphere:
+		case EDefaultObject::Geosphere:
+			shape = new btSphereShape(1.0f);
+			shape->setLocalScaling(btVector3(x, y, z));
+			break;
+		case EDefaultObject::Cylinder:
+			shape = new btCylinderShape(btVector3(0.5f, 1.5f, 0.5f));
+			shape->setLocalScaling(btVector3(x, y, z));
+			break;
+		case EDefaultObject::Grid:
+			shape = new btBoxShape(btVector3(50.0f, 0.0f, 50.0f));
+			shape->setLocalScaling(btVector3(x, y, z));
+			break;
+		default:
+			break;
+		}
+		m_rigidBodies[instanceID]->m_hasDifferentShape = true;
+		m_rigidBodies[instanceID]->m_body->setCollisionShape(shape);
+	};
+	auto scaleHullMesh = [&](float x, float y, float z)
+	{
+		if (m_rigidBodies[instanceID]->m_hasDifferentShape)
+		{
+			btVector3 localScaling = m_rigidBodies[instanceID]->m_body->getCollisionShape()->getLocalScaling();
+			x *= localScaling.x();
+			y *= localScaling.y();
+			z *= localScaling.z();
+			delete m_rigidBodies[instanceID]->m_body->getCollisionShape();
+		}
+		btCollisionShape * shape;
+		//if (x == y && y == z)
+		//shape = new btUniformScalingShape((btConvexShape*)m_collisionShape, btScalar(x));
+		//else
+		shape = CreateHullCollisionShape();
+		shape->setLocalScaling(btVector3(x, y, z));
+		m_rigidBodies[instanceID]->m_hasDifferentShape = true;
+		m_rigidBodies[instanceID]->m_body->setCollisionShape(shape);
+	};
+	switch (m_shapeType)
+	{
+	case EShapeType::eGImpactMesh:
+		break;
+	case EShapeType::eStaticMesh:
+		break;
+	case EShapeType::eHullMesh:
+		scaleHullMesh(Sx, Sy, Sz);
+		break;
+	case EShapeType::eDefaultMesh:
+		scaleDefaultMesh(Sx, Sy, Sz);
+		break;
+	case EShapeType::eDontCare:
+	default:
+		THROW_ERROR("Scaling not possible because the collision shape hasn't been initialized.");
+		break;
+	}
+}
+
+inline void CollisionObject::GlobalScale(float Sx, float Sy, float Sz)
+{
+	m_collisionShape->setLocalScaling(btVector3(Sx, Sy, Sz));
+}
+
+inline bool CollisionObject::isIDinstance(uint32_t ID)
+{
+	return m_rigidBodies.find(ID) != m_rigidBodies.end();
 }
 
 btVector3 CollisionObject::CalculateLocalIntertia(float mass)

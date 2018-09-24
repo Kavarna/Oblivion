@@ -26,7 +26,7 @@ float3 NormalSampleToWorldSpace(float3 Sample,
 
 	float3 N = UnitNormalW;
 	float3 T = normalize(TangentW - dot(TangentW, N) * N);
-	float3 B = cross(N, T);
+	float3 B = BinormalW;
 
 	float3x3 TBN = float3x3(T, B, N);
 

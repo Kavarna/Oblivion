@@ -383,13 +383,14 @@ void Model::DrawIndexedInstanced(ICamera * cam) const
 	if (renderInstances == 0)
 		return;
 	
-	for (uint32_t i = 0; i < m_drawnInstances.size(); ++i)
+	/// TODO: Fix this. Make it render a mesh when it's visible at least one
+	//for (uint32_t i = 0; i < m_drawnInstances.size(); ++i) /// Might be useful another time
 	{
 		for (auto & mesh : m_meshes)
 		{
 			if (m_materials[mesh.m_materialIndex].opacity != 1.0f)
 				continue;
-			if (shouldRenderMesh(mesh, m_drawnInstances[i]))
+			//if (shouldRenderMesh(mesh, m_drawnInstances[i]))
 			{
 				BindMaterial(m_materials[mesh.m_materialIndex], m_bindMaterialToShader);
 				m_d3d11Context->DrawIndexedInstanced((UINT)(mesh.m_indexRange.end - mesh.m_indexRange.begin),
@@ -401,14 +402,14 @@ void Model::DrawIndexedInstanced(ICamera * cam) const
 		}
 	}
 	auto renderer = Direct3D11::Get();
-	for (uint32_t i = 0; i < m_drawnInstances.size(); ++i)
+	//for (uint32_t i = 0; i < m_drawnInstances.size(); ++i) /// Might be useful another time
 	{
 		for (auto & mesh : m_meshes)
 		{
 			float opacity = m_materials[mesh.m_materialIndex].opacity;
 			if (opacity == 1.0f)
 				continue;
-			if (shouldRenderMesh(mesh, m_drawnInstances[i]))
+			//if (shouldRenderMesh(mesh, m_drawnInstances[i]))
 			{
 				renderer->OMTransparency(opacity);
 				BindMaterial(m_materials[mesh.m_materialIndex], m_bindMaterialToShader);
@@ -728,7 +729,7 @@ void Model::Create(EDefaultObject object)
 	}
 	else if (object == EDefaultObject::Grid)
 	{
-		g.CreateGrid(100.0f, 100.0f, 7, 7, data);
+		g.CreateGrid(100.0f, 100.0f, 2, 2, data);
 		m_boundingBox = DirectX::BoundingBox(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(50.0f, 0.01f, 50.0f));
 	}
 	else if (object == EDefaultObject::Sphere)

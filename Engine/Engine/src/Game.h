@@ -26,7 +26,7 @@ public:
 
 public:
 	inline float GetNearZ() const { return 1.0f; };
-	inline float GetFarZ() const { return 10000.0f; };
+	inline float GetFarZ() const { return 1000.0f; };
 
 public:
 	void OnSize(uint32_t width, uint32_t height);
@@ -65,10 +65,10 @@ private:
 	bool												m_selectObjects = false;
 
 private:
-	//std::unique_ptr<CollisionObject>					m_ground;
+	std::unique_ptr<CollisionObject>					m_ground;
 	std::unique_ptr<CollisionObject>					m_sphere;
-	//std::unique_ptr<CollisionObject>					m_tree;
-	std::unique_ptr<CollisionObject>					m_sponza;
+	std::unique_ptr<CollisionObject>					m_tree;
+	//std::unique_ptr<CollisionObject>					m_sponza;
 
 	std::vector<Model*>									m_models;
 	Model*												m_selectedObject;

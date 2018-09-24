@@ -173,25 +173,30 @@ void Game::Init2D()
 
 void Game::Init3D()
 {
-	//m_ground = std::make_unique<CollisionObject>();
-	//m_ground->Create(EDefaultObject::Grid);
-	//m_ground->AddInstance();
+	m_ground = std::make_unique<CollisionObject>();
+	m_ground->Create(EDefaultObject::Grid);
+	m_ground->AddInstance();
+	m_ground->Scale(5.0f, 1.0f, 5.0f);
 
 	m_sphere = std::make_unique<CollisionObject>();
 	m_sphere->Create(EDefaultObject::Sphere);
 
-	//m_tree = std::make_unique<CollisionObject>();
-	//m_tree->Create("Resources/LowPolyTree");
-	//m_tree->AddInstance();
+	m_tree = std::make_unique<CollisionObject>();
+	m_tree->Create("Resources/LowPolyTree");
+	m_tree->AddInstance();
 	
-	m_sponza = std::make_unique<CollisionObject>();
-	m_sponza->Create("Resources/Sponza");
-	m_sponza->AddInstance();
+	uint32_t instance = m_tree->AddInstance();
+	m_tree->Translate(25.0f, 0.0f, 3.0f, instance);
+	m_tree->Scale(0.5f, 0.5f, 0.5f, instance);
+	
+	//m_sponza = std::make_unique<CollisionObject>();
+	//m_sponza->Create("Resources/Sponza");
+	//m_sponza->AddInstance();
 
-	//m_models.push_back(m_ground.get());
+	m_models.push_back(m_ground.get());
 	m_models.push_back(m_sphere.get());
-	//m_models.push_back(m_tree.get());
-	m_models.push_back(m_sponza.get());
+	m_models.push_back(m_tree.get());
+	//m_models.push_back(m_sponza.get());
 }
 
 void Game::InitSizeDependent()
@@ -318,10 +323,17 @@ void Game::Update()
 	if (mouse.leftButton && !leftClickPressed)
 	{
 		leftClickPressed = true;
-		uint32_t instanceID = m_sphere->AddInstance();
-		auto camPos = g_camera->GetPosition();
-		m_sphere->Translate(camPos.x, camPos.y, camPos.z, instanceID);
-
+		if (!m_showDeveloperConsole)
+		{
+			uint32_t instanceID = m_sphere->AddInstance();
+			auto camPos = g_camera->GetPosition();
+			m_sphere->Translate(camPos.x, camPos.y, camPos.z, instanceID);
+			auto camDir = g_camera->GetDirection();
+			const float speed = 25.0f;
+			m_sphere->Impulse(camDir.x * speed, camDir.y * speed, camDir.z * speed, instanceID);
+			float scale = DX::randomNumber(0.3f, 3.0f);
+			m_sphere->Scale(scale, scale, scale, instanceID);
+		}
 	}
 	else if (!mouse.leftButton)
 		leftClickPressed = false;
@@ -559,7 +571,9 @@ void Game::Render()
 		model->Render<DisplacementShader>(g_camera.get());
 	}*/
 	m_sphere->Render<DisplacementShader>(g_camera.get());
-	m_sponza->Render<TextureLightShader>(g_camera.get());
+	//m_sponza->Render<TextureLightShader>(g_camera.get());
+	m_ground->Render<DisplacementShader>(g_camera.get());
+	m_tree->Render<TextureLightShader>(g_camera.get());
 
 
 	if (g_isDeveloper)
