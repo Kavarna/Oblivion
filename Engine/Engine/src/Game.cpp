@@ -193,8 +193,8 @@ void Game::Init3D()
 	m_cup = std::make_unique<CollisionObject>();
 	m_cup->Create("Resources/Cup");
 	m_cup->AddInstance(DirectX::XMMatrixTranslation(0.0f, 30.f, 15.0f));
-	//m_cup->Translate(0.0f, 30.0f, 0.0f, 0);
-	//m_cup->GlobalScale(3.0f, 3.0f, 3.0f);
+	m_cup->Translate(0.0f, 30.0f, 0.0f, 0);
+	m_cup->GlobalScale(3.0f, 3.0f, 3.0f);
 	
 	//m_sponza = std::make_unique<CollisionObject>();
 	//m_sponza->Create("Resources/Sponza");
@@ -344,13 +344,13 @@ void Game::Update()
 		leftClickPressed = true;
 		if (!m_showDeveloperConsole)
 		{
-			uint32_t instanceID = m_sphere->AddInstance();
+			float scale = DX::randomNumber(0.3f, 3.0f);
+			uint32_t instanceID = m_sphere->AddInstance(scale);
 			auto camPos = g_camera->GetPosition();
 			m_sphere->Translate(camPos.x, camPos.y, camPos.z, instanceID);
 			auto camDir = g_camera->GetDirection();
 			const float speed = 25.0f;
 			m_sphere->Impulse(camDir.x * speed, camDir.y * speed, camDir.z * speed, instanceID);
-			float scale = DX::randomNumber(0.3f, 3.0f);
 			m_sphere->Scale(scale, scale, scale, instanceID);
 		}
 	}

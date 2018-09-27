@@ -22,6 +22,9 @@ void CollisionObject::Create(std::string const & filename)
 		ReadPhysicsFile(filename + ".physics");
 		switch (m_shapeType)
 		{
+		case EShapeType::eGImpactMesh:
+			m_collisionShape = CreateGImpactCollisionShape();
+			break;
 		case EShapeType::eStaticMesh:
 			m_collisionShape = CreateStaticCollisionShape();
 			break;
@@ -30,6 +33,7 @@ void CollisionObject::Create(std::string const & filename)
 			m_collisionShape = CreateHullCollisionShape();
 			break;
 		default:
+			THROW_ERROR("Unavailable mesh shape");
 			break;
 		}
 	}
@@ -90,19 +94,7 @@ void CollisionObject::Destroy()
 
 uint32_t CollisionObject::AddInstance(DirectX::FXMMATRIX const & mat)
 {
-	btMotionState* motionState = new btDefaultMotionState();
-	motionState->setWorldTransform(btTransform(Math::Matrix3x3FromXMMatrix(mat), Math::GetTranslationFromMatrix(mat)));
-	btRigidBody::btRigidBodyConstructionInfo bodyCI(m_mass, motionState, m_collisionShape, CalculateLocalIntertia(m_mass));
-	btRigidBody* body = new btRigidBody(bodyCI);
-
-	uint32_t instanceID = IGameObject::AddInstance(mat);
-
-	m_rigidBodies[instanceID] = new RigidBodyInfo(m_mass, motionState, body);
-	InitBodyWithProperties(body);
-
-	BulletWorld::Get()->AddRigidBody(body);
-
-	return instanceID;
+	return AddInstance(m_mass, mat);
 }
 
 uint32_t CollisionObject::AddInstance(uint32_t num)
@@ -124,6 +116,23 @@ uint32_t CollisionObject::AddInstance(uint32_t num)
 	}
 
 	return IGameObject::AddInstance(num);
+}
+
+uint32_t CollisionObject::AddInstance(float mass, DirectX::FXMMATRIX const & mat)
+{
+	btMotionState* motionState = new btDefaultMotionState();
+	motionState->setWorldTransform(btTransform(Math::Matrix3x3FromXMMatrix(mat), Math::GetTranslationFromMatrix(mat)));
+	btRigidBody::btRigidBodyConstructionInfo bodyCI(mass, motionState, m_collisionShape, CalculateLocalIntertia(mass));
+	btRigidBody* body = new btRigidBody(bodyCI);
+
+	uint32_t instanceID = IGameObject::AddInstance(mat);
+
+	m_rigidBodies[instanceID] = new RigidBodyInfo(mass, motionState, body);
+	InitBodyWithProperties(body);
+
+	BulletWorld::Get()->AddRigidBody(body);
+
+	return instanceID;
 }
 
 void CollisionObject::Update(float frameTime)
@@ -188,6 +197,8 @@ inline void CollisionObject::ReadPhysicsFile(const std::string & filename)
 		m_shapeType = EShapeType::eHullMesh;
 	else if (to_lower_copy(collisionShape) == "estaticmesh" || to_lower_copy(collisionShape) == "etrianglemesh")
 		m_shapeType = EShapeType::eStaticMesh;
+	else if (to_lower_copy(collisionShape) == "egimpactmesh")
+		m_shapeType = EShapeType::eGImpactMesh;
 	else if (to_lower_copy(collisionShape) == "edefaultmesh")
 		m_shapeType = EShapeType::eHullMesh;
 
@@ -525,7 +536,8 @@ btCollisionShape * CollisionObject::CreateGImpactCollisionShape()
 	btCollisionShape * shape = nullptr;
 	if (m_compound)
 	{
-		btCompoundShape * compoundShape = new btCompoundShape(true, (int)m_meshes.size());
+		// Should be using btGImpactCompundShape(?) instead?
+		btCompoundShape * compoundShape = new btCompoundShape(false);
 		for (uint32_t i = 0; i < m_meshes.size(); ++i)
 		{
 			btTriangleMesh * mesh = new btTriangleMesh(true, false);
@@ -538,7 +550,9 @@ btCollisionShape * CollisionObject::CreateGImpactCollisionShape()
 				mesh->addTriangle(v0, v1, v2);
 			}
 			m_usedMeshes.push_back(mesh);
-			compoundShape->addChildShape(btTransform(btQuaternion(0, 0, 0, 1)), new btGImpactMeshShape(mesh));
+			auto childShape = new btGImpactMeshShape(mesh);
+			childShape->updateBound();
+			compoundShape->addChildShape(btTransform(btQuaternion(0, 0, 0, 1)), childShape);
 		}
 		shape = compoundShape;
 	}
@@ -559,6 +573,7 @@ btCollisionShape * CollisionObject::CreateGImpactCollisionShape()
 		m_usedMeshes.push_back(mesh);
 		shape = new btGImpactMeshShape(mesh);
 		//btVector3 aabbMin, aabbMax;
+		((btGImpactMeshShape*)shape)->setLocalScaling(btVector3(1, 1, 1));
 		((btGImpactMeshShape*)shape)->updateBound();
 	}
 	return shape;

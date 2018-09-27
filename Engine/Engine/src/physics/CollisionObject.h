@@ -14,6 +14,7 @@ enum class ECollisionObjectType
 enum class EShapeType
 {
 	eStaticMesh, // Aka eTriangleMesh
+	eGImpactMesh,
 	eHullMesh, eDefaultMesh, eDontCare
 };
 
@@ -30,6 +31,7 @@ public:
 
 			uint32_t						AddInstance(DirectX::FXMMATRIX const& mat = DirectX::XMMatrixIdentity()) override;
 			uint32_t						AddInstance(uint32_t num) override;
+			uint32_t						AddInstance(float mass, DirectX::FXMMATRIX const& mat = DirectX::XMMatrixIdentity());
 			
 			void							Update(float frameTime) override;
 
