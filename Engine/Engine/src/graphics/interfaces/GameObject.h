@@ -100,6 +100,9 @@ protected:
 	static			CommonTypes::Range				AddVertices(std::vector<Oblivion::SVertex> & vertices);
 	static			CommonTypes::Range				AddVertices(std::vector<Oblivion::SVertex> & vertices, int start, int end);
 	static			void							RemoveVertices(CommonTypes::Range const&);
+	static			CommonTypes::Range				AddIndices(std::vector<uint32_t> & indices);
+	static			CommonTypes::Range				AddIndices(std::vector<uint32_t> & indices, int start, int end);
+	static			void							RemoveIndices(CommonTypes::Range const&);
 
 protected:
 					void							BindMaterial(Rendering::material_t const& mat, int shader) const;
@@ -110,6 +113,8 @@ public:
 protected:
 	static	std::vector<Oblivion::SVertex>			m_staticVertices;
 	static	MicrosoftPointer<ID3D11Buffer>			m_staticVerticesBuffer;
+	static	std::vector<uint32_t>					m_staticIndices;
+	static	MicrosoftPointer<ID3D11Buffer>			m_staticIndicesBuffer;
 
 protected:
 			MicrosoftPointer<ID3D11Buffer>			m_instanceBuffer;

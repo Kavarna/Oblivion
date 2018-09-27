@@ -236,7 +236,6 @@ void Game::InitSizeDependent()
 	g_screen->m_nearZ = nearZ;
 	g_screen->m_farZ = farZ;
 	g_screen->Construct();
-
 }
 
 void Game::Run()

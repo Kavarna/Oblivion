@@ -34,8 +34,7 @@ private:
 	float								m_height;
 
 
-	MicrosoftPointer<ID3D11Buffer>		m_indexBuffer;
 	CommonTypes::Range					m_vertexRange;
-	std::vector<uint32_t>				m_indices;
+	CommonTypes::Range					m_indexRange;
 	Rendering::SMaterial				m_material;
 };

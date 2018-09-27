@@ -8,13 +8,9 @@ Square::Square()
 	GeometryGenerator::MeshData data;
 	gg.CreateFullscreenQuad(data);
 
-	m_indices = std::move(data.Indices);
 
 	m_vertexRange = AddVertices(data.Vertices);
-
-	ShaderHelper::CreateBuffer(m_d3d11Device.Get(), &m_indexBuffer,
-		D3D11_USAGE::D3D11_USAGE_IMMUTABLE, D3D11_BIND_FLAG::D3D11_BIND_INDEX_BUFFER,
-		sizeof(uint32_t) * m_indices.size(), 0, m_indices.data());
+	m_indexRange = AddIndices(data.Indices);
 }
 
 
@@ -51,7 +47,7 @@ void Square::Destroy()
 
 uint32_t Square::GetIndexCount(int subObject) const
 {
-	return (uint32_t)m_indices.size();
+	return (uint32_t)m_indexRange.end - m_indexRange.begin;
 }
 
 uint32_t Square::GetVertexCount(int subObject) const
@@ -101,7 +97,7 @@ void Square::DrawIndexedInstanced(ICamera * cam) const
 
 	BindMaterial(m_material, m_bindMaterialToShader);
 	m_d3d11Context->DrawIndexedInstanced(GetIndexCount(),
-		renderInstances, 0, m_vertexRange.begin, 0);
+		renderInstances, m_indexRange.begin, m_vertexRange.begin, 0);
 	if (g_isDeveloper)
 		g_drawCalls++;
 }
@@ -110,7 +106,6 @@ bool Square::PrepareIA(const Pipeline & p) const
 {
 	if (p == Pipeline::PipelineTexture)
 	{
-		m_d3d11Context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
 		m_d3d11Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		return true;
 	}

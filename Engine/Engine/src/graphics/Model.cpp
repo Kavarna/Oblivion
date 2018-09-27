@@ -57,7 +57,6 @@ void Model::Update(float frameTime)
 
 void Model::Destroy()
 {
-	m_indexBuffer.Reset();
 	m_materialBuffer.Reset();
 }
 
@@ -454,12 +453,10 @@ bool Model::PrepareIA(const Pipeline & p) const
 {
 	if (p == Pipeline::PipelineDisplacementTextureLight)
 	{
-		m_d3d11Context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
 		m_d3d11Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 	}
 	else
 	{
-		m_d3d11Context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
 		m_d3d11Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	}
 	return true;
@@ -655,16 +652,18 @@ void Model::Create(std::string const& filename)
 		fin >> numIndices;
 		std::getline(fin, check);
 
-		int startIndices = (int)m_indices.size();
-		m_indices.reserve(m_indices.size() + numIndices);
+		//int startIndices = (int)m_indices.size();
+		//m_indices.reserve(m_indices.size() + numIndices);
+		std::vector<uint32_t> indices;
+		indices.reserve(numIndices);
 		for (int i = 0; i < numIndices; ++i)
 		{
 			int index;
 			fin >> index;
-			m_indices.push_back(index);
+			indices.push_back(index);
 		}
 
-		m_meshes[i].m_indexRange = { (uint32_t)startIndices, (uint32_t)m_indices.size() };
+		m_meshes[i].m_indexRange = AddIndices(indices);
 
 
 		ReadTillEnd(fin);
@@ -685,10 +684,6 @@ void Model::Create(std::string const& filename)
 	ReadMaterials(filename + ".material");
 
 #undef INVALID
-
-	ShaderHelper::CreateBuffer(m_d3d11Device.Get(), &m_indexBuffer,
-		D3D11_USAGE::D3D11_USAGE_IMMUTABLE, D3D11_BIND_FLAG::D3D11_BIND_INDEX_BUFFER,
-		sizeof(decltype(m_indices[0])) * m_indices.size(), 0, &m_indices[0]);
 
 	DirectX::XMFLOAT3 center, offset;
 	center = DirectX::XMFLOAT3(
@@ -738,8 +733,9 @@ void Model::Create(EDefaultObject object)
 		m_boundingBox = DirectX::BoundingBox(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f));
 	}
 	std::vector<Oblivion::SVertex> vertices;
+	std::vector<uint32_t> indices;
 	vertices = std::move(data.Vertices);
-	m_indices = std::move(data.Indices);
+	indices = std::move(data.Indices);
 	m_meshes.emplace_back();
 	try
 	{
@@ -781,10 +777,6 @@ void Model::Create(EDefaultObject object)
 		THROW_ERROR("Can't open texture: \"Resources/stones.jpg\"");
 	}
 
-	ShaderHelper::CreateBuffer(m_d3d11Device.Get(), &m_indexBuffer,
-		D3D11_USAGE::D3D11_USAGE_IMMUTABLE, D3D11_BIND_FLAG::D3D11_BIND_INDEX_BUFFER,
-		sizeof(decltype(m_indices[0])) * m_indices.size(), 0, &m_indices[0]);
-
 	m_meshes.back().m_vertexRange = AddVertices(vertices);
-	m_meshes.back().m_indexRange = { 0, (uint32_t)m_indices.size() };
+	m_meshes.back().m_indexRange = AddIndices(indices);
 }

@@ -458,9 +458,9 @@ btCollisionShape * CollisionObject::CreateStaticCollisionShape()
 			for (uint32_t j = m_meshes[i].m_indexRange.begin; j < m_meshes[i].m_indexRange.end; j += 3)
 			{
 				btVector3 v0, v1, v2;
-				v0 = getVertexID(i, m_indices[j]);
-				v1 = getVertexID(i, m_indices[j + 1]);
-				v2 = getVertexID(i, m_indices[j + 2]);
+				v0 = getVertexID(i, m_staticIndices[j]);
+				v1 = getVertexID(i, m_staticIndices[j + 1]);
+				v2 = getVertexID(i, m_staticIndices[j + 2]);
 				mesh->addTriangle(v0, v1, v2);
 			}
 			m_usedMeshes.push_back(mesh);
@@ -476,9 +476,9 @@ btCollisionShape * CollisionObject::CreateStaticCollisionShape()
 			for (uint32_t j = m_meshes[i].m_indexRange.begin; j < m_meshes[i].m_indexRange.end; j += 3)
 			{
 				btVector3 v0, v1, v2;
-				v0 = getVertexID(i, m_indices[j]);
-				v1 = getVertexID(i, m_indices[j + 1]);
-				v2 = getVertexID(i, m_indices[j + 2]);
+				v0 = getVertexID(i, m_staticIndices[j]);
+				v1 = getVertexID(i, m_staticIndices[j + 1]);
+				v2 = getVertexID(i, m_staticIndices[j + 2]);
 				mesh->addTriangle(v0, v1, v2);
 			}
 		}
@@ -544,9 +544,9 @@ btCollisionShape * CollisionObject::CreateGImpactCollisionShape()
 			for (uint32_t j = m_meshes[i].m_indexRange.begin; j < m_meshes[i].m_indexRange.end; j += 3)
 			{
 				btVector3 v0, v1, v2;
-				v0 = getVertexID(i, m_indices[j]);
-				v1 = getVertexID(i, m_indices[j + 1]);
-				v2 = getVertexID(i, m_indices[j + 2]);
+				v0 = getVertexID(i, m_staticIndices[j]);
+				v1 = getVertexID(i, m_staticIndices[j + 1]);
+				v2 = getVertexID(i, m_staticIndices[j + 2]);
 				mesh->addTriangle(v0, v1, v2);
 			}
 			m_usedMeshes.push_back(mesh);
@@ -564,9 +564,9 @@ btCollisionShape * CollisionObject::CreateGImpactCollisionShape()
 			for (uint32_t j = m_meshes[i].m_indexRange.begin; j < m_meshes[i].m_indexRange.end; j += 3)
 			{
 				btVector3 v0, v1, v2;
-				v0 = getVertexID(i, m_indices[j]);
-				v1 = getVertexID(i, m_indices[j + 1]);
-				v2 = getVertexID(i, m_indices[j + 2]);
+				v0 = getVertexID(i, m_staticIndices[j]);
+				v1 = getVertexID(i, m_staticIndices[j + 1]);
+				v2 = getVertexID(i, m_staticIndices[j + 2]);
 				mesh->addTriangle(v0, v1, v2);
 			}
 		}

@@ -55,8 +55,6 @@ private:
 		DirectX::BoundingBox				m_boundingBox; /// kinda useless
 	};
 private:
-	MicrosoftPointer<ID3D11Buffer>			m_indexBuffer;
-	
 	DirectX::BoundingBox					m_boundingBox;
 
 	mutable std::vector<uint32_t>			m_drawnInstances;
@@ -67,7 +65,6 @@ private:
 protected:
 	std::vector<Mesh>						m_meshes;
 	std::vector<Rendering::Material>		m_materials;
-	std::vector<uint32_t>					m_indices;
 
 public:
 	/// If a model has more meshes that this value; it will be feasible for advanced frustum culling

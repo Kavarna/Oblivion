@@ -6,6 +6,8 @@ using namespace Oblivion;
 
 std::vector<SVertex>				IGameObject::m_staticVertices;
 MicrosoftPointer<ID3D11Buffer>		IGameObject::m_staticVerticesBuffer;
+std::vector<uint32_t>				IGameObject::m_staticIndices;
+MicrosoftPointer<ID3D11Buffer>		IGameObject::m_staticIndicesBuffer;
 
 IGameObject::IGameObject()
 {
@@ -156,19 +158,7 @@ void IGameObject::RenderDisplacementTextureLight(ICamera * cam) const
 
 Range IGameObject::AddVertices(std::vector<SVertex> & vertices)
 {
-	auto renderer = Direct3D11::Get();
-	Range res;
-	res.begin = (uint32_t)m_staticVertices.size();
-	m_staticVertices.reserve(m_staticVertices.size() + vertices.size());
-	m_staticVertices.insert(m_staticVertices.end(), vertices.begin(),
-		vertices.end());
-	res.end = (uint32_t)m_staticVertices.size();
-	ShaderHelper::CreateBuffer(renderer->getDevice().Get(),
-		&m_staticVerticesBuffer, D3D11_USAGE::D3D11_USAGE_IMMUTABLE,
-		D3D11_BIND_FLAG::D3D11_BIND_VERTEX_BUFFER,
-		sizeof(SVertex) * m_staticVertices.size(), 0,
-		m_staticVertices.data());
-	return res;
+	return AddVertices(vertices, 0, (int)vertices.size());
 }
 
 CommonTypes::Range IGameObject::AddVertices(std::vector<Oblivion::SVertex>& vertices, int start, int end)
@@ -194,6 +184,34 @@ void IGameObject::RemoveVertices(Range const & range)
 {
 	m_staticVertices.erase(m_staticVertices.begin() + range.begin,
 		m_staticVertices.begin() + range.end);
+}
+
+CommonTypes::Range IGameObject::AddIndices(std::vector<uint32_t>& indices)
+{
+	return AddIndices(indices, 0, (int)indices.size());
+}
+
+CommonTypes::Range IGameObject::AddIndices(std::vector<uint32_t>& indices, int start, int end)
+{
+	auto renderer = Direct3D11::Get();
+	Range res;
+	res.begin = (uint32_t)m_staticIndices.size();
+	m_staticIndices.reserve(m_staticIndices.size() + end - start);
+	for (int i = start; i < end; ++i)
+		m_staticIndices.push_back(indices[i]);
+	res.end = (uint32_t)m_staticIndices.size();
+	ShaderHelper::CreateBuffer(renderer->getDevice().Get(),
+		&m_staticIndicesBuffer, D3D11_USAGE::D3D11_USAGE_IMMUTABLE,
+		D3D11_BIND_FLAG::D3D11_BIND_INDEX_BUFFER,
+		sizeof(uint32_t) * m_staticIndices.size(), 0,
+		m_staticIndices.data());
+	return res;
+}
+
+void IGameObject::RemoveIndices(CommonTypes::Range const & range)
+{
+	m_staticIndices.erase(m_staticIndices.begin() + range.begin,
+		m_staticIndices.begin() + range.end);
 }
 
 void IGameObject::BindMaterial(Rendering::material_t const & mat, int shader) const
@@ -227,11 +245,12 @@ void IGameObject::BindMaterial(Rendering::material_t const & mat, int shader) co
 void IGameObject::BindStaticVertexBuffer()
 {
 	auto renderer = Direct3D11::Get();
-	ID3D11Buffer * buffers[1] =
+	ID3D11Buffer * vertexBuffer[1] =
 	{
 		m_staticVerticesBuffer.Get()
 	};
 	UINT stride = sizeof(SVertex);
 	UINT offset = 0;
-	renderer->getContext()->IASetVertexBuffers(0, 1, buffers, &stride, &offset);
+	renderer->getContext()->IASetVertexBuffers(0, 1, vertexBuffer, &stride, &offset);
+	renderer->getContext()->IASetIndexBuffer(m_staticIndicesBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
 }
