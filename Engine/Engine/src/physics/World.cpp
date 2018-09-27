@@ -29,6 +29,8 @@ void BulletWorld::CreateDefaultWorld()
 			m_broadphase, m_constraintSolver, m_collisionConfiguration);
 	
 	m_world->setGravity(btVector3(0, -10, 0));
+
+	btGImpactCollisionAlgorithm::registerAlgorithm(reinterpret_cast<btCollisionDispatcher*>(m_collisionDispatcher));
 }
 
 void BulletWorld::Update(float frameTime)

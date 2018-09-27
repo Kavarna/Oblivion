@@ -22,8 +22,6 @@ void CollisionObject::Create(std::string const & filename)
 		ReadPhysicsFile(filename + ".physics");
 		switch (m_shapeType)
 		{
-		case EShapeType::eGImpactMesh:
-			break;
 		case EShapeType::eStaticMesh:
 			m_collisionShape = CreateStaticCollisionShape();
 			break;
@@ -145,7 +143,9 @@ void CollisionObject::Update(float frameTime)
 				DirectX::XMMATRIX(m);
 		}
 		else
-			m_objectWorld[it->first] = DirectX::XMMATRIX(m) * DirectX::XMMatrixScaling(globalScaling.x(), globalScaling.y(), globalScaling.z());
+			m_objectWorld[it->first] =
+				DirectX::XMMatrixScaling(globalScaling.x(), globalScaling.y(), globalScaling.z()) *
+				DirectX::XMMATRIX(m);
 	}
 	Model::Update(frameTime);
 }
@@ -186,10 +186,8 @@ inline void CollisionObject::ReadPhysicsFile(const std::string & filename)
 		m_shapeType = EShapeType::eHullMesh;
 	else if (to_lower_copy(collisionShape) == "ehullmesh")
 		m_shapeType = EShapeType::eHullMesh;
-	else if (to_lower_copy(collisionShape) == "estaticmesh")
+	else if (to_lower_copy(collisionShape) == "estaticmesh" || to_lower_copy(collisionShape) == "etrianglemesh")
 		m_shapeType = EShapeType::eStaticMesh;
-	else if (to_lower_copy(collisionShape) == "egimpactmesh")
-		m_shapeType = EShapeType::eGImpactMesh;
 	else if (to_lower_copy(collisionShape) == "edefaultmesh")
 		m_shapeType = EShapeType::eHullMesh;
 
@@ -207,13 +205,6 @@ inline void CollisionObject::Activate(int instanceID)
 	if (!isIDinstance(instanceID))
 		return;
 	m_rigidBodies[instanceID]->m_body->activate(true);
-}
-
-inline void CollisionObject::Deactivate(int instanceID)
-{
-	if (!isIDinstance(instanceID))
-		return;
-	m_rigidBodies[instanceID]->m_body->activate(false);
 }
 
 inline void CollisionObject::Identity(int instanceID)
@@ -307,15 +298,20 @@ inline void CollisionObject::Scale(float Sx, float Sy, float Sz, int instanceID)
 {
 	if (!isIDinstance(instanceID))
 		return;
+	static auto getLocalScaling = [](const btVector3& localScaling, float& x, float& y, float& z)
+	{
+		x *= localScaling.x();
+		y *= localScaling.y();
+		z *= localScaling.z();
+	};
 	auto scaleDefaultMesh = [&](float x, float y, float z)
 	{
 		if (m_rigidBodies[instanceID]->m_hasDifferentShape)
 		{
 			btVector3 localScaling = m_rigidBodies[instanceID]->m_body->getCollisionShape()->getLocalScaling();
-			x *= localScaling.x();
-			y *= localScaling.y();
-			z *= localScaling.z();
-			delete m_rigidBodies[instanceID]->m_body->getCollisionShape();
+			getLocalScaling(localScaling, x, y, z);
+			m_rigidBodies[instanceID]->m_body->getCollisionShape()->setLocalScaling(btVector3(x, y, z));
+			return;
 		}
 		btCollisionShape *shape = nullptr;
 		switch (m_defaultShape)
@@ -341,31 +337,68 @@ inline void CollisionObject::Scale(float Sx, float Sy, float Sz, int instanceID)
 		}
 		m_rigidBodies[instanceID]->m_hasDifferentShape = true;
 		m_rigidBodies[instanceID]->m_body->setCollisionShape(shape);
+		BulletWorld::Get()->RemoveRigidBody(m_rigidBodies[instanceID]->m_body);
+		BulletWorld::Get()->AddRigidBody(m_rigidBodies[instanceID]->m_body);
 	};
 	auto scaleHullMesh = [&](float x, float y, float z)
 	{
 		if (m_rigidBodies[instanceID]->m_hasDifferentShape)
 		{
 			btVector3 localScaling = m_rigidBodies[instanceID]->m_body->getCollisionShape()->getLocalScaling();
-			x *= localScaling.x();
-			y *= localScaling.y();
-			z *= localScaling.z();
-			delete m_rigidBodies[instanceID]->m_body->getCollisionShape();
+			getLocalScaling(localScaling, x, y, z);
+			m_rigidBodies[instanceID]->m_body->getCollisionShape()->setLocalScaling(btVector3(x, y, z));
+			return;
 		}
 		btCollisionShape * shape;
-		//if (x == y && y == z)
-		//shape = new btUniformScalingShape((btConvexShape*)m_collisionShape, btScalar(x));
-		//else
 		shape = CreateHullCollisionShape();
 		shape->setLocalScaling(btVector3(x, y, z));
 		m_rigidBodies[instanceID]->m_hasDifferentShape = true;
 		m_rigidBodies[instanceID]->m_body->setCollisionShape(shape);
+		BulletWorld::Get()->RemoveRigidBody(m_rigidBodies[instanceID]->m_body);
+		BulletWorld::Get()->AddRigidBody(m_rigidBodies[instanceID]->m_body);
+	};
+	auto scaleTriangleMesh = [&](float x, float y, float z)
+	{
+		if (m_compound)
+		{
+			btCompoundShape * shape = new btCompoundShape(true, (int)m_meshes.size());
+			btCompoundShape * actualShape = (btCompoundShape*)m_collisionShape;
+			int nChildren = actualShape->getNumChildShapes();
+			btCompoundShapeChild * pChildren = actualShape->getChildList();
+			for (int i = 0; i < nChildren; ++i)
+			{
+				//shape->addChildShape()
+				btCollisionShape * childShape = new btScaledBvhTriangleMeshShape(
+					(btBvhTriangleMeshShape*)pChildren[i].m_childShape,
+					btVector3(1, 1, 1)
+				);
+				m_usedShapes.push_back(childShape);
+				shape->addChildShape(btTransform(btQuaternion(0, 0, 0, 1)), childShape);
+			}
+			shape->setLocalScaling(btVector3(x, y, z));
+			m_rigidBodies[instanceID]->m_hasDifferentShape = true;
+			m_rigidBodies[instanceID]->m_body->setCollisionShape(shape);
+		}
+		else
+		{
+			if (m_rigidBodies[instanceID]->m_hasDifferentShape)
+			{
+				btVector3 localScaling = m_rigidBodies[instanceID]->m_body->getCollisionShape()->getLocalScaling();
+				getLocalScaling(localScaling, x, y, z);
+				m_rigidBodies[instanceID]->m_body->getCollisionShape()->setLocalScaling(btVector3(x, y, z));
+				return;
+			}
+			btCollisionShape* shape = new btScaledBvhTriangleMeshShape((btBvhTriangleMeshShape*)m_collisionShape, btVector3(x, y, z));
+			m_rigidBodies[instanceID]->m_hasDifferentShape = true;
+			m_rigidBodies[instanceID]->m_body->setCollisionShape(shape);
+		}
+		BulletWorld::Get()->RemoveRigidBody(m_rigidBodies[instanceID]->m_body);
+		BulletWorld::Get()->AddRigidBody(m_rigidBodies[instanceID]->m_body);
 	};
 	switch (m_shapeType)
 	{
-	case EShapeType::eGImpactMesh:
-		break;
 	case EShapeType::eStaticMesh:
+		scaleTriangleMesh(Sx, Sy, Sz);
 		break;
 	case EShapeType::eHullMesh:
 		scaleHullMesh(Sx, Sy, Sz);
@@ -378,11 +411,6 @@ inline void CollisionObject::Scale(float Sx, float Sy, float Sz, int instanceID)
 		THROW_ERROR("Scaling not possible because the collision shape hasn't been initialized.");
 		break;
 	}
-}
-
-inline void CollisionObject::GlobalScale(float Sx, float Sy, float Sz)
-{
-	m_collisionShape->setLocalScaling(btVector3(Sx, Sy, Sz));
 }
 
 inline bool CollisionObject::isIDinstance(uint32_t ID)
@@ -412,7 +440,6 @@ btCollisionShape * CollisionObject::CreateStaticCollisionShape()
 	btCollisionShape * shape = nullptr;
 	if (m_compound)
 	{
-		//THROW_ERROR("Compound static mesh unavailable");
 		btCompoundShape * compoundShape = new btCompoundShape(true, (int)m_meshes.size());
 		for (uint32_t i = 0; i < m_meshes.size(); ++i)
 		{
@@ -426,7 +453,7 @@ btCollisionShape * CollisionObject::CreateStaticCollisionShape()
 				mesh->addTriangle(v0, v1, v2);
 			}
 			m_usedMeshes.push_back(mesh);
-			compoundShape->addChildShape(btTransform(btQuaternion(0, 0, 0, 1)), new btBvhTriangleMeshShape(mesh, false));
+			compoundShape->addChildShape(btTransform(btQuaternion(0, 0, 0, 1)), new btBvhTriangleMeshShape(mesh, true));
 		}
 		shape = compoundShape;
 	}
@@ -483,6 +510,56 @@ btCollisionShape * CollisionObject::CreateHullCollisionShape()
 			endIndex - startIndex,
 			sizeof(Oblivion::Vertex)
 		);
+	}
+	return shape;
+}
+
+btCollisionShape * CollisionObject::CreateGImpactCollisionShape()
+{
+	auto getVertexID = [&](uint32_t meshID, uint32_t vertexID)
+	{
+		uint32_t id = m_meshes[meshID].m_vertexRange.begin + vertexID;
+		DirectX::XMFLOAT3 pos = m_staticVertices[id].Position;
+		return btVector3(pos.x, pos.y, pos.z);
+	};
+	btCollisionShape * shape = nullptr;
+	if (m_compound)
+	{
+		btCompoundShape * compoundShape = new btCompoundShape(true, (int)m_meshes.size());
+		for (uint32_t i = 0; i < m_meshes.size(); ++i)
+		{
+			btTriangleMesh * mesh = new btTriangleMesh(true, false);
+			for (uint32_t j = m_meshes[i].m_indexRange.begin; j < m_meshes[i].m_indexRange.end; j += 3)
+			{
+				btVector3 v0, v1, v2;
+				v0 = getVertexID(i, m_indices[j]);
+				v1 = getVertexID(i, m_indices[j + 1]);
+				v2 = getVertexID(i, m_indices[j + 2]);
+				mesh->addTriangle(v0, v1, v2);
+			}
+			m_usedMeshes.push_back(mesh);
+			compoundShape->addChildShape(btTransform(btQuaternion(0, 0, 0, 1)), new btGImpactMeshShape(mesh));
+		}
+		shape = compoundShape;
+	}
+	else
+	{
+		btTriangleMesh * mesh = new btTriangleMesh(true, false);
+		for (uint32_t i = 0; i < m_meshes.size(); ++i)
+		{
+			for (uint32_t j = m_meshes[i].m_indexRange.begin; j < m_meshes[i].m_indexRange.end; j += 3)
+			{
+				btVector3 v0, v1, v2;
+				v0 = getVertexID(i, m_indices[j]);
+				v1 = getVertexID(i, m_indices[j + 1]);
+				v2 = getVertexID(i, m_indices[j + 2]);
+				mesh->addTriangle(v0, v1, v2);
+			}
+		}
+		m_usedMeshes.push_back(mesh);
+		shape = new btGImpactMeshShape(mesh);
+		//btVector3 aabbMin, aabbMax;
+		((btGImpactMeshShape*)shape)->updateBound();
 	}
 	return shape;
 }

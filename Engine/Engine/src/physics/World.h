@@ -3,6 +3,9 @@
 #include "../common/common.h"
 #include "../common/interfaces/Singletone.h"
 
+#include "BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h"
+#include "BulletCollision/Gimpact/btGImpactShape.h"
+
 #include "btBulletCollisionCommon.h"
 #include "btBulletDynamicsCommon.h"
 

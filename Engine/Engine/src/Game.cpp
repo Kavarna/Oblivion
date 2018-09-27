@@ -187,7 +187,14 @@ void Game::Init3D()
 	
 	uint32_t instance = m_tree->AddInstance();
 	m_tree->Translate(25.0f, 0.0f, 3.0f, instance);
-	m_tree->Scale(0.5f, 0.5f, 0.5f, instance);
+	m_tree->Scale(1.5f, 1.5f, 1.5f, instance);
+	m_tree->Deactivate(instance);
+
+	m_cup = std::make_unique<CollisionObject>();
+	m_cup->Create("Resources/Cup");
+	m_cup->AddInstance(DirectX::XMMatrixTranslation(0.0f, 30.f, 15.0f));
+	//m_cup->Translate(0.0f, 30.0f, 0.0f, 0);
+	//m_cup->GlobalScale(3.0f, 3.0f, 3.0f);
 	
 	//m_sponza = std::make_unique<CollisionObject>();
 	//m_sponza->Create("Resources/Sponza");
@@ -196,6 +203,7 @@ void Game::Init3D()
 	m_models.push_back(m_ground.get());
 	m_models.push_back(m_sphere.get());
 	m_models.push_back(m_tree.get());
+	m_models.push_back(m_cup.get());
 	//m_models.push_back(m_sponza.get());
 }
 
@@ -278,7 +286,18 @@ void Game::Update()
 	if (kb.A)
 		g_camera->StrafeLeft(cameraFrameTime);
 
-	BulletWorld::Get()->Update(frameTime);
+	static bool updatePhysics = true;
+	static bool pausePressed = false;
+	if (kb.Pause && !pausePressed)
+	{
+		updatePhysics = !updatePhysics;
+		pausePressed = true;
+	}
+	else if (!kb.Pause)
+		pausePressed = false;
+	
+	if (updatePhysics)
+		BulletWorld::Get()->Update(frameTime);
 
 	if (g_isDeveloper)
 	{
@@ -574,6 +593,7 @@ void Game::Render()
 	//m_sponza->Render<TextureLightShader>(g_camera.get());
 	m_ground->Render<DisplacementShader>(g_camera.get());
 	m_tree->Render<TextureLightShader>(g_camera.get());
+	m_cup->Render<TextureLightShader>(g_camera.get());
 
 
 	if (g_isDeveloper)

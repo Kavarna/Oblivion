@@ -1,0 +1,32 @@
+{
+    "DefaultMaterial": {
+        "Color": "0.600000024 0.600000024 0.600000024 1",
+        "Shininess": "0",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "inside": {
+        "Color": "0.587608993 0.587608993 0.587608993 1",
+        "Shininess": "128",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    },
+    "outside": {
+        "Texture": "Resources/cup.jpg",
+        "Shininess": "256",
+        "Opacity": "1",
+        "Tesselation": {
+            "Minimum": "1",
+            "Maximum": "1",
+            "Scale": "0.100000001"
+        }
+    }
+}

@@ -1,14 +1,14 @@
 {
     "Physics": {
-        "Mass": "0",
+        "Mass": "5",
         "Friction": "1",
         "Restitution": "0.5",
         "Spinning friction": "0.200000003",
         "Rolling friction": "0.200000003",
         "Collision Shape": {
-            "Dynamics": "eStatic",
-            "Type": "eTriangleMesh",
-            "Compound": "true"
+            "Dynamics": "eDynamic",
+            "Type": "eHullShape",
+            "Compound": "false"
         }
     }
 }
