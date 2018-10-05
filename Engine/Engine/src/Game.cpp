@@ -198,10 +198,10 @@ void Game::Init3D()
 	m_cup->GlobalScale(3.0f, 3.0f, 3.0f);
 
 	m_billboardTest = std::make_unique<BillboardObject>();
-	m_billboardTest->Create("Resources/cup.jpg");
+	m_billboardTest->Create("Resources/tree0.dds");
 	m_billboardTest->AddInstance();
-	m_billboardTest->Scale(15.0f, 15.0f);
-	m_billboardTest->Translate(0.0f, 5.0f, 0.0f);
+	m_billboardTest->Scale(30.0f, 30.0f);
+	m_billboardTest->Translate(0.0f, 14.5f, 123.f);
 	
 	//m_sponza = std::make_unique<CollisionObject>();
 	//m_sponza->Create("Resources/Sponza");
@@ -604,15 +604,13 @@ void Game::Render()
 	{
 		model->Render<DisplacementShader>(g_camera.get());
 	}*/
-	/*m_sphere->Render<DisplacementShader>(g_camera.get());
-	//m_sponza->Render<TextureLightShader>(g_camera.get());*/
+	m_sphere->Render<DisplacementShader>(g_camera.get());
+	//m_sponza->Render<TextureLightShader>(g_camera.get());
 	m_ground->Render<DisplacementShader>(g_camera.get());
-	/*m_tree->Render<TextureLightShader>(g_camera.get());
-	m_cup->Render<TextureLightShader>(g_camera.get());*/
+	m_tree->Render<TextureLightShader>(g_camera.get());
+	m_cup->Render<TextureLightShader>(g_camera.get());
 
-	//renderer->RSWireframeRender();
 	m_billboardTest->Render<TextureShader>(g_camera.get());
-	//renderer->RSLastState();
 
 	auto camPos = g_camera->GetPosition();
 	wchar_t buffer[128];

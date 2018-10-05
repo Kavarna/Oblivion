@@ -20,6 +20,7 @@ void BillboardObject::Destroy()
 
 void BillboardObject::DrawIndexedInstanced(ICamera * cam) const
 {
+	auto renderer = Direct3D11::Get();
 	std::function<bool(uint32_t)> func = [&](uint32_t index) -> bool
 	{
 		static DirectX::BoundingBox bb(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(1.0f, 1.0f, 0.0f));
@@ -54,9 +55,11 @@ void BillboardObject::DrawIndexedInstanced(ICamera * cam) const
 	UINT offset = 0;
 	m_d3d11Context->IASetVertexBuffers(1, 1, instances, &stride, &offset);
 
+	renderer->OMBillboardBlend();
 	BindMaterial(m_material, m_bindMaterialToShader);
 	m_d3d11Context->DrawIndexedInstanced(GetIndexCount(),
 		renderInstances, m_indexRange.begin, m_vertexRange.begin, 0);
 	if (g_isDeveloper)
 		g_drawCalls++;
+	renderer->OMDefaultBlend();
 }
