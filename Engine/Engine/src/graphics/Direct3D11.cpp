@@ -354,17 +354,25 @@ void Direct3D11::SetRenderTargetAndDepth()
 
 void Direct3D11::RSWireframeRender()
 {
+	m_d3d11Context->RSGetState(&m_lastRSState);
 	m_d3d11Context->RSSetState(m_wireFrameNoCulling.Get());
 }
 
 void Direct3D11::RSSolidRender()
 {
+	m_d3d11Context->RSGetState(&m_lastRSState);
 	m_d3d11Context->RSSetState(m_solidBackfaceCulling.Get());
 }
 
 void Direct3D11::RSCullNone()
 {
+	m_d3d11Context->RSGetState(&m_lastRSState);
 	m_d3d11Context->RSSetState(m_solidNoCulling.Get());
+}
+
+void Direct3D11::RSLastState()
+{
+	m_d3d11Context->RSSetState(m_lastRSState);
 }
 
 void Direct3D11::DepthEnableLess()

@@ -21,7 +21,9 @@ btMatrix3x3 __vectorcall Math::Matrix3x3FromXMMatrix(DirectX::FXMMATRIX & matrix
 	return ret;
 }
 
-btVector3 __vectorcall Math::GetTranslationFromMatrix(DirectX::FXMMATRIX& matrix)
+
+template <>
+btVector3 __vectorcall Math::GetTranslationFromMatrix<btVector3>(DirectX::FXMMATRIX& matrix)
 {
 
 	btVector3 translation;
@@ -29,6 +31,27 @@ btVector3 __vectorcall Math::GetTranslationFromMatrix(DirectX::FXMMATRIX& matrix
 	translation.setY(XMVectorGetY(matrix.r[3]));
 	translation.setZ(XMVectorGetZ(matrix.r[3]));
 
+	return translation;
+}
+
+template<>
+DirectX::XMFLOAT3 __vectorcall Math::GetScalingFromMatrix(DirectX::FXMMATRIX & matrix)
+{
+	DirectX::XMFLOAT3 scaling;
+	scaling.x = XMVectorGetX(matrix.r[0]);
+	scaling.y = XMVectorGetY(matrix.r[1]);
+	scaling.z = XMVectorGetZ(matrix.r[2]);
+	
+	return scaling;
+}
+
+template <>
+DirectX::XMFLOAT3 __vectorcall Math::GetTranslationFromMatrix<DirectX::XMFLOAT3>(DirectX::FXMMATRIX& matrix)
+{
+	DirectX::XMFLOAT3 translation;
+	translation.x = XMVectorGetX(matrix.r[3]);
+	translation.y = XMVectorGetY(matrix.r[3]);
+	translation.z = XMVectorGetZ(matrix.r[3]);
 	return translation;
 }
 

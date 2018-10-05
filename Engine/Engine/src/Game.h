@@ -71,6 +71,12 @@ private:
 	std::unique_ptr<CollisionObject>					m_cup;
 	//std::unique_ptr<CollisionObject>					m_sponza;
 
+	std::shared_ptr<CFont>								m_32SegoeScriptExtented;
+	std::unique_ptr<Text>								m_camPosText;
+
+	std::unique_ptr<BillboardObject>					m_billboardTest;
+
+	std::vector<IGameObject*>							m_gameObjects;
 	std::vector<Model*>									m_models;
 	Model*												m_selectedObject;
 

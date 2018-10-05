@@ -154,6 +154,7 @@
     <ClCompile Include="src\common\commonmath.cpp" />
     <ClCompile Include="src\COM\COMManager.cpp" />
     <ClCompile Include="src\Game.cpp" />
+    <ClCompile Include="src\graphics\BillboardObject.cpp" />
     <ClCompile Include="src\graphics\Font.cpp" />
     <ClCompile Include="src\graphics\Projection.cpp" />
     <ClCompile Include="src\graphics\Shaders\SimpleTextureShader.cpp" />
@@ -195,6 +196,7 @@
     <ClInclude Include="src\common\Bezier\BezierEasing.h" />
     <ClInclude Include="src\common\Bezier\p2Point.h" />
     <ClInclude Include="src\COM\COMManager.h" />
+    <ClInclude Include="src\graphics\BillboardObject.h" />
     <ClInclude Include="src\graphics\Font.h" />
     <ClInclude Include="src\graphics\interfaces\I2DTransforms.h" />
     <ClInclude Include="src\common\interfaces\Singletone.h" />
@@ -215,7 +217,6 @@
     <ClInclude Include="src\graphics\Helpers\RenderHelper.h" />
     <ClInclude Include="src\graphics\interfaces\GraphicsObject.h" />
     <ClInclude Include="src\graphics\Shaders\BatchShader.h" />
-    <ClInclude Include="src\common\commontypes.h" />
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\common\common.h" />
     <ClInclude Include="src\common\commonmath.h" />

@@ -109,6 +109,6 @@ bool Square::PrepareIA(const Pipeline & p) const
 		m_d3d11Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		return true;
 	}
-	// TODO: LOG
+	DX::OutputVDebugString(L"Can't render a square using this pipeline\n");
 	return false;
 }

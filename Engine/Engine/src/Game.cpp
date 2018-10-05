@@ -169,6 +169,7 @@ void Game::InitImGui()
 
 void Game::Init2D()
 {
+	m_32SegoeScriptExtented = std::make_shared<CFont>("Resources/Fonts/32SegoeScriptExtented.fnt");
 }
 
 void Game::Init3D()
@@ -195,16 +196,27 @@ void Game::Init3D()
 	m_cup->AddInstance(DirectX::XMMatrixTranslation(0.0f, 30.f, 15.0f));
 	m_cup->Translate(0.0f, 30.0f, 0.0f, 0);
 	m_cup->GlobalScale(3.0f, 3.0f, 3.0f);
+
+	m_billboardTest = std::make_unique<BillboardObject>();
+	m_billboardTest->Create("Resources/cup.jpg");
+	m_billboardTest->AddInstance();
+	m_billboardTest->Scale(15.0f, 15.0f);
+	m_billboardTest->Translate(0.0f, 5.0f, 0.0f);
 	
 	//m_sponza = std::make_unique<CollisionObject>();
 	//m_sponza->Create("Resources/Sponza");
 	//m_sponza->AddInstance();
 
+	m_gameObjects.push_back(m_ground.get());
+	m_gameObjects.push_back(m_sphere.get());
+	m_gameObjects.push_back(m_tree.get());
+	m_gameObjects.push_back(m_cup.get());
+	//m_models.push_back(m_sponza.get());
+
 	m_models.push_back(m_ground.get());
 	m_models.push_back(m_sphere.get());
 	m_models.push_back(m_tree.get());
 	m_models.push_back(m_cup.get());
-	//m_models.push_back(m_sponza.get());
 }
 
 void Game::InitSizeDependent()
@@ -236,6 +248,10 @@ void Game::InitSizeDependent()
 	g_screen->m_nearZ = nearZ;
 	g_screen->m_farZ = farZ;
 	g_screen->Construct();
+
+	m_camPosText.reset();
+	m_camPosText = std::make_unique<Text>(m_32SegoeScriptExtented, 0.0f, 0.0f);
+	m_camPosText->SetWindowInfo((float)m_windowWidth, (float)m_windowHeight);
 }
 
 void Game::Run()
@@ -384,7 +400,7 @@ void Game::Update()
 	else if (!mouse.rightButton)
 		bRightClick = false;
 
-	for (auto & model : m_models)
+	for (auto & model : m_gameObjects)
 	{
 		model->Update(frameTime);
 	}
@@ -588,12 +604,23 @@ void Game::Render()
 	{
 		model->Render<DisplacementShader>(g_camera.get());
 	}*/
-	m_sphere->Render<DisplacementShader>(g_camera.get());
-	//m_sponza->Render<TextureLightShader>(g_camera.get());
+	/*m_sphere->Render<DisplacementShader>(g_camera.get());
+	//m_sponza->Render<TextureLightShader>(g_camera.get());*/
 	m_ground->Render<DisplacementShader>(g_camera.get());
-	m_tree->Render<TextureLightShader>(g_camera.get());
-	m_cup->Render<TextureLightShader>(g_camera.get());
+	/*m_tree->Render<TextureLightShader>(g_camera.get());
+	m_cup->Render<TextureLightShader>(g_camera.get());*/
 
+	//renderer->RSWireframeRender();
+	m_billboardTest->Render<TextureShader>(g_camera.get());
+	//renderer->RSLastState();
+
+	auto camPos = g_camera->GetPosition();
+	wchar_t buffer[128];
+	swprintf_s(buffer, L"Cam pos: (%.2f, %.2f, %.2f)",
+		camPos.x, camPos.y, camPos.z);
+
+	m_camPosText->Render(g_screen.get(), buffer, 0.0f, 64.f,
+		DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
 
 	if (g_isDeveloper)
 	{

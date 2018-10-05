@@ -19,6 +19,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> mTextureUAV;
 
 	std::string mPath;
+	CommonTypes::fDimension mDimensions;
 public:
 	Texture() = default;
 	Texture(std::string);
@@ -57,6 +58,8 @@ public:
 			mTextureUAV = Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView>(newUAV);
 		}
 	}
+public:
+	const CommonTypes::fDimension& GetDimensions() const;
 private:
 	void CreateUAV();
 };

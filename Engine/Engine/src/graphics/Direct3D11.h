@@ -35,6 +35,7 @@ public:
 	void										RSWireframeRender();
 	void										RSSolidRender();
 	void										RSCullNone();
+	void										RSLastState();
 	void										DepthEnableLess();
 	void										DepthDisable();
 	void										OMTransparency(float blendFactor);
@@ -69,6 +70,7 @@ private: // States
 	MicrosoftPointer<ID3D11RasterizerState>		m_wireFrameNoCulling		= nullptr;
 	MicrosoftPointer<ID3D11RasterizerState>		m_solidBackfaceCulling		= nullptr;
 	MicrosoftPointer<ID3D11RasterizerState>		m_solidNoCulling			= nullptr;
+	ID3D11RasterizerState*						m_lastRSState				= nullptr;
 	// Blend
 	MicrosoftPointer<ID3D11BlendState>			m_transparencyBlendState	= nullptr;
 	MicrosoftPointer<ID3D11BlendState>			m_2dLightBlendState			= nullptr;

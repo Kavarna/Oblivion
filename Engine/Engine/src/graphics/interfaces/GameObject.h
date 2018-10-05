@@ -2,7 +2,6 @@
 
 
 #include "../../common/common.h"
-#include "../../common/commontypes.h"
 #include "../Texture.h"
 #include "ICamera.h"
 #include "../../common/interfaces/AlignedObject.h"
@@ -79,7 +78,8 @@ public:
 	virtual			void							ClearInstances() { m_objectWorld.clear(); };
 	virtual			void							RemoveInstance(int ID);
 	virtual			void							RemoveInstance(CommonTypes::Range const& range);
-	virtual			int								PrepareInstances(std::function<bool(uint32_t)> & func) const;
+	virtual			int								PrepareInstances(std::function<bool(uint32_t)> & func,
+														std::function<DirectX::XMMATRIX(DirectX::FXMMATRIX)> modifyWorld = nullptr) const;
 	virtual			void							Render(ICamera * cam, const Pipeline& p) const;
 
 	template <class Shader>
@@ -128,35 +128,40 @@ template<class Shader>
 inline void IGameObject::Render(ICamera * cam) const
 {
 	static_assert(std::is_base_of<IShader, Shader>::value,
-		"Generic argument for Rende must be a IShader based class");
+		"Generic argument for Render(ICamera * cam) must be a IShader based class");
 
 	if (m_objectWorld.size() < 1)
 		return;
 
 	if constexpr (std::is_same<Shader, BasicShader>::value)
 	{
-		PrepareIA(Pipeline::PipelineBasic);
+		if (!PrepareIA(Pipeline::PipelineBasic))
+			return;
 		RenderBasic(cam);
 	}
 	else if constexpr (std::is_same<Shader, TextureShader>::value)
 	{
-		PrepareIA(Pipeline::PipelineTexture);
+		if (!PrepareIA(Pipeline::PipelineTexture))
+			return;
 		RenderTexture(cam);
 	}
 	else if constexpr (std::is_same<Shader, TextureLightShader>::value)
 	{
-		PrepareIA(Pipeline::PipelineTextureLight);
+		if (!PrepareIA(Pipeline::PipelineTextureLight))
+			return;
 		RenderTextureLight(cam);
 	}
 	else if constexpr (std::is_same<Shader, DisplacementShader>::value)
 	{
-		PrepareIA(Pipeline::PipelineDisplacementTextureLight);
+		if (!PrepareIA(Pipeline::PipelineDisplacementTextureLight))
+			return;
 		RenderDisplacementTextureLight(cam);
 	}
 	else
 	{
 		auto shader = Shader::Get();
-		PrepareIA(shader->GetPreferedPipelineType());
+		if (!PrepareIA(shader->GetPreferedPipelineType()))
+			return;
 		shader->RenderGameObject(this, cam);
 		//static_assert(false,
 			//"Can't render a game object using this shader");

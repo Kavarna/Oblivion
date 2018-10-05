@@ -13,9 +13,9 @@ public:
 	~Square();
 
 	// Inherited via IGameObject
-			void						Create(std::string const &) override;
-			void						Create(LPWSTR);
-			void						Create() override;
+	virtual	void						Create(std::string const &) override;
+	virtual	void						Create(LPWSTR);
+	virtual	void						Create() override;
 			void						Update(float frameTime) override;
 			void						Destroy() override;
 	inline	uint32_t					GetIndexCount(int subObject = 0) const override;
@@ -29,7 +29,7 @@ public:
 private:
 			void						DrawIndexedInstanced(ICamera * cam) const override;
 			bool						PrepareIA(const Pipeline& p) const override;
-private:
+protected:
 	float								m_width;
 	float								m_height;
 

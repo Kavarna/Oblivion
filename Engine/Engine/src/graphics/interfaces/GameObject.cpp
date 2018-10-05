@@ -64,7 +64,8 @@ void IGameObject::RemoveInstance(CommonTypes::Range const & range)
 		m_objectWorld.begin() + range.end);
 }
 
-int IGameObject::PrepareInstances(std::function<bool(uint32_t)> & shouldRender) const
+int IGameObject::PrepareInstances(std::function<bool(uint32_t)> & shouldRender,
+	std::function<DirectX::XMMATRIX(DirectX::FXMMATRIX)> modifyWorld) const
 {
 	auto data = (DirectX::XMMATRIX*)ShaderHelper::MapBuffer(m_d3d11Context.Get(), m_instanceBuffer.Get());
 	uint32_t renderInstances = 0;
@@ -72,7 +73,10 @@ int IGameObject::PrepareInstances(std::function<bool(uint32_t)> & shouldRender) 
 	{
 		if (shouldRender((uint32_t)i))
 		{
-			data[renderInstances++] = m_objectWorld[i];
+			if (modifyWorld)
+				data[renderInstances++] = modifyWorld(m_objectWorld[i]);
+			else
+				data[renderInstances++] = m_objectWorld[i];
 		}
 	}
 	
@@ -125,7 +129,7 @@ void IGameObject::RenderTexture(ICamera * cam) const
 		DirectX::XMMatrixTranspose(cam->GetProjection())
 		});
 
-	m_d3d11Context->PSSetSamplers(0, 1, renderer->m_linearWrapSampler.GetAddressOf());
+	m_d3d11Context->PSSetSamplers(0, 1, renderer->m_anisotropicWrapSampler.GetAddressOf());
 	m_bindMaterialToShader = (int)Shader::ShaderType::ePixel;
 }
 

@@ -41,12 +41,12 @@ void Text::InitializeBuffers(UINT length)
 
 void Text::Render(ICamera * cam, const std::wstring& Text, float X, float Y, DirectX::XMFLOAT4 Color)
 {
-	if (X == mLastX && Y == mLastY &&
+	/*if (X == mLastX && Y == mLastY &&
 		(lstrcmpW(mLastText, Text.c_str()) != 0))
 	{
 		Render(cam, Color);
 		return;
-	}
+	}*/
 
 	if (Text.length() > mSize)
 	{

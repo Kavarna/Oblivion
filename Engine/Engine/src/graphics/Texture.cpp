@@ -11,6 +11,7 @@ Texture::Texture(std::string path)
 
 Texture::Texture(float width, float height, bool hasUAV)
 {
+	mDimensions = { width,height };
 	mHasUAV = hasUAV;
 	UINT flags = D3D11_BIND_FLAG::D3D11_BIND_SHADER_RESOURCE;
 	if (hasUAV)
@@ -55,6 +56,10 @@ Texture::Texture(ID3D11Texture2D * tex, ID3D11ShaderResourceView * srv, ID3D11Un
 		mTextureUAV.Reset();
 		mTextureUAV = MicrosoftPointer<ID3D11UnorderedAccessView>(uav);
 	}
+
+	D3D11_TEXTURE2D_DESC texDesc;
+	mTexture->GetDesc(&texDesc);
+	mDimensions = { (float)texDesc.Width,(float)texDesc.Height };
 }
 
 Texture::~Texture()
@@ -106,6 +111,14 @@ void Texture::Create(LPWSTR lpPath, bool hasUAV)
 			);
 		}
 	}
+	D3D11_TEXTURE2D_DESC texDesc;
+	mTexture->GetDesc(&texDesc);
+	mDimensions = { (float)texDesc.Width,(float)texDesc.Height };
+}
+
+const CommonTypes::fDimension& Texture::GetDimensions() const 
+{
+	return mDimensions;
 }
 
 void Texture::CreateUAV()

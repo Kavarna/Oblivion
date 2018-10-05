@@ -22,6 +22,7 @@
 #include "graphics/Square.h"
 #include "graphics/Font.h"
 #include "graphics/Text.h"
+#include "graphics/BillboardObject.h"
 
 #include "physics/World.h"
 #include "physics/CollisionObject.h"

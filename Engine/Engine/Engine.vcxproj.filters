@@ -41,6 +41,7 @@
     <ClCompile Include="src\graphics\Font.cpp" />
     <ClCompile Include="src\graphics\Text.cpp" />
     <ClCompile Include="src\graphics\Shaders\SimpleTextureShader.cpp" />
+    <ClCompile Include="src\graphics\BillboardObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\commonmath.h" />
@@ -70,7 +71,6 @@
     <ClInclude Include="src\graphics\Shaders\BasicShader.h" />
     <ClInclude Include="src\graphics\Shaders\TextureLightShader.h" />
     <ClInclude Include="src\graphics\Helpers\Lights.h" />
-    <ClInclude Include="src\common\commontypes.h" />
     <ClInclude Include="src\graphics\Shaders\BatchShader.h" />
     <ClInclude Include="src\graphics\Helpers\RenderHelper.h" />
     <ClInclude Include="src\graphics\RenderTexture.h" />
@@ -97,6 +97,7 @@
     <ClInclude Include="src\graphics\Shaders\SimpleTextureShader.h" />
     <ClInclude Include="src\common\interfaces\Singletone.h" />
     <ClInclude Include="src\common\interfaces\AlignedObject.h" />
+    <ClInclude Include="src\graphics\BillboardObject.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\BasicVertexShader.hlsl" />

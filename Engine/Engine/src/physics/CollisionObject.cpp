@@ -121,7 +121,7 @@ uint32_t CollisionObject::AddInstance(uint32_t num)
 uint32_t CollisionObject::AddInstance(float mass, DirectX::FXMMATRIX const & mat)
 {
 	btMotionState* motionState = new btDefaultMotionState();
-	motionState->setWorldTransform(btTransform(Math::Matrix3x3FromXMMatrix(mat), Math::GetTranslationFromMatrix(mat)));
+	motionState->setWorldTransform(btTransform(Math::Matrix3x3FromXMMatrix(mat), Math::GetTranslationFromMatrix<btVector3>(mat)));
 	btRigidBody::btRigidBodyConstructionInfo bodyCI(mass, motionState, m_collisionShape, CalculateLocalIntertia(mass));
 	btRigidBody* body = new btRigidBody(bodyCI);
 
