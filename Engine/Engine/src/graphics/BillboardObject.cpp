@@ -39,7 +39,6 @@ void BillboardObject::DrawIndexedInstanced(ICamera * cam) const
 		auto scaling = Math::GetScalingFromMatrix<DirectX::XMFLOAT3>(mat);
 		DirectX::XMMATRIX rot;
 		float angle = atan2f(objPos.x - camPos.x, objPos.z - camPos.z);
-		DX::OutputVDebugString(L"Scaling = (%.2f,%.2f,%.2f)\n", scaling.x, scaling.y, scaling.z);
 		return DirectX::XMMatrixScaling(scaling.x, scaling.y, scaling.z) *
 			DirectX::XMMatrixRotationY(angle) *
 			DirectX::XMMatrixTranslation(objPos.x, objPos.y, objPos.z);
