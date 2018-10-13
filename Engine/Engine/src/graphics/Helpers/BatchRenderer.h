@@ -4,9 +4,26 @@
 #include "../interfaces/Shader.h"
 #include "../interfaces/GraphicsObject.h"
 #include "../interfaces/ICamera.h"
-#include "../Shaders/BatchShader.h"
+//#include "../Shaders/BatchShader.h"
 #include "../Texture.h"
 
+class BatchShader
+{
+public:
+	struct SVertex
+	{
+
+	};
+};
+
+class TextureBatchShader
+{
+public:
+	struct SVertex
+	{
+
+	};
+};
 
 class BatchRenderer : public IGraphicsObject
 {

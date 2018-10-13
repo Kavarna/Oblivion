@@ -101,11 +101,6 @@ void Game::InitSettings()
 	}
 }
 
-void SetSun(Sun& light)
-{
-	TextureLightShader::Get()->SetLightInformations(light);
-}
-
 void Game::InitWindow()
 {
 	WNDCLASSEX wndClass = {};
@@ -151,7 +146,9 @@ void Game::InitDirect3D()
 		{ 1.0f,1.0f,1.0f,1.0f },
 		{ 0.1f,0.1f,0.1f,1.0f }
 	};
-	TextureLightShader::Get()->SetLightInformations(sunLight);
+
+	/// TODO: Fix this
+	//TextureLightShader::Get()->SetLightInformations(sunLight);
 	BulletWorld::Get()->CreateDefaultWorld();
 }
 
@@ -174,49 +171,52 @@ void Game::Init2D()
 
 void Game::Init3D()
 {
-	m_ground = std::make_unique<CollisionObject>();
-	m_ground->Create(EDefaultObject::Grid);
-	m_ground->AddInstance();
-	m_ground->Scale(5.0f, 1.0f, 5.0f);
+	//m_ground = std::make_unique<CollisionObject>();
+	//m_ground->Create(EDefaultObject::Grid);
+	//m_ground->AddInstance();
+	//m_ground->Scale(5.0f, 1.0f, 5.0f);
 
-	m_sphere = std::make_unique<CollisionObject>();
-	m_sphere->Create(EDefaultObject::Sphere);
+	//m_sphere = std::make_unique<CollisionObject>();
+	//m_sphere->Create(EDefaultObject::Sphere);
 
-	m_tree = std::make_unique<CollisionObject>();
-	m_tree->Create("Resources/LowPolyTree");
-	m_tree->AddInstance();
-	
-	uint32_t instance = m_tree->AddInstance();
-	m_tree->Translate(25.0f, 0.0f, 3.0f, instance);
-	m_tree->Scale(1.5f, 1.5f, 1.5f, instance);
-	m_tree->Deactivate(instance);
+	//m_tree = std::make_unique<CollisionObject>();
+	//m_tree->Create("Resources/LowPolyTree");
+	//m_tree->AddInstance();
+	//
+	//uint32_t instance = m_tree->AddInstance();
+	//m_tree->Translate(25.0f, 0.0f, 3.0f, instance);
+	//m_tree->Scale(1.5f, 1.5f, 1.5f, instance);
+	//m_tree->Deactivate(instance);
 
-	m_cup = std::make_unique<CollisionObject>();
-	m_cup->Create("Resources/Cup");
-	m_cup->AddInstance(DirectX::XMMatrixTranslation(0.0f, 30.f, 15.0f));
-	m_cup->Translate(0.0f, 30.0f, 0.0f, 0);
-	m_cup->GlobalScale(3.0f, 3.0f, 3.0f);
+	//m_cup = std::make_unique<CollisionObject>();
+	//m_cup->Create("Resources/Cup");
+	//m_cup->AddInstance(DirectX::XMMatrixTranslation(0.0f, 30.f, 15.0f));
+	//m_cup->Translate(0.0f, 30.0f, 0.0f, 0);
+	//m_cup->GlobalScale(3.0f, 3.0f, 3.0f);
 
-	m_billboardTest = std::make_unique<BillboardObject>();
-	m_billboardTest->Create("Resources/tree0.dds");
-	m_billboardTest->AddInstance();
-	m_billboardTest->Scale(30.0f, 30.0f);
-	m_billboardTest->Translate(0.0f, 14.5f, 123.f);
+	//m_billboardTest = std::make_unique<BillboardObject>();
+	//m_billboardTest->Create("Resources/tree0.dds");
+	//m_billboardTest->AddInstance();
+	//m_billboardTest->Scale(30.0f, 30.0f);
+	//m_billboardTest->Translate(0.0f, 14.5f, 123.f);
 	
 	//m_sponza = std::make_unique<CollisionObject>();
 	//m_sponza->Create("Resources/Sponza");
 	//m_sponza->AddInstance();
 
-	m_gameObjects.push_back(m_ground.get());
-	m_gameObjects.push_back(m_sphere.get());
-	m_gameObjects.push_back(m_tree.get());
-	m_gameObjects.push_back(m_cup.get());
-	//m_models.push_back(m_sponza.get());
+	m_fullscreenQuad = std::make_unique<Square>();
+	m_fullscreenQuad->Create();
 
-	m_models.push_back(m_ground.get());
-	m_models.push_back(m_sphere.get());
-	m_models.push_back(m_tree.get());
-	m_models.push_back(m_cup.get());
+	//m_gameObjects.push_back(m_ground.get());
+	//m_gameObjects.push_back(m_sphere.get());
+	//m_gameObjects.push_back(m_tree.get());
+	//m_gameObjects.push_back(m_cup.get());
+	////m_models.push_back(m_sponza.get());
+
+	//m_models.push_back(m_ground.get());
+	//m_models.push_back(m_sphere.get());
+	//m_models.push_back(m_tree.get());
+	//m_models.push_back(m_cup.get());
 }
 
 void Game::InitSizeDependent()
@@ -599,26 +599,32 @@ void Game::Render()
 
 	IGameObject::BindStaticVertexBuffer();
 
+	SimpleVertexShader::Get()->bind();
+	BasicPixelShader::Get()->bind();
+
+	renderer->getContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	renderer->getContext()->DrawIndexed(6, 0, 0);
+
 
 	/*for (const auto & model : m_models)
 	{
 		model->Render<DisplacementShader>(g_camera.get());
 	}*/
-	m_sphere->Render<DisplacementShader>(g_camera.get());
-	//m_sponza->Render<TextureLightShader>(g_camera.get());
-	m_ground->Render<DisplacementShader>(g_camera.get());
-	m_tree->Render<TextureLightShader>(g_camera.get());
-	m_cup->Render<TextureLightShader>(g_camera.get());
+	//m_sphere->Render<DisplacementShader>(g_camera.get());
+	////m_sponza->Render<TextureLightShader>(g_camera.get());
+	//m_ground->Render<DisplacementShader>(g_camera.get());
+	//m_tree->Render<TextureLightShader>(g_camera.get());
+	//m_cup->Render<TextureLightShader>(g_camera.get());
 
-	m_billboardTest->Render<TextureShader>(g_camera.get());
+	//m_billboardTest->Render<TextureShader>(g_camera.get());
 
-	auto camPos = g_camera->GetPosition();
-	wchar_t buffer[128];
-	swprintf_s(buffer, L"Cam pos: (%.2f, %.2f, %.2f)",
-		camPos.x, camPos.y, camPos.z);
+	//auto camPos = g_camera->GetPosition();
+	//wchar_t buffer[128];
+	//swprintf_s(buffer, L"Cam pos: (%.2f, %.2f, %.2f)",
+	//	camPos.x, camPos.y, camPos.z);
 
-	m_camPosText->Render(g_screen.get(), buffer, 0.0f, 64.f,
-		DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	//m_camPosText->Render(g_screen.get(), buffer, 0.0f, 64.f,
+	//	DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
 
 	if (g_isDeveloper)
 	{

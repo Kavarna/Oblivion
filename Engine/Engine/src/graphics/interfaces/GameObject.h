@@ -8,10 +8,10 @@
 #include "Shader.h"
 #include "GraphicsObject.h"
 
-#include "../Shaders/BasicShader.h"
-#include "../Shaders/TextureLightShader.h"
-#include "../Shaders/TextureShader.h"
-#include "../Shaders/DisplacementShader.h"
+//#include "../Shaders/BasicShader.h"
+//#include "../Shaders/TextureLightShader.h"
+//#include "../Shaders/TextureShader.h"
+//#include "../Shaders/DisplacementShader.h"
 
 #include "../Helpers/GraphicsDebugDraw.h"
 

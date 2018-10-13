@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../common/common.h"
+#include "../../common/interfaces/Singletone.h"
 #include "../interfaces/GraphicsObject.h"
 #include "../Helpers/ShaderHelper.h"
 #include "../Direct3D11.h"
@@ -39,51 +40,138 @@ enum Pipeline
 class IShader : public IGraphicsObject
 {
 public:
-	struct SVertex; // For consistency
-protected:
-	IShader() {};
-	virtual ~IShader() {};
+	virtual void							bind() const = 0;
 
+	virtual inline Shader::ShaderType		getShaderType() const = 0;
+
+	inline	LPVOID							getShaderBlobPointer() const { return m_shaderBlob->GetBufferPointer(); };
+	inline	SIZE_T							getShaderBlobSize() const { return m_shaderBlob->GetBufferSize(); };
+
+protected:
+	MicrosoftPointer<ID3DBlob>				m_shaderBlob;
+	
+};
+
+enum VertexShaderEnum
+{
+	VertexShaderNone = 0,
+	VertexShaderSimple,
+	VertexShaderInstanced,
+	VertexShaderCustom = ~0
+};
+
+class IVertexShader : public IShader
+{
 private:
-	static Pipeline							m_currentlyBoundPipeline;
-
-protected:
-	static bool								shouldBind(const Pipeline& p)
-	{
-		if (p == m_currentlyBoundPipeline)
-			return false;
-		return true;
-	}
-
-protected:
-	MicrosoftPointer<ID3D11VertexShader>	m_vertexShader;
-	MicrosoftPointer<ID3D11HullShader>		m_hullShader;
-	MicrosoftPointer<ID3D11DomainShader>	m_domainShader;
-	MicrosoftPointer<ID3D11GeometryShader>	m_geometryShader;
-	MicrosoftPointer<ID3D11PixelShader>		m_pixelShader;
-	MicrosoftPointer<ID3D11ComputeShader>	m_computeShader;
-	MicrosoftPointer<ID3D11InputLayout>		m_inputLayout;
-
-protected:
-	virtual const Pipeline					GetPipelineType() const = 0;
+	static VertexShaderEnum					m_boundVertexShader;
 
 public:
-	virtual void							Create()		= 0;
-	virtual void							bind() const
-	{
-		auto p = GetPipelineType();
-		if (shouldBind(p))
-		{
-			m_currentlyBoundPipeline = p;
+	static bool								shouldBind(const VertexShaderEnum);
+	virtual void							bind() const;
+public:
+	IVertexShader() = default;
+	IVertexShader(LPWSTR path);
+	virtual ~IVertexShader();
 
-			m_d3d11Context->VSSetShader(m_vertexShader.Get(), nullptr, 0);
-			m_d3d11Context->IASetInputLayout(m_inputLayout.Get());
-			m_d3d11Context->HSSetShader(m_hullShader.Get(), nullptr, 0);
-			m_d3d11Context->DSSetShader(m_domainShader.Get(), nullptr, 0);
-			m_d3d11Context->GSSetShader(m_geometryShader.Get(), nullptr, 0);
-			m_d3d11Context->PSSetShader(m_pixelShader.Get(), nullptr, 0);
-			m_d3d11Context->CSSetShader(m_computeShader.Get(), nullptr, 0);
-		}
-	}
+public:
+	virtual void							createInputLayout() = 0;
 
+public:
+	virtual VertexShaderEnum				getVertexShaderType() const = 0;
+	virtual inline Shader::ShaderType		getShaderType() const final;
+	
+protected:
+	MicrosoftPointer<ID3D11InputLayout>		m_inputLayout;
+
+private:
+	MicrosoftPointer<ID3D11VertexShader>	m_vertexShader;
+
+};
+
+enum PixelShaderEnum
+{
+	PixelShaderNone = 0,
+	PixelShaderBasic,
+	PixelShaderBatch,
+	PixelShaderDisplacement,
+	PixelShaderTexture,
+	PixelShaderTextureLight,
+	PixelShaderCustom = ~0
+};
+
+class IPixelShader : public IShader
+{
+private:
+	static PixelShaderEnum					m_boundPixelShader;
+
+public:
+	static bool								shouldBind(const PixelShaderEnum);
+	virtual void							bind() const;
+public:
+	IPixelShader() = default;
+	IPixelShader(LPWSTR path);
+	virtual ~IPixelShader();
+
+public:
+	virtual PixelShaderEnum					getPixelShaderType() const = 0;
+	virtual inline Shader::ShaderType		getShaderType() const final;
+
+private:
+	MicrosoftPointer<ID3D11PixelShader>		m_pixelShader;
+};
+
+enum DomainShaderEnum
+{
+	DomainShaderNone = 0,
+	DomainShaderDisplacement,
+	DomainShaderCustom = ~0
+};
+
+class IDomainShader : public IShader
+{
+private:
+	static DomainShaderEnum					m_boundDomainShader;
+
+public:
+	static bool								shouldBind(const DomainShaderEnum);
+	virtual void							bind() const;
+public:
+	IDomainShader() = default;
+	IDomainShader(LPWSTR path);
+	virtual ~IDomainShader();
+
+public:
+	virtual DomainShaderEnum				getDomainShaderType() const = 0;
+	virtual inline Shader::ShaderType		getShaderType() const final;
+
+private:
+	MicrosoftPointer<ID3D11DomainShader>	m_domainShader;
+};
+
+enum HullShaderEnum
+{
+	HullShaderNone = 0,
+	HullShaderDisplacement,
+	HullShaderCustom = ~0
+};
+
+class IHullShader : public IShader
+{
+private:
+	static HullShaderEnum					m_boundHullShader;
+
+public:
+	static bool								shouldBind(const HullShaderEnum);
+	virtual void							bind() const;
+public:
+	IHullShader() = default;
+	IHullShader(LPWSTR path);
+	virtual ~IHullShader();
+
+public:
+	virtual HullShaderEnum					getHullShaderType() const = 0;
+	virtual inline Shader::ShaderType		getShaderType() const final;
+
+private:
+	MicrosoftPointer<ID3D11HullShader>		m_hullShader;
 };

@@ -157,30 +157,26 @@
     <ClCompile Include="src\graphics\BillboardObject.cpp" />
     <ClCompile Include="src\graphics\Font.cpp" />
     <ClCompile Include="src\graphics\Projection.cpp" />
-    <ClCompile Include="src\graphics\Shaders\SimpleTextureShader.cpp" />
+    <ClCompile Include="src\graphics\Shaders\BasicPixelShader.cpp" />
+    <ClCompile Include="src\graphics\Shaders\SimpleVertexShader.cpp" />
     <ClCompile Include="src\graphics\Text.cpp" />
     <ClCompile Include="src\physics\CollisionObject.cpp" />
     <ClCompile Include="src\physics\PhysicsDebugDraw.cpp" />
     <ClCompile Include="src\physics\World.cpp" />
     <ClCompile Include="src\graphics\interfaces\Shader.cpp" />
-    <ClCompile Include="src\graphics\Shaders\DisplacementShader.cpp" />
     <ClCompile Include="src\graphics\DDSTextureLoader.cpp" />
     <ClCompile Include="src\graphics\Helpers\GraphicsDebugDraw.cpp" />
     <ClCompile Include="src\graphics\interfaces\ICamera.cpp" />
-    <ClCompile Include="src\graphics\Shaders\EmptyShader.cpp" />
     <ClCompile Include="src\graphics\Square.cpp" />
     <ClCompile Include="src\common\Globals.cpp" />
     <ClCompile Include="src\graphics\RenderTexture.cpp" />
     <ClCompile Include="src\graphics\Helpers\BatchRenderer.cpp" />
     <ClCompile Include="src\common\common.cpp" />
     <ClCompile Include="src\graphics\interfaces\GameObject.cpp" />
-    <ClCompile Include="src\graphics\Shaders\BasicShader.cpp" />
     <ClCompile Include="src\graphics\Camera.cpp" />
     <ClCompile Include="src\graphics\Direct3D11.cpp" />
     <ClCompile Include="src\graphics\Helpers\GeometryGenerator.cpp" />
     <ClCompile Include="src\graphics\Model.cpp" />
-    <ClCompile Include="src\graphics\Shaders\BatchShader.cpp" />
-    <ClCompile Include="src\graphics\Shaders\TextureLightShader.cpp" />
     <ClCompile Include="src\graphics\Texture.cpp" />
     <ClCompile Include="src\graphics\WICTextureLoader.cpp" />
     <ClCompile Include="src\imgui\imgui.cpp" />
@@ -190,7 +186,6 @@
     <ClCompile Include="src\input\Keyboard.cpp" />
     <ClCompile Include="src\input\Mouse.cpp" />
     <ClCompile Include="src\winmain.cpp" />
-    <ClCompile Include="src\graphics\Shaders\TextureShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\Bezier\BezierEasing.h" />
@@ -200,13 +195,13 @@
     <ClInclude Include="src\graphics\Font.h" />
     <ClInclude Include="src\graphics\interfaces\I2DTransforms.h" />
     <ClInclude Include="src\common\interfaces\Singletone.h" />
-    <ClInclude Include="src\graphics\Shaders\SimpleTextureShader.h" />
+    <ClInclude Include="src\graphics\Shaders\BasicPixelShader.h" />
+    <ClInclude Include="src\graphics\Shaders\ShaderBufferManager.h" />
+    <ClInclude Include="src\graphics\Shaders\SimpleVertexShader.h" />
     <ClInclude Include="src\graphics\Text.h" />
     <ClInclude Include="src\physics\CollisionObject.h" />
     <ClInclude Include="src\physics\PhysicsDebugDraw.h" />
     <ClInclude Include="src\physics\World.h" />
-    <ClInclude Include="src\graphics\Shaders\EmptyShader.h" />
-    <ClInclude Include="src\graphics\Shaders\DisplacementShader.h" />
     <ClInclude Include="src\graphics\DDSTextureLoader.h" />
     <ClInclude Include="src\graphics\Helpers\GraphicsDebugDraw.h" />
     <ClInclude Include="src\graphics\Square.h" />
@@ -216,12 +211,10 @@
     <ClInclude Include="src\graphics\Helpers\BatchRenderer.h" />
     <ClInclude Include="src\graphics\Helpers\RenderHelper.h" />
     <ClInclude Include="src\graphics\interfaces\GraphicsObject.h" />
-    <ClInclude Include="src\graphics\Shaders\BatchShader.h" />
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\common\common.h" />
     <ClInclude Include="src\common\commonmath.h" />
     <ClInclude Include="src\graphics\Helpers\Lights.h" />
-    <ClInclude Include="src\graphics\Shaders\BasicShader.h" />
     <ClInclude Include="src\graphics\Camera.h" />
     <ClInclude Include="src\graphics\Direct3D11.h" />
     <ClInclude Include="src\graphics\Helpers\GeometryGenerator.h" />
@@ -231,7 +224,6 @@
     <ClInclude Include="src\graphics\interfaces\Shader.h" />
     <ClInclude Include="src\graphics\Model.h" />
     <ClInclude Include="src\graphics\Helpers\ShaderHelper.h" />
-    <ClInclude Include="src\graphics\Shaders\TextureLightShader.h" />
     <ClInclude Include="src\graphics\Texture.h" />
     <ClInclude Include="src\graphics\Helpers\TextureUtilities.h" />
     <ClInclude Include="src\graphics\WICTextureLoader.h" />
@@ -246,7 +238,6 @@
     <ClInclude Include="src\input\Mouse.h" />
     <ClInclude Include="src\input\PlatformHelpers.h" />
     <ClInclude Include="src\OblivionInclude.h" />
-    <ClInclude Include="src\graphics\Shaders\TextureShader.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\BasicPixelShader.hlsl">
@@ -338,29 +329,21 @@
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(LocalDebuggerWorkingDirectory)Shaders\%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(LocalDebuggerWorkingDirectory)Shaders\%(Filename).cso</ObjectFileOutput>
     </FxCompile>
-    <FxCompile Include="src\shaders\SimpleTexturePixelShader.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)Shaders\%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)Shaders\%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(LocalDebuggerWorkingDirectory)Shaders\%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(LocalDebuggerWorkingDirectory)Shaders\%(Filename).cso</ObjectFileOutput>
+    <FxCompile Include="src\shaders\InstancedVertexShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
-    <FxCompile Include="src\shaders\TextureBatchPixelShader.hlsl">
+    <FxCompile Include="src\shaders\SimpleVertexShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(LocalDebuggerWorkingDirectory)Shaders\%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(LocalDebuggerWorkingDirectory)Shaders\%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)Shaders\%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)Shaders\%(Filename).cso</ObjectFileOutput>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="src\shaders\TextureBatchVertexShader.hlsl">
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)Shaders\%(Filename).cso</ObjectFileOutput>

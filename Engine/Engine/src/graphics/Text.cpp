@@ -1,5 +1,5 @@
 #include "Text.h"
-#include "Shaders/SimpleTextureShader.h"
+#include "interfaces/Shader.h"
 
 Text::Text(std::shared_ptr<CFont> Font,
 	float WindowWidth, float WindowHeight,
@@ -85,8 +85,11 @@ void Text::Render(ICamera * cam, const DirectX::XMFLOAT4& color)
 	static UINT Stride = sizeof(CFont::SVertex);
 	static UINT Offset = 0;
 	static auto renderer = Direct3D11::Get();
-	auto shader = SimpleTextureShader::Get();
-
+	/// TODO: Change this
+	//auto shader = SimpleTextureShader::Get();
+	//shader->bind();
+	/*shader->SetCameraInfo(WVP);
+	shader->SetColor(color);*/
 	ID3D11Buffer * vertexBuffers[] = {
 		mVertexBuffer.Get(),
 		nullptr
@@ -95,12 +98,9 @@ void Text::Render(ICamera * cam, const DirectX::XMFLOAT4& color)
 	m_d3d11Context->IASetVertexBuffers(0, 2, vertexBuffers, &Stride, &Offset);
 	m_d3d11Context->IASetIndexBuffer(mIndexBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
 	m_d3d11Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	shader->bind();
 	static DirectX::XMMATRIX WVP;
 	WVP = cam->GetView() * cam->GetProjection();
 	WVP = DirectX::XMMatrixTranspose(WVP);
-	shader->SetCameraInfo(WVP);
-	shader->SetColor(color);
 
 	ID3D11ShaderResourceView * SRVs[] = 
 	{

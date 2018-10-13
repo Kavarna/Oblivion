@@ -30,28 +30,30 @@ void BatchRenderer::Begin()
 
 void BatchRenderer::Vertex(BatchShader::SVertex const & vertex)
 {
-	Vertex(vertex.Position, vertex.Color);
+	/// TODO: Fix this
+	//Vertex(vertex.Position, vertex.Color);
 }
 
 void BatchRenderer::Vertex(DirectX::XMFLOAT3 const & pos, DirectX::XMFLOAT4 const & color)
 {
-	m_bufferData[m_currentIndex].Position = pos;
-	m_bufferData[m_currentIndex].Color = color;
+	/// TODO: Fix this
+	//m_bufferData[m_currentIndex].Position = pos;
+	//m_bufferData[m_currentIndex].Color = color;
 	m_currentIndex++;
-	//assert(m_currentIndex < m_numMaxVertices);
 	if (m_currentIndex >= m_numMaxVertices)
 		ReconstructAndCopy(m_numMaxVertices * 10);
 }
 
 void BatchRenderer::End(ICamera * cam, D3D11_PRIMITIVE_TOPOLOGY topology)
 {
-	auto shader = BatchShader::Get();
+	/// TODO: Fix this
+	//auto shader = BatchShader::Get();
 
-	shader->bind();
+	//shader->bind();
 
-	DirectX::XMMATRIX VP = cam->GetView() * cam->GetProjection();
-	VP = DirectX::XMMatrixTranspose(VP);
-	shader->SetCamera(VP);
+	//DirectX::XMMATRIX VP = cam->GetView() * cam->GetProjection();
+	//VP = DirectX::XMMatrixTranspose(VP);
+	//shader->SetCamera(VP);
 
 	ShaderHelper::UnmapBuffer(m_d3d11Context.Get(), m_vertexBuffer.Get());
 
@@ -114,21 +116,25 @@ void TextureBatchRenderer::Begin()
 
 void TextureBatchRenderer::Vertex(DirectX::XMFLOAT3 const & pos, DirectX::XMFLOAT2 const & tex)
 {
-	m_bufferData[m_currentIndex].Position = pos;
-	m_bufferData[m_currentIndex].texCoord = tex;
+	/// TODO: Fix this
+	/*m_bufferData[m_currentIndex].Position = pos;
+	m_bufferData[m_currentIndex].texCoord = tex;*/
 	m_currentIndex++;
 	assert(m_currentIndex < m_numMaxVertices);
 }
 
 void TextureBatchRenderer::End(ICamera * cam, Texture * tex, D3D11_PRIMITIVE_TOPOLOGY top)
 {
-	auto shader = TextureBatchShader::Get();
-
-	shader->bind();
+	/// TODO: Fix this
+	/*auto shader = TextureBatchShader::Get();
 
 	DirectX::XMMATRIX VP = cam->GetView() * cam->GetProjection();
 	VP = DirectX::XMMatrixTranspose(VP);
 	shader->SetCamera(VP);
+
+	shader->bind();
+
+	*/
 
 	ShaderHelper::UnmapBuffer(m_d3d11Context.Get(), m_vertexBuffer.Get());
 

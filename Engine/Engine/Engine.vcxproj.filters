@@ -15,20 +15,14 @@
     <ClCompile Include="src\graphics\Camera.cpp" />
     <ClCompile Include="src\graphics\Model.cpp" />
     <ClCompile Include="src\graphics\Helpers\GeometryGenerator.cpp" />
-    <ClCompile Include="src\graphics\Shaders\BasicShader.cpp" />
-    <ClCompile Include="src\graphics\Shaders\TextureLightShader.cpp" />
     <ClCompile Include="src\graphics\interfaces\GameObject.cpp" />
-    <ClCompile Include="src\graphics\Shaders\BatchShader.cpp" />
     <ClCompile Include="src\graphics\RenderTexture.cpp" />
     <ClCompile Include="src\common\Globals.cpp" />
-    <ClCompile Include="src\graphics\Shaders\TextureShader.cpp" />
     <ClCompile Include="src\graphics\Square.cpp" />
     <ClCompile Include="src\graphics\Helpers\BatchRenderer.cpp" />
     <ClCompile Include="src\graphics\interfaces\ICamera.cpp" />
     <ClCompile Include="src\graphics\DDSTextureLoader.cpp" />
-    <ClCompile Include="src\graphics\Shaders\DisplacementShader.cpp" />
     <ClCompile Include="src\graphics\interfaces\Shader.cpp" />
-    <ClCompile Include="src\graphics\Shaders\EmptyShader.cpp" />
     <ClCompile Include="src\COM\COMManager.cpp" />
     <ClCompile Include="src\common\commonmath.cpp" />
     <ClCompile Include="src\graphics\Projection.cpp" />
@@ -40,8 +34,9 @@
     <ClCompile Include="src\common\Bezier\BezierEasing.cpp" />
     <ClCompile Include="src\graphics\Font.cpp" />
     <ClCompile Include="src\graphics\Text.cpp" />
-    <ClCompile Include="src\graphics\Shaders\SimpleTextureShader.cpp" />
     <ClCompile Include="src\graphics\BillboardObject.cpp" />
+    <ClCompile Include="src\graphics\Shaders\SimpleVertexShader.cpp" />
+    <ClCompile Include="src\graphics\Shaders\BasicPixelShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\commonmath.h" />
@@ -68,21 +63,15 @@
     <ClInclude Include="src\graphics\Helpers\ShaderHelper.h" />
     <ClInclude Include="src\graphics\Helpers\GeometryGenerator.h" />
     <ClInclude Include="src\graphics\Helpers\TextureUtilities.h" />
-    <ClInclude Include="src\graphics\Shaders\BasicShader.h" />
-    <ClInclude Include="src\graphics\Shaders\TextureLightShader.h" />
     <ClInclude Include="src\graphics\Helpers\Lights.h" />
-    <ClInclude Include="src\graphics\Shaders\BatchShader.h" />
     <ClInclude Include="src\graphics\Helpers\RenderHelper.h" />
     <ClInclude Include="src\graphics\RenderTexture.h" />
     <ClInclude Include="src\common\Globals.h" />
-    <ClInclude Include="src\graphics\Shaders\TextureShader.h" />
     <ClInclude Include="src\graphics\Projection.h" />
     <ClInclude Include="src\graphics\Square.h" />
     <ClInclude Include="src\graphics\Helpers\BatchRenderer.h" />
     <ClInclude Include="src\graphics\interfaces\ICamera.h" />
     <ClInclude Include="src\graphics\DDSTextureLoader.h" />
-    <ClInclude Include="src\graphics\Shaders\DisplacementShader.h" />
-    <ClInclude Include="src\graphics\Shaders\EmptyShader.h" />
     <ClInclude Include="src\COM\COMManager.h" />
     <ClInclude Include="src\physics\World.h" />
     <ClInclude Include="src\physics\CollisionObject.h" />
@@ -94,10 +83,12 @@
     <ClInclude Include="src\graphics\interfaces\GraphicsObject.h" />
     <ClInclude Include="src\graphics\Font.h" />
     <ClInclude Include="src\graphics\Text.h" />
-    <ClInclude Include="src\graphics\Shaders\SimpleTextureShader.h" />
     <ClInclude Include="src\common\interfaces\Singletone.h" />
     <ClInclude Include="src\common\interfaces\AlignedObject.h" />
     <ClInclude Include="src\graphics\BillboardObject.h" />
+    <ClInclude Include="src\graphics\Shaders\SimpleVertexShader.h" />
+    <ClInclude Include="src\graphics\Shaders\BasicPixelShader.h" />
+    <ClInclude Include="src\graphics\Shaders\ShaderBufferManager.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\BasicVertexShader.hlsl" />
@@ -113,9 +104,9 @@
     <FxCompile Include="src\shaders\DisplacementMappingHullShader.hlsl" />
     <FxCompile Include="src\shaders\DisplacementMappingDomainShader.hlsl" />
     <FxCompile Include="src\shaders\TextureBatchVertexShader.hlsl" />
-    <FxCompile Include="src\shaders\TextureBatchPixelShader.hlsl" />
-    <FxCompile Include="src\shaders\SimpleTexturePixelShader.hlsl" />
     <FxCompile Include="src\shaders\SimpleTextureVertexShader.hlsl" />
+    <FxCompile Include="src\shaders\InstancedVertexShader.hlsl" />
+    <FxCompile Include="src\shaders\SimpleVertexShader.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\Lights.hlsli" />

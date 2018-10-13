@@ -110,24 +110,26 @@ void IGameObject::Render(ICamera * cam, const Pipeline& p) const
 
 void IGameObject::RenderBasic(ICamera * cam) const
 {
-	static BasicShader * shader = BasicShader::Get();
+	/// TODO: Fix this
+	/*static BasicShader * shader = BasicShader::Get();
 	shader->bind();
 	static DirectX::XMMATRIX VP;
 	VP = cam->GetView() * cam->GetProjection();
 	VP = DirectX::XMMatrixTranspose(VP);
-	shader->SetCameraInformations({ VP });
+	shader->SetCameraInformations({ VP });*/
 	m_bindMaterialToShader = (int)Shader::ShaderType::ePixel;
 }
 
 void IGameObject::RenderTexture(ICamera * cam) const
 {
+	/// TODO: Fix this
 	static auto renderer = Direct3D11::Get();
-	static TextureShader * shader = TextureShader::Get();
+	/*static TextureShader * shader = TextureShader::Get();
 	shader->bind();
 	shader->SetCameraInformations({
 		DirectX::XMMatrixTranspose(cam->GetView()),
 		DirectX::XMMatrixTranspose(cam->GetProjection())
-		});
+		});*/
 
 	m_d3d11Context->PSSetSamplers(0, 1, renderer->m_anisotropicWrapSampler.GetAddressOf());
 	m_bindMaterialToShader = (int)Shader::ShaderType::ePixel;
@@ -135,13 +137,14 @@ void IGameObject::RenderTexture(ICamera * cam) const
 
 void IGameObject::RenderTextureLight(ICamera * cam) const
 {
+	/// TODO: Fix this
 	static auto renderer = Direct3D11::Get();
-	static TextureLightShader * shader = TextureLightShader::Get();
+	/*static TextureLightShader * shader = TextureLightShader::Get();
 	shader->bind();
 	shader->SetCameraInformations({
 		DirectX::XMMatrixTranspose(cam->GetView()),
 		DirectX::XMMatrixTranspose(cam->GetProjection())
-		});
+		});*/
 
 	m_d3d11Context->PSSetSamplers(0, 1, renderer->m_linearWrapSampler.GetAddressOf());
 	m_bindMaterialToShader = (int)Shader::ShaderType::ePixel;
@@ -149,10 +152,11 @@ void IGameObject::RenderTextureLight(ICamera * cam) const
 
 void IGameObject::RenderDisplacementTextureLight(ICamera * cam) const
 {
+	/// TODO: Fix this
 	static auto renderer = Direct3D11::Get();
-	static DisplacementShader * shader = DisplacementShader::Get();
+	/*static DisplacementShader * shader = DisplacementShader::Get();
 	shader->bind();
-	shader->SetCameraInfo(cam);
+	shader->SetCameraInfo(cam);*/
 	m_d3d11Context->PSSetSamplers(0, 1, renderer->m_linearWrapSampler.GetAddressOf());
 	m_d3d11Context->DSSetSamplers(0, 1, renderer->m_linearWrapSampler.GetAddressOf());
 	m_bindMaterialToShader  = (int)Shader::ShaderType::ePixel;
