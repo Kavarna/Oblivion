@@ -57,7 +57,6 @@ MessageBoxA(NULL,"Unexpected error occured", "Error", MB_ICONERROR| MB_OK); exit
 #include <dxgi.h>
 #include <D3Dcompiler.h>
 #include <wrl.h>
-#include <comdecl.h>
 #include <comdef.h>
 #include <ShObjIdl.h>
 
