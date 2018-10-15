@@ -205,7 +205,9 @@ void Game::Init3D()
 	//m_sponza->AddInstance();
 
 	m_fullscreenQuad = std::make_unique<Square>();
-	m_fullscreenQuad->Create();
+	m_fullscreenQuad->Create(L"Resources/grass.dds");
+	m_fullscreenQuad->AddInstance();
+	m_fullscreenQuad->Scale(50.f, 50.f);
 
 	//m_gameObjects.push_back(m_ground.get());
 	//m_gameObjects.push_back(m_sphere.get());
@@ -599,11 +601,7 @@ void Game::Render()
 
 	IGameObject::BindStaticVertexBuffer();
 
-	SimpleVertexShader::Get()->bind();
-	BasicPixelShader::Get()->bind();
-
-	renderer->getContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	renderer->getContext()->DrawIndexed(6, 0, 0);
+	m_fullscreenQuad->Render<TexturePipeline>(g_screen.get());
 
 
 	/*for (const auto & model : m_models)

@@ -28,7 +28,7 @@ public:
 			void						TranslateTo(float X, float Y, int InstanceID = 0);
 private:
 			void						DrawIndexedInstanced(ICamera * cam) const override;
-			bool						PrepareIA(const Pipeline& p) const override;
+			bool						PrepareIA(const PipelineEnum& p) const override;
 protected:
 	float								m_width;
 	float								m_height;

@@ -23,20 +23,6 @@ namespace Shader
 
 }
 
-enum Pipeline
-{
-	PipelineNone = 0,
-	PipelineBatchShader = -1,
-	PipelineTextureBatchShader = -2,
-	PipelineSimpleTexture = -3,
-	PipelineBasic = 1,
-	PipelineTexture = 2,
-	PipelineTextureLight = 3,
-	PipelineDisplacementTextureLight = 4,
-	PipelineCompute2D = 5,
-	PipelineCustom = INT_MAX
-};
-
 class IShader : public IGraphicsObject
 {
 public:

@@ -8,6 +8,10 @@
 #include "Shader.h"
 #include "GraphicsObject.h"
 
+#include "../Pipelines/Pipeline.h"
+#include "../Pipelines/BasicPipeline.h"
+#include "../Pipelines/TexturePipeline.h"
+
 //#include "../Shaders/BasicShader.h"
 //#include "../Shaders/TextureLightShader.h"
 //#include "../Shaders/TextureShader.h"
@@ -80,9 +84,9 @@ public:
 	virtual			void							RemoveInstance(CommonTypes::Range const& range);
 	virtual			int								PrepareInstances(std::function<bool(uint32_t)> & func,
 														std::function<DirectX::XMMATRIX(DirectX::FXMMATRIX)> modifyWorld = nullptr) const;
-	virtual			void							Render(ICamera * cam, const Pipeline& p) const;
+	virtual			void							Render(ICamera * cam, const PipelineEnum& p) const;
 
-	template <class Shader>
+	template <class Pipeline>
 					void							Render(ICamera * cam) const;
 
 protected:
@@ -91,7 +95,7 @@ protected:
 	virtual			void							RenderTextureLight(ICamera * cam) const;
 	virtual			void							RenderDisplacementTextureLight(ICamera * cam) const;
 	virtual			void							DrawIndexedInstanced(ICamera * cam) const = 0;
-	virtual			bool							PrepareIA(const Pipeline&) const = 0;
+	virtual			bool							PrepareIA(const PipelineEnum&) const = 0;
 
 protected:
 	/*
@@ -124,47 +128,75 @@ protected:
 			std::string								m_objectName;
 };
 
-template<class Shader>
+//template<class Pipeline>
+//inline void IGameObject::Render(ICamera * cam) const
+//{
+//	static_assert(std::is_base_of<IShader, Shader>::value,
+//		"Generic argument for Render(ICamera * cam) must be a IShader based class");
+//
+//	if (m_objectWorld.size() < 1)
+//		return;
+//
+//	if constexpr (std::is_same<Shader, BasicShader>::value)
+//	{
+//		if (!PrepareIA(Pipeline::PipelineBasic))
+//			return;
+//		RenderBasic(cam);
+//	}
+//	else if constexpr (std::is_same<Shader, TextureShader>::value)
+//	{
+//		if (!PrepareIA(Pipeline::PipelineTexture))
+//			return;
+//		RenderTexture(cam);
+//	}
+//	else if constexpr (std::is_same<Shader, TextureLightShader>::value)
+//	{
+//		if (!PrepareIA(Pipeline::PipelineTextureLight))
+//			return;
+//		RenderTextureLight(cam);
+//	}
+//	else if constexpr (std::is_same<Shader, DisplacementShader>::value)
+//	{
+//		if (!PrepareIA(Pipeline::PipelineDisplacementTextureLight))
+//			return;
+//		RenderDisplacementTextureLight(cam);
+//	}
+//	else
+//	{
+//		auto shader = Shader::Get();
+//		if (!PrepareIA(shader->GetPreferedPipelineType()))
+//			return;
+//		shader->RenderGameObject(this, cam);
+//		//static_assert(false,
+//			//"Can't render a game object using this shader");
+//	}
+//
+//	DrawIndexedInstanced(cam);
+//}
+
+
+template <class Pipeline>
 inline void IGameObject::Render(ICamera * cam) const
 {
-	static_assert(std::is_base_of<IShader, Shader>::value,
-		"Generic argument for Render(ICamera * cam) must be a IShader based class");
+	static_assert(std::is_base_of<IPipeline, Pipeline>::value,
+		"Generic argument for Render(ICamera * cam) must be a IPipeline based class");
 
 	if (m_objectWorld.size() < 1)
 		return;
 
-	if constexpr (std::is_same<Shader, BasicShader>::value)
+	if constexpr (std::is_same<Pipeline, BasicPipeline>::value)
 	{
-		if (!PrepareIA(Pipeline::PipelineBasic))
+		if (!PrepareIA(PipelineEnum::PipelineBasic))
 			return;
+		BasicPipeline::Get()->bind(cam);
 		RenderBasic(cam);
 	}
-	else if constexpr (std::is_same<Shader, TextureShader>::value)
+	else if constexpr (std::is_same<Pipeline, TexturePipeline>::value)
 	{
-		if (!PrepareIA(Pipeline::PipelineTexture))
+		if (!PrepareIA(PipelineEnum::PipelineTexture))
 			return;
+		TexturePipeline::Get()->bind(cam);
 		RenderTexture(cam);
-	}
-	else if constexpr (std::is_same<Shader, TextureLightShader>::value)
-	{
-		if (!PrepareIA(Pipeline::PipelineTextureLight))
-			return;
-		RenderTextureLight(cam);
-	}
-	else if constexpr (std::is_same<Shader, DisplacementShader>::value)
-	{
-		if (!PrepareIA(Pipeline::PipelineDisplacementTextureLight))
-			return;
-		RenderDisplacementTextureLight(cam);
-	}
-	else
-	{
-		auto shader = Shader::Get();
-		if (!PrepareIA(shader->GetPreferedPipelineType()))
-			return;
-		shader->RenderGameObject(this, cam);
-		//static_assert(false,
-			//"Can't render a game object using this shader");
 	}
 
 	DrawIndexedInstanced(cam);

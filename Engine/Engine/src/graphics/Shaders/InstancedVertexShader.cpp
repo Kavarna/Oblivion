@@ -1,7 +1,7 @@
-#include "SimpleVertexShader.h"
+#include "InstancedVertexShader.h"
 
-SimpleVertexShader::SimpleVertexShader() :
-	IVertexShader(L"Shaders/SimpleVertexShader.cso")
+InstancedVertexShader::InstancedVertexShader() :
+	IVertexShader(L"Shaders/InstancedVertexShader.cso")
 {
 	ShaderHelper::CreateBuffer(
 		m_d3d11Device.Get(), &m_cameraBuffer,
@@ -11,24 +11,24 @@ SimpleVertexShader::SimpleVertexShader() :
 	);
 }
 
-void __vectorcall SimpleVertexShader::SetCamera(const SCameraInfo & WVP)
+void __vectorcall InstancedVertexShader::SetCamera(const SCameraInfo & WVP)
 {
 	ShaderHelper::MapBuffer(m_d3d11Context.Get(), m_cameraBuffer.Get(), (void*)&WVP,
 		sizeof(SCameraInfo));
 	m_d3d11Context->VSSetConstantBuffers(0, 1, m_cameraBuffer.GetAddressOf());
 }
 
-void SimpleVertexShader::Create()
+void InstancedVertexShader::Create()
 {
 	createInputLayout();
 }
 
-void SimpleVertexShader::createInputLayout()
+void InstancedVertexShader::createInputLayout()
 {
-	LPVOID shaderPointer	= getShaderBlobPointer();
-	SIZE_T shaderSize		= getShaderBlobSize();
+	LPVOID shaderPointer = getShaderBlobPointer();
+	SIZE_T shaderSize = getShaderBlobSize();
 
-	D3D11_INPUT_ELEMENT_DESC layout[5];
+	D3D11_INPUT_ELEMENT_DESC layout[9];
 	layout[0].AlignedByteOffset = 0;
 	layout[0].Format = DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT;
 	layout[0].InputSlot = 0;
@@ -69,13 +69,42 @@ void SimpleVertexShader::createInputLayout()
 	layout[4].SemanticIndex = 0;
 	layout[4].SemanticName = "BINORMAL";
 
+	layout[5].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+	layout[5].Format = DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT;
+	layout[5].InputSlot = 1;
+	layout[5].InputSlotClass = D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA;
+	layout[5].InstanceDataStepRate = 1;
+	layout[5].SemanticIndex = 0;
+	layout[5].SemanticName = "WORLDMATRIX";
+	layout[6].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+	layout[6].Format = DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT;
+	layout[6].InputSlot = 1;
+	layout[6].InputSlotClass = D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA;
+	layout[6].InstanceDataStepRate = 1;
+	layout[6].SemanticIndex = 1;
+	layout[6].SemanticName = "WORLDMATRIX";
+	layout[7].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+	layout[7].Format = DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT;
+	layout[7].InputSlot = 1;
+	layout[7].InputSlotClass = D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA;
+	layout[7].InstanceDataStepRate = 1;
+	layout[7].SemanticIndex = 2;
+	layout[7].SemanticName = "WORLDMATRIX";
+	layout[8].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+	layout[8].Format = DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT;
+	layout[8].InputSlot = 1;
+	layout[8].InputSlotClass = D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA;
+	layout[8].InstanceDataStepRate = 1;
+	layout[8].SemanticIndex = 3;
+	layout[8].SemanticName = "WORLDMATRIX";
+
 	ThrowIfFailed(
 		m_d3d11Device->CreateInputLayout(layout, ARRAYSIZE(layout),
 			shaderPointer, shaderSize, &m_inputLayout)
 	);
 }
 
-VertexShaderEnum SimpleVertexShader::getVertexShaderType() const
+VertexShaderEnum InstancedVertexShader::getVertexShaderType() const
 {
-	return VertexShaderEnum::VertexShaderSimple;
+	return VertexShaderEnum::VertexShaderInstanced;
 }

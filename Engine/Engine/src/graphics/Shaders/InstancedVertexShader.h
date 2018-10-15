@@ -2,10 +2,10 @@
 
 #include "../interfaces/Shader.h"
 
-class SimpleVertexShader sealed : public IVertexShader, public Singletone<SimpleVertexShader>
+class InstancedVertexShader sealed : public IVertexShader, public Singletone<InstancedVertexShader>
 {
 public:
-	SimpleVertexShader();
+	InstancedVertexShader();
 
 private:
 	MicrosoftPointer<ID3D11Buffer>		m_cameraBuffer;
@@ -13,7 +13,6 @@ private:
 public:
 	struct SCameraInfo
 	{
-		DirectX::XMMATRIX World;
 		DirectX::XMMATRIX View;
 		DirectX::XMMATRIX Projection;
 	};

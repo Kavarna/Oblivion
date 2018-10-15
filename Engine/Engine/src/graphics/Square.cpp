@@ -102,9 +102,9 @@ void Square::DrawIndexedInstanced(ICamera * cam) const
 		g_drawCalls++;
 }
 
-bool Square::PrepareIA(const Pipeline & p) const
+bool Square::PrepareIA(const PipelineEnum & p) const
 {
-	if (p == Pipeline::PipelineTexture)
+	if (p == PipelineEnum::PipelineTexture)
 	{
 		m_d3d11Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		return true;

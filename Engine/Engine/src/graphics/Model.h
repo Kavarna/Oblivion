@@ -41,7 +41,7 @@ private:
 
 protected:
 			void							DrawIndexedInstanced(ICamera * cam) const override;
-			bool							PrepareIA(const Pipeline& p) const override;
+			bool							PrepareIA(const PipelineEnum& p) const override;
 
 private:
 	virtual	bool							ShouldRenderInstance(ICamera * cam, uint32_t id) const;

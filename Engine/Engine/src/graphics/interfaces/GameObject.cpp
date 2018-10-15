@@ -84,22 +84,22 @@ int IGameObject::PrepareInstances(std::function<bool(uint32_t)> & shouldRender,
 	return renderInstances;
 }
 
-void IGameObject::Render(ICamera * cam, const Pipeline& p) const
+void IGameObject::Render(ICamera * cam, const PipelineEnum& p) const
 {
 	if (!PrepareIA(p))
 		return;
 	switch (p)
 	{
-	case Pipeline::PipelineBasic:
+	case PipelineEnum::PipelineBasic:
 		RenderBasic(cam);
 		break;
-	case Pipeline::PipelineTexture:
+	case PipelineEnum::PipelineTexture:
 		RenderTexture(cam);
 		break;
-	case Pipeline::PipelineTextureLight:
+	case PipelineEnum::PipelineTextureLight:
 		RenderTextureLight(cam);
 		break;
-	case Pipeline::PipelineDisplacementTextureLight:
+	case PipelineEnum::PipelineDisplacementTextureLight:
 		RenderDisplacementTextureLight(cam);
 		break;
 	default:

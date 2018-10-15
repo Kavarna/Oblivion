@@ -449,9 +449,9 @@ void Model::DrawIndexedInstanced(ICamera * cam) const
 
 }
 
-bool Model::PrepareIA(const Pipeline & p) const
+bool Model::PrepareIA(const PipelineEnum & p) const
 {
-	if (p == Pipeline::PipelineDisplacementTextureLight)
+	if (p == PipelineEnum::PipelineDisplacementTextureLight)
 	{
 		m_d3d11Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 	}

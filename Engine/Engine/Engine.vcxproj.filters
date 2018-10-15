@@ -37,6 +37,8 @@
     <ClCompile Include="src\graphics\BillboardObject.cpp" />
     <ClCompile Include="src\graphics\Shaders\SimpleVertexShader.cpp" />
     <ClCompile Include="src\graphics\Shaders\BasicPixelShader.cpp" />
+    <ClCompile Include="src\graphics\Shaders\InstancedVertexShader.cpp" />
+    <ClCompile Include="src\graphics\Shaders\TexturePixelShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\commonmath.h" />
@@ -88,7 +90,11 @@
     <ClInclude Include="src\graphics\BillboardObject.h" />
     <ClInclude Include="src\graphics\Shaders\SimpleVertexShader.h" />
     <ClInclude Include="src\graphics\Shaders\BasicPixelShader.h" />
-    <ClInclude Include="src\graphics\Shaders\ShaderBufferManager.h" />
+    <ClInclude Include="src\graphics\Pipelines\Pipeline.h" />
+    <ClInclude Include="src\graphics\Pipelines\BasicPipeline.h" />
+    <ClInclude Include="src\graphics\Shaders\InstancedVertexShader.h" />
+    <ClInclude Include="src\graphics\Pipelines\TexturePipeline.h" />
+    <ClInclude Include="src\graphics\Shaders\TexturePixelShader.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\BasicVertexShader.hlsl" />

@@ -22,11 +22,11 @@ cbuffer cbMaterial : register(b2)
 struct VSOut
 {
 	float4 PosH			: SV_POSITION;
+	float2 Tex			: TEXCOORD;
 	float3 PosW			: POSITION;
 	float3 NormalW		: NORMAL;
 	float3 TangentW		: TANGENT;
 	float3 BinormalW	: BINORMAL;
-	float2 Tex			: TEXCOORD;
 	float  TessFactor	: TESS;
 };
 

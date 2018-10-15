@@ -10,6 +10,8 @@ ZeroMemory(&name,sizeof(type));
 #define ZeroVariable(name) ZeroMemory(&name,sizeof(decltype(name)))
 #define ALIGN16 __declspec(align(16))
 
+#define FUCKING // The most important define; To be used when angry
+
 #define THROW_ERROR(...) {char message[1024];\
 sprintf_s(message,sizeof(message),__VA_ARGS__);\
 std::exception error(message);\
