@@ -12,6 +12,13 @@
 class TexturePipeline : public IPipeline, public Singletone<TexturePipeline>
 {
 public:
+	TexturePipeline()
+	{
+		m_usedStages = (uint32_t)Shader::ShaderType::ePixel |
+			(uint32_t)Shader::ShaderType::eVertex;
+	}
+
+public:
 
 	void setAdditionalColor(const DirectX::XMFLOAT4& color) const
 	{
@@ -21,6 +28,7 @@ public:
 	// Inherited via IPipeline
 	virtual void __vectorcall bind(ICamera * cam) const override final
 	{
+		clearPipeline();
 		static auto vertexShader = InstancedVertexShader::Get();
 		static auto pixelShader = TexturePixelShader::Get();
 
@@ -35,6 +43,7 @@ public:
 
 	virtual void __vectorcall bind(DirectX::FXMMATRIX & world, ICamera * cam) const override final
 	{
+		clearPipeline();
 		static auto vertexShader = SimpleVertexShader::Get();
 		static auto pixelShader = TexturePixelShader::Get();
 

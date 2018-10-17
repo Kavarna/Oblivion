@@ -156,7 +156,6 @@
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\graphics\BillboardObject.cpp" />
     <ClCompile Include="src\graphics\Font.cpp" />
-    <ClCompile Include="src\graphics\Pipelines\TextureLightPipeline.cpp" />
     <ClCompile Include="src\graphics\Projection.cpp" />
     <ClCompile Include="src\graphics\Shaders\BasicPixelShader.cpp" />
     <ClCompile Include="src\graphics\Shaders\InstancedVertexShader.cpp" />
@@ -204,6 +203,7 @@
     <ClInclude Include="src\graphics\Pipelines\TextureLightPipeline.h" />
     <ClInclude Include="src\graphics\Pipelines\TexturePipeline.h" />
     <ClInclude Include="src\graphics\Shaders\BasicPixelShader.h" />
+    <ClInclude Include="src\graphics\Shaders\EmptyShader.h" />
     <ClInclude Include="src\graphics\Shaders\InstancedVertexShader.h" />
     <ClInclude Include="src\graphics\Shaders\SimpleVertexShader.h" />
     <ClInclude Include="src\graphics\Shaders\TextureLightPixelShader.h" />

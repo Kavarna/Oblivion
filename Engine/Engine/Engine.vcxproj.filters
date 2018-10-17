@@ -40,7 +40,6 @@
     <ClCompile Include="src\graphics\Shaders\InstancedVertexShader.cpp" />
     <ClCompile Include="src\graphics\Shaders\TexturePixelShader.cpp" />
     <ClCompile Include="src\graphics\Shaders\TextureLightPixelShader.cpp" />
-    <ClCompile Include="src\graphics\Pipelines\TextureLightPipeline.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\commonmath.h" />
@@ -99,6 +98,7 @@
     <ClInclude Include="src\graphics\Shaders\TexturePixelShader.h" />
     <ClInclude Include="src\graphics\Shaders\TextureLightPixelShader.h" />
     <ClInclude Include="src\graphics\Pipelines\TextureLightPipeline.h" />
+    <ClInclude Include="src\graphics\Shaders\EmptyShader.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\BasicVertexShader.hlsl" />

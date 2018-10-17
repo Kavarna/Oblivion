@@ -3,16 +3,53 @@
 
 #include "Pipeline.h"
 #include "../Helpers/Lights.h"
+#include "../Shaders/InstancedVertexShader.h"
+#include "../Shaders/SimpleVertexShader.h"
+#include "../Shaders/TextureLightPixelShader.h"
 
 class TextureLightPipeline : public IPipeline, public Singletone<TextureLightPipeline>
 {
 public:
+	TextureLightPipeline()
+	{
+		m_usedStages = (uint32_t)Shader::ShaderType::ePixel |
+			(uint32_t)Shader::ShaderType::eVertex;
+	}
+public:
 
-	void setSunLight(const Sun&);
+	void setSunLight(const Sun& s)
+	{
+		TextureLightPixelShader::Get()->SetLight(s);
+	}
 
 	// Inherited via IPipeline
-	virtual void __vectorcall bind(ICamera * cam) const override final;
-	virtual void __vectorcall bind(DirectX::FXMMATRIX & world, ICamera * cam) const override final;
+	virtual void __vectorcall bind(ICamera * cam) const override final
+	{
+		clearPipeline();
+		auto vertexShader = InstancedVertexShader::Get();
+		auto pixelShader = TextureLightPixelShader::Get();
+		vertexShader->bind();
+		vertexShader->SetCamera({
+			cam->GetView(),
+			cam->GetProjection()
+			});
+		pixelShader->bind();
+		pixelShader->bindLightBuffer();
+	}
+	virtual void __vectorcall bind(DirectX::FXMMATRIX & world, ICamera * cam) const override final
+	{
+		clearPipeline();
+		auto vertexShader = SimpleVertexShader::Get();
+		auto pixelShader = TextureLightPixelShader::Get();
+		vertexShader->bind();
+		vertexShader->SetCamera({
+			world,
+			cam->GetView(),
+			cam->GetProjection()
+			});
+		pixelShader->bind();
+		pixelShader->bindLightBuffer();
+	}
 
 private:
 	Sun m_light;

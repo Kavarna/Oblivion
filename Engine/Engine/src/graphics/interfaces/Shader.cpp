@@ -1,9 +1,10 @@
 #include "Shader.h"
 
-VertexShaderEnum	IVertexShader::m_boundVertexShader	= VertexShaderNone;
-PixelShaderEnum		IPixelShader::m_boundPixelShader	= PixelShaderNone;
-DomainShaderEnum	IDomainShader::m_boundDomainShader	= DomainShaderNone;
-HullShaderEnum		IHullShader::m_boundHullShader		= HullShaderNone;
+VertexShaderEnum	IVertexShader::m_boundVertexShader		= VertexShaderNone;
+PixelShaderEnum		IPixelShader::m_boundPixelShader		= PixelShaderNone;
+DomainShaderEnum	IDomainShader::m_boundDomainShader		= DomainShaderNone;
+HullShaderEnum		IHullShader::m_boundHullShader			= HullShaderNone;
+GeometryShaderEnum	IGeometryShader::m_boundGeometryShader	= GeometryShaderNone;
 
 bool IVertexShader::shouldBind(const VertexShaderEnum vs)
 {
@@ -43,6 +44,11 @@ void IVertexShader::bind() const
 	}
 }
 
+void IVertexShader::unbind() const
+{
+	m_d3d11Context->VSSetShader(nullptr, nullptr, 0);
+}
+
 bool IPixelShader::shouldBind(const PixelShaderEnum ps)
 {
 	if (m_boundPixelShader == ps)
@@ -58,6 +64,11 @@ void IPixelShader::bind() const
 		m_d3d11Context->PSSetShader(m_pixelShader.Get(), nullptr, 0);
 		m_boundPixelShader = shaderType;
 	}
+}
+
+void IPixelShader::unbind() const
+{
+	m_d3d11Context->PSSetShader(nullptr, nullptr, 0);
 }
 
 IPixelShader::IPixelShader(LPWSTR path)
@@ -95,6 +106,11 @@ void IDomainShader::bind() const
 	}
 }
 
+void IDomainShader::unbind() const
+{
+	m_d3d11Context->DSSetShader(nullptr, nullptr, 0);
+}
+
 IDomainShader::IDomainShader(LPWSTR path)
 {
 	ID3D11DomainShader ** DS = &m_domainShader;
@@ -130,6 +146,11 @@ void IHullShader::bind() const
 	}
 }
 
+void IHullShader::unbind() const
+{
+	m_d3d11Context->HSSetShader(nullptr, nullptr, 0);
+}
+
 IHullShader::IHullShader(LPWSTR path)
 {
 	ID3D11HullShader ** HS = &m_hullShader;
@@ -146,4 +167,44 @@ IHullShader::~IHullShader()
 inline Shader::ShaderType IHullShader::getShaderType() const
 {
 	return Shader::ShaderType::eHull;
+}
+
+bool IGeometryShader::shouldBind(const GeometryShaderEnum hs)
+{
+	if (m_boundGeometryShader == hs)
+		return false;
+	return true;
+}
+
+void IGeometryShader::bind() const
+{
+	auto shaderType = getGeometryShaderType();
+	if (shouldBind(shaderType)) // if current shader is not bound already
+	{
+		m_d3d11Context->GSSetShader(m_geometryShader.Get(), nullptr, 0);
+		m_boundGeometryShader = shaderType;
+	}
+}
+
+void IGeometryShader::unbind() const
+{
+	m_d3d11Context->HSSetShader(nullptr, nullptr, 0);
+}
+
+IGeometryShader::IGeometryShader(LPWSTR path)
+{
+	ID3D11GeometryShader ** HS = &m_geometryShader;
+	ShaderHelper::CreateShaderFromFile(path, "ds_4_0",
+		m_d3d11Device.Get(), &m_shaderBlob,
+		reinterpret_cast<ID3D11DeviceChild**>(HS));
+}
+
+IGeometryShader::~IGeometryShader()
+{
+	m_geometryShader.Reset();
+}
+
+inline Shader::ShaderType IGeometryShader::getShaderType() const
+{
+	return Shader::ShaderType::eGeometry;
 }
