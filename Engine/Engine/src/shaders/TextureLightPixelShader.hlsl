@@ -19,8 +19,8 @@ cbuffer cbMaterial : register(b2)
 struct PSIn
 {
 	float4 PositionH : SV_POSITION;
-	float3 PositionW : POSITION;
 	float2 TexCoord : TEXCOORD;
+	float3 PositionW : POSITION;
 	float3 NormalW : NORMAL;
 };
 

@@ -11,6 +11,7 @@
 #include "../Pipelines/Pipeline.h"
 #include "../Pipelines/BasicPipeline.h"
 #include "../Pipelines/TexturePipeline.h"
+#include "../Pipelines/TextureLightPipeline.h"
 
 //#include "../Shaders/BasicShader.h"
 //#include "../Shaders/TextureLightShader.h"
@@ -197,6 +198,13 @@ inline void IGameObject::Render(ICamera * cam) const
 			return;
 		TexturePipeline::Get()->bind(cam);
 		RenderTexture(cam);
+	}
+	else if constexpr (std::is_same<Pipeline, TextureLightPipeline>::value)
+	{
+		if (!PrepareIA(PipelineEnum::PipelineTextureLight))
+			return;
+		TextureLightPipeline::Get()->bind(cam);
+		RenderTextureLight(cam);
 	}
 
 	DrawIndexedInstanced(cam);

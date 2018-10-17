@@ -164,6 +164,15 @@ void Game::InitImGui()
 	ImGui::StyleColorsDark();
 }
 
+void Game::InitPipelines()
+{
+	Sun s;
+	s.m_direction = DirectX::XMFLOAT4(0.0f, -1.0f, 0.0f, 0.0f);
+	s.m_diffuseColor = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	s.m_ambientColor = DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	TextureLightPipeline::Get()->setSunLight(s);
+}
+
 void Game::Init2D()
 {
 	m_32SegoeScriptExtented = std::make_shared<CFont>("Resources/Fonts/32SegoeScriptExtented.fnt");
@@ -197,8 +206,8 @@ void Game::Init3D()
 	m_billboardTest = std::make_unique<BillboardObject>();
 	m_billboardTest->Create("Resources/tree0.dds");
 	m_billboardTest->AddInstance();
-	m_billboardTest->Scale(30.0f, 30.0f);
-	m_billboardTest->Translate(0.0f, 14.5f, 123.f);
+	m_billboardTest->Scale(100.0f, 100.0f);
+	m_billboardTest->Translate(0.0f, 50.0f, 123.f);
 	
 	//m_sponza = std::make_unique<CollisionObject>();
 	//m_sponza->Create("Resources/Sponza");
@@ -253,6 +262,7 @@ void Game::InitSizeDependent()
 
 void Game::Run()
 {
+	InitPipelines();
 	Init2D();
 	InitSizeDependent();
 	Init3D();
@@ -601,11 +611,11 @@ void Game::Render()
 	{
 		model->Render<DisplacementShader>(g_camera.get());
 	}*/
-	m_sphere->Render<TexturePipeline>(g_camera.get());
+	m_sphere->Render<TextureLightPipeline>(g_camera.get());
 	////m_sponza->Render<TextureLightShader>(g_camera.get());
-	m_ground->Render<TexturePipeline>(g_camera.get());
-	m_tree->Render<TexturePipeline>(g_camera.get());
-	m_cup->Render<TexturePipeline>(g_camera.get());
+	m_ground->Render<TextureLightPipeline>(g_camera.get());
+	m_tree->Render<TextureLightPipeline>(g_camera.get());
+	m_cup->Render<TextureLightPipeline>(g_camera.get());
 
 	m_billboardTest->Render<TexturePipeline>(g_camera.get());
 

@@ -3,10 +3,6 @@
 TextureLightPixelShader::TextureLightPixelShader() : 
 	IPixelShader(L"Shaders/TextureLightPixelShader.cso")
 {
-	Sun s;
-	s.m_direction = DirectX::XMFLOAT4(0.0f, -1.0f, 0.0f, 0.0f);
-	s.m_diffuseColor = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	s.m_ambientColor = DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 	ShaderHelper::CreateBuffer(m_d3d11Device.Get(),
 		&m_lightBuffer, D3D11_USAGE::D3D11_USAGE_DEFAULT,
 		D3D11_BIND_FLAG::D3D11_BIND_CONSTANT_BUFFER,

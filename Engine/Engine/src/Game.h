@@ -37,6 +37,7 @@ private:
 	void InitInput();
 	void InitDirect3D();
 	void InitImGui();
+	void InitPipelines();
 	void Init2D();
 	void Init3D();
 	void InitSizeDependent();

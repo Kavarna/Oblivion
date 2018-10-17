@@ -4,6 +4,11 @@
 #include "../Shaders/TextureLightPixelShader.h"
 
 
+void TextureLightPipeline::setSunLight(const Sun & s)
+{
+	TextureLightPixelShader::Get()->SetLight(s);
+}
+
 void __vectorcall TextureLightPipeline::bind(ICamera * cam) const
 {
 	auto vertexShader = InstancedVertexShader::Get();

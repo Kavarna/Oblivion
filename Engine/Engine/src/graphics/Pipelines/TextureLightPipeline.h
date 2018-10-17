@@ -8,6 +8,8 @@ class TextureLightPipeline : public IPipeline, public Singletone<TextureLightPip
 {
 public:
 
+	void setSunLight(const Sun&);
+
 	// Inherited via IPipeline
 	virtual void __vectorcall bind(ICamera * cam) const override final;
 	virtual void __vectorcall bind(DirectX::FXMMATRIX & world, ICamera * cam) const override final;
