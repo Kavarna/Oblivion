@@ -6,6 +6,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	try
 	{
+		srand((unsigned int)time(NULL));
 		HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
 		if (FAILED(hr))
 			throw std::exception("Can't initialize COM");

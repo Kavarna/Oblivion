@@ -156,10 +156,12 @@
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\graphics\BillboardObject.cpp" />
     <ClCompile Include="src\graphics\Font.cpp" />
+    <ClCompile Include="src\graphics\Pipelines\TextureLightPipeline.cpp" />
     <ClCompile Include="src\graphics\Projection.cpp" />
     <ClCompile Include="src\graphics\Shaders\BasicPixelShader.cpp" />
     <ClCompile Include="src\graphics\Shaders\InstancedVertexShader.cpp" />
     <ClCompile Include="src\graphics\Shaders\SimpleVertexShader.cpp" />
+    <ClCompile Include="src\graphics\Shaders\TextureLightPixelShader.cpp" />
     <ClCompile Include="src\graphics\Shaders\TexturePixelShader.cpp" />
     <ClCompile Include="src\graphics\Text.cpp" />
     <ClCompile Include="src\physics\CollisionObject.cpp" />
@@ -199,10 +201,12 @@
     <ClInclude Include="src\common\interfaces\Singletone.h" />
     <ClInclude Include="src\graphics\Pipelines\BasicPipeline.h" />
     <ClInclude Include="src\graphics\Pipelines\Pipeline.h" />
+    <ClInclude Include="src\graphics\Pipelines\TextureLightPipeline.h" />
     <ClInclude Include="src\graphics\Pipelines\TexturePipeline.h" />
     <ClInclude Include="src\graphics\Shaders\BasicPixelShader.h" />
     <ClInclude Include="src\graphics\Shaders\InstancedVertexShader.h" />
     <ClInclude Include="src\graphics\Shaders\SimpleVertexShader.h" />
+    <ClInclude Include="src\graphics\Shaders\TextureLightPixelShader.h" />
     <ClInclude Include="src\graphics\Shaders\TexturePixelShader.h" />
     <ClInclude Include="src\graphics\Text.h" />
     <ClInclude Include="src\physics\CollisionObject.h" />

@@ -3,8 +3,8 @@
 
 cbuffer cbPerObject : register(b0)
 {
-	float4x4 View;
-	float4x4 Projection;
+	row_major float4x4 View;
+	row_major float4x4 Projection;
 }
 
 cbuffer cbPerCamera : register(b1)

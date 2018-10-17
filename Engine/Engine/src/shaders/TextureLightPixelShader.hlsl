@@ -11,7 +11,7 @@ cbuffer cbLight : register(b0)
 	Sun g_sunLight;
 };
 
-cbuffer cbLight : register(b2)
+cbuffer cbMaterial : register(b2)
 {
 	Material g_material;
 }

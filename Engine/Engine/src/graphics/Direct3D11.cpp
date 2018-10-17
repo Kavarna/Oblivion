@@ -255,6 +255,10 @@ void Direct3D11::InitializeStates()
 	ThrowIfFailed(
 		m_d3d11Device->CreateSamplerState(&sampDesc, &m_linearClampSampler)
 	);
+	sampDesc.AddressU =
+		sampDesc.AddressV =
+		sampDesc.AddressW =
+		D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_WRAP;
 	sampDesc.Filter = D3D11_FILTER::D3D11_FILTER_ANISOTROPIC;
 	sampDesc.MaxAnisotropy = 16;
 	sampDesc.MaxLOD = FLT_MAX;

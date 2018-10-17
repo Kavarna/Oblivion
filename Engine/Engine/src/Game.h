@@ -71,8 +71,6 @@ private:
 	std::unique_ptr<CollisionObject>					m_cup;
 	//std::unique_ptr<CollisionObject>					m_sponza;
 
-	std::unique_ptr<Square>								m_fullscreenQuad;
-
 	std::shared_ptr<CFont>								m_32SegoeScriptExtented;
 	std::unique_ptr<Text>								m_camPosText;
 
