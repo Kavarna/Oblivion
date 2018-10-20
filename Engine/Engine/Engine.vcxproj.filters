@@ -99,6 +99,7 @@
     <ClInclude Include="src\graphics\Shaders\TextureLightPixelShader.h" />
     <ClInclude Include="src\graphics\Pipelines\TextureLightPipeline.h" />
     <ClInclude Include="src\graphics\Shaders\EmptyShader.h" />
+    <ClInclude Include="src\graphics\Helpers\BufferManager.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\BasicVertexShader.hlsl" />

@@ -196,6 +196,7 @@
     <ClInclude Include="src\COM\COMManager.h" />
     <ClInclude Include="src\graphics\BillboardObject.h" />
     <ClInclude Include="src\graphics\Font.h" />
+    <ClInclude Include="src\graphics\Helpers\BufferManager.h" />
     <ClInclude Include="src\graphics\interfaces\I2DTransforms.h" />
     <ClInclude Include="src\common\interfaces\Singletone.h" />
     <ClInclude Include="src\graphics\Pipelines\BasicPipeline.h" />
