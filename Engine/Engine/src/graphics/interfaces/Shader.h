@@ -5,6 +5,7 @@
 #include "../interfaces/GraphicsObject.h"
 #include "../Helpers/ShaderHelper.h"
 #include "../Direct3D11.h"
+#include "../Helpers/BufferManager.h"
 
 namespace Shader
 {

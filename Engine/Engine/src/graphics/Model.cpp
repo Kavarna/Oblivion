@@ -57,7 +57,6 @@ void Model::Update(float frameTime)
 
 void Model::Destroy()
 {
-	m_materialBuffer.Reset();
 }
 
 inline uint32_t Model::GetIndexCount(int subObject) const

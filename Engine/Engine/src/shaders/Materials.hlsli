@@ -4,7 +4,6 @@
 
 #include "Lights.hlsli"
 
-
 struct Material
 {
 	float4 color; // 16
@@ -36,5 +35,14 @@ struct Material
 		return UnitNormalW;
 	}
 };
+
+#define MATERIAL_SLOT 2
+
+cbuffer cbMaterial : register(b2)
+{
+	Material g_material;
+}
+
+
 
 #endif

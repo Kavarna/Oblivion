@@ -11,11 +11,6 @@ cbuffer cbLight : register(b0)
 	Sun g_sunLight;
 };
 
-cbuffer cbMaterial : register(b2)
-{
-	Material g_material;
-}
-
 struct PSIn
 {
 	float4 PosH			: SV_POSITION;

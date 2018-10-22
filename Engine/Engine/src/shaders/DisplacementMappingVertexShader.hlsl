@@ -14,11 +14,6 @@ cbuffer cbPerCamera : register(b1)
 	float g_maxTessDistance;
 }
 
-cbuffer cbMaterial : register(b2)
-{
-	Material g_material;
-}
-
 struct VSOut
 {
 	float4 PosH			: SV_POSITION;

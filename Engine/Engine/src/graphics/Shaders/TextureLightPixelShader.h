@@ -18,5 +18,5 @@ public:
 	virtual PixelShaderEnum getPixelShaderType() const override final;
 
 private:
-	MicrosoftPointer<ID3D11Buffer>				m_lightBuffer;
+	ConstantBufferHandle				m_lightBuffer;
 };

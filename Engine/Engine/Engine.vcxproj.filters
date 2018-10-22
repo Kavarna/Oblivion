@@ -108,7 +108,6 @@
     <FxCompile Include="src\shaders\TextureLightPixelShader.hlsl" />
     <FxCompile Include="src\shaders\BatchVertexShader.hlsl" />
     <FxCompile Include="src\shaders\BatchPixelShader.hlsl" />
-    <FxCompile Include="src\shaders\TextureVertexShader.hlsl" />
     <FxCompile Include="src\shaders\TexturePixelShader.hlsl" />
     <FxCompile Include="src\shaders\DisplacementMappingVertexShader.hlsl" />
     <FxCompile Include="src\shaders\DisplacementMappingPixelShader.hlsl" />
@@ -122,5 +121,6 @@
   <ItemGroup>
     <None Include="src\shaders\Lights.hlsli" />
     <None Include="src\shaders\Materials.hlsli" />
+    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>

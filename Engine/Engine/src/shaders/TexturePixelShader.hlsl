@@ -4,11 +4,6 @@
 Texture2D ObjTexture : register(t0);
 SamplerState ObjWrapSampler : register(s0);
 
-cbuffer cbLight : register(b2)
-{
-	Material g_material;
-}
-
 cbuffer cbColor : register(b13)
 {
 	float4 additionalColor;

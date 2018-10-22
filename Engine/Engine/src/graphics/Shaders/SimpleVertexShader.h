@@ -8,7 +8,7 @@ public:
 	SimpleVertexShader();
 
 private:
-	MicrosoftPointer<ID3D11Buffer>		m_cameraBuffer;
+	ConstantBufferHandle m_cameraBuffer;
 
 public:
 	struct SCameraInfo

@@ -11,8 +11,8 @@ MicrosoftPointer<ID3D11Buffer>		IGameObject::m_staticIndicesBuffer;
 
 IGameObject::IGameObject()
 {
-	ShaderHelper::CreateBuffer(m_d3d11Device.Get(), &m_materialBuffer,
-		D3D11_USAGE::D3D11_USAGE_DYNAMIC, D3D11_BIND_FLAG::D3D11_BIND_CONSTANT_BUFFER,
+	static auto bufferManager = BufferManager::Get();
+	m_materialBuffer = bufferManager->CreateBuffer(D3D11_USAGE::D3D11_USAGE_DYNAMIC,
 		sizeof(Shader::material_t), D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE);
 }
 
@@ -224,7 +224,8 @@ void IGameObject::RemoveIndices(CommonTypes::Range const & range)
 
 void IGameObject::BindMaterial(Rendering::material_t const & mat, int shader) const
 {
-	auto data = (Shader::material_t*)ShaderHelper::MapBuffer(m_d3d11Context.Get(), m_materialBuffer.Get());
+	static auto bufferManager = BufferManager::Get();
+	auto data = (Shader::material_t*)bufferManager->MapBuffer(m_materialBuffer);
 
 	data->color			= mat.diffuseColor;
 	data->hasTexture	= mat.hasTexture;
@@ -236,7 +237,7 @@ void IGameObject::BindMaterial(Rendering::material_t const & mat, int shader) co
 	data->tessMax		= mat.tessMax;
 	data->tessScale		= mat.tessScale;
 
-	ShaderHelper::UnmapBuffer(m_d3d11Context.Get(), m_materialBuffer.Get());
+	bufferManager->UnmapBuffer(m_materialBuffer);
 
 	ID3D11ShaderResourceView *resources[] =
 	{
@@ -246,7 +247,7 @@ void IGameObject::BindMaterial(Rendering::material_t const & mat, int shader) co
 	};
 
 
-	ShaderHelper::BindConstantBuffer(m_d3d11Context.Get(), 2, 1, m_materialBuffer.GetAddressOf(), shader);
+	bufferManager->bindMaterial(shader, m_materialBuffer);
 	ShaderHelper::BindResources(m_d3d11Context.Get(), 0, 3, resources, shader);
 }
 

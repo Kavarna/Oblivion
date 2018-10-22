@@ -3,19 +3,17 @@
 InstancedVertexShader::InstancedVertexShader() :
 	IVertexShader(L"Shaders/InstancedVertexShader.cso")
 {
-	ShaderHelper::CreateBuffer(
-		m_d3d11Device.Get(), &m_cameraBuffer,
-		D3D11_USAGE::D3D11_USAGE_DYNAMIC,
-		D3D11_BIND_FLAG::D3D11_BIND_CONSTANT_BUFFER, sizeof(SCameraInfo),
+	m_cameraBuffer = BufferManager::Get()->CreateBuffer(
+		D3D11_USAGE::D3D11_USAGE_DYNAMIC, sizeof(SCameraInfo),
 		D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE
 	);
 }
 
 void __vectorcall InstancedVertexShader::SetCamera(const SCameraInfo & WVP)
 {
-	ShaderHelper::MapBuffer(m_d3d11Context.Get(), m_cameraBuffer.Get(), (void*)&WVP,
-		sizeof(SCameraInfo));
-	m_d3d11Context->VSSetConstantBuffers(0, 1, m_cameraBuffer.GetAddressOf());
+	static auto bufferManager = BufferManager::Get();
+	bufferManager->MapBuffer(m_cameraBuffer, (void*)&WVP);
+	bufferManager->bindVSBuffer(0, m_cameraBuffer);
 }
 
 void InstancedVertexShader::Create()

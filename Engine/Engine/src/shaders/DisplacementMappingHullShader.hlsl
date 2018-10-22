@@ -34,11 +34,6 @@ struct HS_CONSTANT_DATA_OUTPUT
 
 #define NUM_CONTROL_POINTS 3
 
-cbuffer cbMaterial : register(b2)
-{
-	Material g_material;
-}
-
 // Patch Constant Function
 HS_CONSTANT_DATA_OUTPUT CalcHSPatchConstants(
 	InputPatch<VS_CONTROL_POINT_OUTPUT, NUM_CONTROL_POINTS> ip,

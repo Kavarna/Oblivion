@@ -51,7 +51,4 @@ public:
 		pixelShader->bindLightBuffer();
 	}
 
-private:
-	Sun m_light;
-
 };

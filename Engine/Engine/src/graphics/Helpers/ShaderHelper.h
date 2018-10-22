@@ -175,6 +175,7 @@ namespace ShaderHelper
 		}
 	}
 
+	[[deprecated]]
 	inline void BindConstantBuffer(ID3D11DeviceContext * context,
 		uint32_t slot, uint32_t num, ID3D11Buffer *const* buffer, uint32_t shader)
 	{

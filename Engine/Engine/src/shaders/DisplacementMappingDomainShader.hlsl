@@ -41,11 +41,6 @@ cbuffer cbCamera : register(b0)
 	float4x4 Projection;
 }
 
-cbuffer cbMaterial : register(b2)
-{
-	Material g_material;
-}
-
 [domain("tri")]
 DS_OUTPUT main(
 	HS_CONSTANT_DATA_OUTPUT input,

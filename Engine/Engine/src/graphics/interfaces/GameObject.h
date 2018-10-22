@@ -124,7 +124,7 @@ protected:
 protected:
 			MicrosoftPointer<ID3D11Buffer>			m_instanceBuffer;
 			std::vector<DirectX::XMMATRIX>			m_objectWorld;
-			MicrosoftPointer<ID3D11Buffer>			m_materialBuffer;
+			ConstantBufferHandle					m_materialBuffer;
 	mutable int										m_bindMaterialToShader;
 			std::string								m_objectName;
 };
