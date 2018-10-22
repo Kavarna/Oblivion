@@ -147,8 +147,6 @@ void Game::InitDirect3D()
 		{ 0.1f,0.1f,0.1f,1.0f }
 	};
 
-	/// TODO: Fix this
-	//TextureLightShader::Get()->SetLightInformations(sunLight);
 	BulletWorld::Get()->CreateDefaultWorld();
 }
 
