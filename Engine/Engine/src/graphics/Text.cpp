@@ -119,4 +119,6 @@ void Text::Render(ICamera * cam, const DirectX::XMFLOAT4& color)
 
 	m_d3d11Context->DrawIndexed(mIndexCount, 0, 0);
 	g_drawCalls++;
+
+	pipeline->lastAdditionalColor();
 }

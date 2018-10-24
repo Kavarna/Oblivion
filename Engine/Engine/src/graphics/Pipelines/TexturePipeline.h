@@ -16,13 +16,26 @@ public:
 	{
 		m_usedStages = (uint32_t)Shader::ShaderType::ePixel |
 			(uint32_t)Shader::ShaderType::eVertex;
+		m_color = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	}
+
+private:
+	mutable DirectX::XMFLOAT4 m_lastColor;
+	mutable DirectX::XMFLOAT4 m_color;
 
 public:
 
 	void setAdditionalColor(const DirectX::XMFLOAT4& color) const
 	{
 		TexturePixelShader::Get()->SetAdditionalColor(color);
+		memcpy((void*)&m_lastColor, &m_color, sizeof(DirectX::XMFLOAT4));
+		memcpy((void*)&m_color, &color, sizeof(DirectX::XMFLOAT4));
+	}
+
+	void lastAdditionalColor() const
+	{
+		memcpy((void*)&m_color, &m_lastColor, sizeof(DirectX::XMFLOAT4));
+		TexturePixelShader::Get()->SetAdditionalColor(m_color);
 	}
 
 	// Inherited via IPipeline

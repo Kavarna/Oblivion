@@ -23,7 +23,7 @@ struct VSOut
 	float3 NormalW		: NORMAL;
 	float3 TangentW		: TANGENT;
 	float3 BinormalW	: BINORMAL;
-	float  TessFactor : TESS;
+	float  TessFactor	: TESS;
 };
 
 VSOut main(float3 pos : POSITION, float2 tex : TEXCOORD,

@@ -102,14 +102,11 @@
     <ClInclude Include="src\graphics\Helpers\BufferManager.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="src\shaders\BasicVertexShader.hlsl" />
     <FxCompile Include="src\shaders\BasicPixelShader.hlsl" />
-    <FxCompile Include="src\shaders\TextureLightVertexShader.hlsl" />
     <FxCompile Include="src\shaders\TextureLightPixelShader.hlsl" />
     <FxCompile Include="src\shaders\BatchVertexShader.hlsl" />
     <FxCompile Include="src\shaders\BatchPixelShader.hlsl" />
     <FxCompile Include="src\shaders\TexturePixelShader.hlsl" />
-    <FxCompile Include="src\shaders\DisplacementMappingVertexShader.hlsl" />
     <FxCompile Include="src\shaders\DisplacementMappingPixelShader.hlsl" />
     <FxCompile Include="src\shaders\DisplacementMappingHullShader.hlsl" />
     <FxCompile Include="src\shaders\DisplacementMappingDomainShader.hlsl" />
