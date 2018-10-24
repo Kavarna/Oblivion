@@ -49,6 +49,7 @@ public:
 
 		vertexShader->bind();
 		vertexShader->SetCamera({
+			world,
 			cam->GetView(),
 			cam->GetProjection()
 			});

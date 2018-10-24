@@ -617,13 +617,13 @@ void Game::Render()
 
 	m_billboardTest->Render<TexturePipeline>(g_camera.get());
 
-	/*auto camPos = g_camera->GetPosition();
+	auto camPos = g_camera->GetPosition();
 	wchar_t buffer[128];
 	swprintf_s(buffer, L"Cam pos: (%.2f, %.2f, %.2f)",
 		camPos.x, camPos.y, camPos.z);
 
 	m_camPosText->Render(g_screen.get(), buffer, 0.0f, 64.f,
-		DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));*/
+		DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
 
 	if (g_isDeveloper)
 	{

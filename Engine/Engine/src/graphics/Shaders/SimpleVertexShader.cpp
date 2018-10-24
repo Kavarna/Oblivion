@@ -9,7 +9,7 @@ SimpleVertexShader::SimpleVertexShader() :
 		D3D11_BIND_FLAG::D3D11_BIND_CONSTANT_BUFFER, sizeof(SCameraInfo),
 		D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE
 	);*/
-	BufferManager::Get()->CreateBuffer(D3D11_USAGE::D3D11_USAGE_DYNAMIC,
+	m_cameraBuffer = BufferManager::Get()->CreateBuffer(D3D11_USAGE::D3D11_USAGE_DYNAMIC,
 		sizeof(SCameraInfo), D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE);
 }
 

@@ -1,5 +1,7 @@
 #include "Text.h"
 #include "interfaces/Shader.h"
+#include "Pipelines/TexturePipeline.h"
+#include "OblivionObjects.h"
 
 Text::Text(std::shared_ptr<CFont> Font,
 	float WindowWidth, float WindowHeight,
@@ -90,12 +92,16 @@ void Text::Render(ICamera * cam, const DirectX::XMFLOAT4& color)
 	//shader->bind();
 	/*shader->SetCameraInfo(WVP);
 	shader->SetColor(color);*/
+
+	static auto pipeline = TexturePipeline::Get();
+	pipeline->bind(DirectX::XMMatrixIdentity(), cam);
+	pipeline->setAdditionalColor(color);
+
 	ID3D11Buffer * vertexBuffers[] = {
-		mVertexBuffer.Get(),
-		nullptr
+		mVertexBuffer.Get()
 	};
 
-	m_d3d11Context->IASetVertexBuffers(0, 2, vertexBuffers, &Stride, &Offset);
+	m_d3d11Context->IASetVertexBuffers(0, 1, vertexBuffers, &Stride, &Offset);
 	m_d3d11Context->IASetIndexBuffer(mIndexBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
 	m_d3d11Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	static DirectX::XMMATRIX WVP;

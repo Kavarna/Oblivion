@@ -18,12 +18,12 @@ cbuffer cbPerCamera : register(b1)
 struct VSOut
 {
 	float4 PosH			: SV_POSITION;
+	float2 Tex			: TEXCOORD;
 	float3 PosW			: POSITION;
 	float3 NormalW		: NORMAL;
 	float3 TangentW		: TANGENT;
 	float3 BinormalW	: BINORMAL;
-	float2 Tex			: TEXCOORD;
-	float  TessFactor	: TESS;
+	float  TessFactor : TESS;
 };
 
 VSOut main(float3 pos : POSITION, float2 tex : TEXCOORD,
