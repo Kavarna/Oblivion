@@ -118,6 +118,5 @@
   <ItemGroup>
     <None Include="src\shaders\Lights.hlsli" />
     <None Include="src\shaders\Materials.hlsli" />
-    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>
