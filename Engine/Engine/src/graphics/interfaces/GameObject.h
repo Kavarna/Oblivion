@@ -83,8 +83,8 @@ public:
 	virtual			void							ClearInstances() { m_objectWorld.clear(); };
 	virtual			void							RemoveInstance(int ID);
 	virtual			void							RemoveInstance(CommonTypes::Range const& range);
-	virtual			int								PrepareInstances(std::function<bool(uint32_t)> & func,
-														std::function<DirectX::XMMATRIX(DirectX::FXMMATRIX)> modifyWorld = nullptr) const;
+	virtual			int								PrepareInstances(const std::function<bool(uint32_t)> & func,
+														const std::function<DirectX::XMMATRIX(DirectX::FXMMATRIX)>& modifyWorld = std::function<DirectX::XMMATRIX(DirectX::FXMMATRIX)>()) const;
 	virtual			void							Render(ICamera * cam, const PipelineEnum& p) const;
 
 	template <class Pipeline>
@@ -128,52 +128,6 @@ protected:
 	mutable int										m_bindMaterialToShader;
 			std::string								m_objectName;
 };
-
-//template<class Pipeline>
-//inline void IGameObject::Render(ICamera * cam) const
-//{
-//	static_assert(std::is_base_of<IShader, Shader>::value,
-//		"Generic argument for Render(ICamera * cam) must be a IShader based class");
-//
-//	if (m_objectWorld.size() < 1)
-//		return;
-//
-//	if constexpr (std::is_same<Shader, BasicShader>::value)
-//	{
-//		if (!PrepareIA(Pipeline::PipelineBasic))
-//			return;
-//		RenderBasic(cam);
-//	}
-//	else if constexpr (std::is_same<Shader, TextureShader>::value)
-//	{
-//		if (!PrepareIA(Pipeline::PipelineTexture))
-//			return;
-//		RenderTexture(cam);
-//	}
-//	else if constexpr (std::is_same<Shader, TextureLightShader>::value)
-//	{
-//		if (!PrepareIA(Pipeline::PipelineTextureLight))
-//			return;
-//		RenderTextureLight(cam);
-//	}
-//	else if constexpr (std::is_same<Shader, DisplacementShader>::value)
-//	{
-//		if (!PrepareIA(Pipeline::PipelineDisplacementTextureLight))
-//			return;
-//		RenderDisplacementTextureLight(cam);
-//	}
-//	else
-//	{
-//		auto shader = Shader::Get();
-//		if (!PrepareIA(shader->GetPreferedPipelineType()))
-//			return;
-//		shader->RenderGameObject(this, cam);
-//		//static_assert(false,
-//			//"Can't render a game object using this shader");
-//	}
-//
-//	DrawIndexedInstanced(cam);
-//}
 
 
 template <class Pipeline>

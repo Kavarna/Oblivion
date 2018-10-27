@@ -64,8 +64,8 @@ void IGameObject::RemoveInstance(CommonTypes::Range const & range)
 		m_objectWorld.begin() + range.end);
 }
 
-int IGameObject::PrepareInstances(std::function<bool(uint32_t)> & shouldRender,
-	std::function<DirectX::XMMATRIX(DirectX::FXMMATRIX)> modifyWorld) const
+int IGameObject::PrepareInstances(const std::function<bool(uint32_t)> & shouldRender,
+	const std::function<DirectX::XMMATRIX(DirectX::FXMMATRIX)>& modifyWorld) const
 {
 	auto data = (DirectX::XMMATRIX*)ShaderHelper::MapBuffer(m_d3d11Context.Get(), m_instanceBuffer.Get());
 	uint32_t renderInstances = 0;
