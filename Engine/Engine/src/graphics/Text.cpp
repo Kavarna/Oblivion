@@ -87,11 +87,6 @@ void Text::Render(ICamera * cam, const DirectX::XMFLOAT4& color)
 	static UINT Stride = sizeof(CFont::SVertex);
 	static UINT Offset = 0;
 	static auto renderer = Direct3D11::Get();
-	/// TODO: Change this
-	//auto shader = SimpleTextureShader::Get();
-	//shader->bind();
-	/*shader->SetCameraInfo(WVP);
-	shader->SetColor(color);*/
 
 	static auto pipeline = TexturePipeline::Get();
 	pipeline->bind(DirectX::XMMatrixIdentity(), cam);

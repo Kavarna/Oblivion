@@ -37,32 +37,6 @@ void BatchRenderer::Vertex(DirectX::XMFLOAT3 const & pos, DirectX::XMFLOAT4 cons
 		ReconstructAndCopy(m_numMaxVertices * 10);
 }
 
-/*void BatchRenderer::End(ICamera * cam, D3D11_PRIMITIVE_TOPOLOGY topology)
-{
-	/// TODO: Fix this
-	//auto shader = BatchShader::Get();
-
-	//shader->bind();
-
-	//DirectX::XMMATRIX VP = cam->GetView() * cam->GetProjection();
-	//VP = DirectX::XMMatrixTranspose(VP);
-	//shader->SetCamera(VP);
-
-	ShaderHelper::UnmapBuffer(m_d3d11Context.Get(), m_vertexBuffer.Get());
-
-	if (m_currentIndex)
-	{
-		m_d3d11Context->IASetPrimitiveTopology(topology);
-		static UINT stride = Oblivion::vertex_t::positionSize + Oblivion::vertex_t::textureSize;
-		static UINT offset = 0;
-		m_d3d11Context->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), &stride, &offset);
-		m_d3d11Context->Draw(m_currentIndex, 0);
-		if (g_isDeveloper)
-			g_drawCalls++;
-	}
-	m_bufferData = nullptr;
-}*/
-
 void BatchRenderer::ReconstructAndCopy(uint32_t newSize)
 {
 	if (m_bufferData)
