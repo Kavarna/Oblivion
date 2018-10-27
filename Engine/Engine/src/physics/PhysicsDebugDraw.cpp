@@ -1,5 +1,7 @@
 #include "PhysicsDebugDraw.h"
 
+#include "../graphics/Pipelines/ColorPipeline.h"
+
 
 btDebugDraw::btDebugDraw()
 {
@@ -66,7 +68,7 @@ void btDebugDraw::clearLines()
 
 void btDebugDraw::flushLines()
 {
-	m_renderer->End(reinterpret_cast<ICamera*>(g_camera.get()));
+	m_renderer->End<ColorPipeline>(reinterpret_cast<ICamera*>(g_camera.get()));
 }
 
 void btDebugDraw::EnableDebug()

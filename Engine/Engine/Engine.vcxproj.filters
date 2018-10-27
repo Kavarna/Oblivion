@@ -40,6 +40,7 @@
     <ClCompile Include="src\graphics\Shaders\InstancedVertexShader.cpp" />
     <ClCompile Include="src\graphics\Shaders\TexturePixelShader.cpp" />
     <ClCompile Include="src\graphics\Shaders\TextureLightPixelShader.cpp" />
+    <ClCompile Include="src\graphics\Shaders\ColorPixelShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\commonmath.h" />
@@ -100,20 +101,18 @@
     <ClInclude Include="src\graphics\Pipelines\TextureLightPipeline.h" />
     <ClInclude Include="src\graphics\Shaders\EmptyShader.h" />
     <ClInclude Include="src\graphics\Helpers\BufferManager.h" />
+    <ClInclude Include="src\graphics\Shaders\ColorPixelShader.h" />
+    <ClInclude Include="src\graphics\Pipelines\ColorPipeline.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="src\shaders\BasicPixelShader.hlsl" />
     <FxCompile Include="src\shaders\TextureLightPixelShader.hlsl" />
-    <FxCompile Include="src\shaders\BatchVertexShader.hlsl" />
-    <FxCompile Include="src\shaders\BatchPixelShader.hlsl" />
     <FxCompile Include="src\shaders\TexturePixelShader.hlsl" />
     <FxCompile Include="src\shaders\DisplacementMappingPixelShader.hlsl" />
     <FxCompile Include="src\shaders\DisplacementMappingHullShader.hlsl" />
     <FxCompile Include="src\shaders\DisplacementMappingDomainShader.hlsl" />
-    <FxCompile Include="src\shaders\TextureBatchVertexShader.hlsl" />
-    <FxCompile Include="src\shaders\SimpleTextureVertexShader.hlsl" />
     <FxCompile Include="src\shaders\InstancedVertexShader.hlsl" />
     <FxCompile Include="src\shaders\SimpleVertexShader.hlsl" />
+    <FxCompile Include="src\shaders\ColorPixelShader.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\Lights.hlsli" />

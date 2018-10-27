@@ -60,8 +60,8 @@ void PrintHelp()
 }
 
 void CalculateTangentAndBinormal(const DirectX::XMFLOAT3& P1, const DirectX::XMFLOAT3& P2,
-	const DirectX::XMFLOAT3& P3, const DirectX::XMFLOAT2& T1, const DirectX::XMFLOAT2& T2,
-	const DirectX::XMFLOAT2& T3, DirectX::XMFLOAT3& tangent, DirectX::XMFLOAT3& binormal)
+	const DirectX::XMFLOAT3& P3, const DirectX::XMFLOAT4& T1, const DirectX::XMFLOAT4& T2,
+	const DirectX::XMFLOAT4& T3, DirectX::XMFLOAT3& tangent, DirectX::XMFLOAT3& binormal)
 {
 	DirectX::XMFLOAT3 edge1; DirectX::XMFLOAT2 tex1;
 	DirectX::XMFLOAT3 edge2; DirectX::XMFLOAT2 tex2;

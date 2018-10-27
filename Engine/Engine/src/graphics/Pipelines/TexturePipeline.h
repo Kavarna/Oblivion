@@ -67,6 +67,7 @@ public:
 			cam->GetProjection()
 			});
 		pixelShader->bind();
+		pixelShader->bindColorBuffer();
 	}
 
 };

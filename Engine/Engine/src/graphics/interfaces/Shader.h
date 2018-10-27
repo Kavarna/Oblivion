@@ -81,7 +81,7 @@ enum PixelShaderEnum
 {
 	PixelShaderNone = 0,
 	PixelShaderBasic,
-	PixelShaderBatch,
+	PixelShaderColor,
 	PixelShaderDisplacement,
 	PixelShaderTexture,
 	PixelShaderTextureLight,

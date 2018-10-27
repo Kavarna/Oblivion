@@ -8,7 +8,7 @@ GeometryShaderEnum	IGeometryShader::m_boundGeometryShader	= GeometryShaderNone;
 
 bool IVertexShader::shouldBind(const VertexShaderEnum vs)
 {
-	if (m_boundVertexShader == vs)
+	if (m_boundVertexShader == vs && vs != VertexShaderEnum::VertexShaderCustom)
 		return false;
 	return true;
 }
@@ -51,7 +51,7 @@ void IVertexShader::unbind() const
 
 bool IPixelShader::shouldBind(const PixelShaderEnum ps)
 {
-	if (m_boundPixelShader == ps)
+	if (m_boundPixelShader == ps && ps != PixelShaderEnum::PixelShaderCustom)
 		return false;
 	return true;
 }
@@ -91,7 +91,7 @@ inline Shader::ShaderType IPixelShader::getShaderType() const
 
 bool IDomainShader::shouldBind(const DomainShaderEnum ds)
 {
-	if (m_boundDomainShader == ds)
+	if (m_boundDomainShader == ds && ds != DomainShaderEnum::DomainShaderCustom)
 		return false;
 	return true;
 }
@@ -131,7 +131,7 @@ inline Shader::ShaderType IDomainShader::getShaderType() const
 
 bool IHullShader::shouldBind(const HullShaderEnum hs)
 {
-	if (m_boundHullShader == hs)
+	if (m_boundHullShader == hs && hs != HullShaderEnum::HullShaderCustom)
 		return false;
 	return true;
 }
@@ -169,9 +169,9 @@ inline Shader::ShaderType IHullShader::getShaderType() const
 	return Shader::ShaderType::eHull;
 }
 
-bool IGeometryShader::shouldBind(const GeometryShaderEnum hs)
+bool IGeometryShader::shouldBind(const GeometryShaderEnum gs)
 {
-	if (m_boundGeometryShader == hs)
+	if (m_boundGeometryShader == gs && gs != GeometryShaderEnum::GeometryShaderCustom)
 		return false;
 	return true;
 }

@@ -106,14 +106,20 @@ namespace Oblivion
 
 	typedef struct vertex_t
 	{
+		static constexpr const size_t positionSize = sizeof(DirectX::XMFLOAT3);
+		static constexpr const size_t textureSize = sizeof(DirectX::XMFLOAT4);
+		static constexpr const size_t normalSize = sizeof(DirectX::XMFLOAT3);
+		static constexpr const size_t tangentSize = sizeof(DirectX::XMFLOAT3);
+		static constexpr const size_t binormalSize = sizeof(DirectX::XMFLOAT3);
+
 		vertex_t() = default;
 		vertex_t(float x, float y, float z,
 			float tu, float tv,
 			float nx, float ny, float nz) :
-			Position(x, y, z), TexC(tu, tv),
+			Position(x, y, z), TexC(tu, tv, 0.0f, 0.0f), 
 			Normal(nx, ny, nz) {};
 		vertex_t(const DirectX::XMFLOAT3& p, const DirectX::XMFLOAT3& n, const DirectX::XMFLOAT3& t, const DirectX::XMFLOAT2& uv) :
-			Position(p), Normal(n), TangentU(t), TexC(uv)
+			Position(p), Normal(n), TangentU(t), TexC(uv.x,uv.y,0.0f,0.0f)
 		{
 			DirectX::XMVECTOR Normal, Tangent;
 			Normal = DirectX::XMLoadFloat3(&this->Normal);
@@ -126,7 +132,7 @@ namespace Oblivion
 			float tx, float ty, float tz,
 			float u, float v)
 			: Position(px, py, pz), Normal(nx, ny, nz),
-			TangentU(tx, ty, tz), TexC(u, v)
+			TangentU(tx, ty, tz), TexC(u, v, 0.0f,0.0f)
 		{
 			DirectX::XMVECTOR Normal, Tangent;
 			Normal = DirectX::XMLoadFloat3(&this->Normal);
@@ -135,7 +141,7 @@ namespace Oblivion
 		}
 
 		DirectX::XMFLOAT3 Position;
-		DirectX::XMFLOAT2 TexC;
+		DirectX::XMFLOAT4 TexC;
 		DirectX::XMFLOAT3 Normal;
 		DirectX::XMFLOAT3 TangentU;
 		DirectX::XMFLOAT3 Binormal;

@@ -3,9 +3,9 @@
 
 cbuffer cbPerObject : register(b0)
 {
+	row_major float4x4 World;
 	row_major float4x4 View;
 	row_major float4x4 Projection;
-	row_major float4x4 World;
 }
 
 cbuffer cbPerCamera : register(b1)
@@ -18,7 +18,7 @@ cbuffer cbPerCamera : register(b1)
 struct VSOut
 {
 	float4 PosH			: SV_POSITION;
-	float2 Tex			: TEXCOORD;
+	float4 Tex			: TEXCOORD;
 	float3 PosW			: POSITION;
 	float3 NormalW		: NORMAL;
 	float3 TangentW		: TANGENT;
@@ -26,7 +26,7 @@ struct VSOut
 	float  TessFactor	: TESS;
 };
 
-VSOut main(float3 pos : POSITION, float2 tex : TEXCOORD,
+VSOut main(float3 pos : POSITION, float4 tex : TEXCOORD,
 	float3 nor : NORMAL, float3 tan : TANGENT, float3 bin : BINORMAL)
 {
 	VSOut output;

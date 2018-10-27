@@ -1,4 +1,5 @@
 #include "GraphicsDebugDraw.h"
+#include "../Pipelines/ColorPipeline.h"
 
 std::once_flag	GraphicsDebugDraw::m_singletoneFlag;
 std::unique_ptr<GraphicsDebugDraw>	GraphicsDebugDraw::m_singletoneInstance;
@@ -99,7 +100,7 @@ void GraphicsDebugDraw::RenderBoundingFrustum(DirectX::BoundingFrustum const & f
 
 void GraphicsDebugDraw::End(ICamera * cam)
 {
-	m_batchRenderer->End(cam);
+	m_batchRenderer->End<ColorPipeline>(cam);
 	m_insideBeginEnd = false;
 }
 

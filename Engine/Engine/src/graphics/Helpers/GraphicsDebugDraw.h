@@ -36,7 +36,7 @@ public:
 	};
 
 private:
-	static std::once_flag						m_singletoneFlag;
+	static std::once_flag								m_singletoneFlag;
 	static std::unique_ptr<GraphicsDebugDraw>			m_singletoneInstance;
 public:
 	static GraphicsDebugDraw*							Get();

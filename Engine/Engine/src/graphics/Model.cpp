@@ -435,14 +435,14 @@ void Model::DrawIndexedInstanced(ICamera * cam) const
 				m_boundingBox.Transform(toRender, m_objectWorld[i]);
 				GraphicsDebugDrawer->RenderBoundingBox(toRender);
 			}
-			for (uint32_t i = 0; i < m_objectWorld.size(); ++i)
+			/*for (uint32_t i = 0; i < m_objectWorld.size(); ++i)
 			{
 				for (uint32_t j = 0; j < m_meshes.size(); ++j)
 				{
 					m_meshes[j].m_boundingBox.Transform(toRender, m_objectWorld[i]);
 					GraphicsDebugDrawer->RenderBoundingBox(toRender);
 				}
-			}
+			}*/
 		}
 	}
 
@@ -599,7 +599,7 @@ void Model::Create(std::string const& filename)
 			if (hasTexture)
 			{
 				fin >> x >> y;
-				vertices.back().TexC = { x,y };
+				vertices.back().TexC = { x,y, 0.0f, 0.0f };
 			}
 			if (hasNormals)
 			{
