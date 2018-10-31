@@ -723,7 +723,7 @@ void Model::Create(EDefaultObject object)
 	}
 	else if (object == EDefaultObject::Grid)
 	{
-		g.CreateGrid(100.0f, 100.0f, 5, 5, data);
+		g.CreateGrid(100.0f, 100.0f, 3, 3, data);
 		m_boundingBox = DirectX::BoundingBox(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(50.0f, 0.01f, 50.0f));
 	}
 	else if (object == EDefaultObject::Sphere)

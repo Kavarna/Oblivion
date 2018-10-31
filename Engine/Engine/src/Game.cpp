@@ -612,7 +612,7 @@ void Game::Render()
 	{
 		model->Render<DisplacementShader>(g_camera.get());
 	}*/
-	m_sphere->Render<TextureLightPipeline>(g_camera.get());
+	m_sphere->Render<DisplacementLightPipeline>(g_camera.get());
 	////m_sponza->Render<TextureLightShader>(g_camera.get());
 	m_ground->Render<DisplacementLightPipeline>(g_camera.get());
 	m_tree->Render<TextureLightPipeline>(g_camera.get());
