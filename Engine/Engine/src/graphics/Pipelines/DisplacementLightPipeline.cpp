@@ -1,0 +1,3 @@
+#include "DisplacementLightPipeline.h"
+
+DECLARE_SINGLETONE_WITHOUT_CREATE(DisplacementLightPipeline);

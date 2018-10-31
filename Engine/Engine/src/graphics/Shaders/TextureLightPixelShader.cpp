@@ -8,6 +8,14 @@ TextureLightPixelShader::TextureLightPixelShader() :
 		D3D11_USAGE::D3D11_USAGE_DEFAULT, sizeof(Sun), 0);
 }
 
+TextureLightPixelShader::TextureLightPixelShader(LPWSTR path)
+	: IPixelShader(path)
+{
+	static auto bufferManager = BufferManager::Get();
+	m_lightBuffer = bufferManager->CreateBuffer(
+		D3D11_USAGE::D3D11_USAGE_DEFAULT, sizeof(Sun), 0);
+}
+
 void TextureLightPixelShader::SetLight(const Sun & s)
 {
 	static auto bufferManager = BufferManager::Get();

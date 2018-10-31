@@ -1,0 +1,3 @@
+#include "TextureLightPipeline.h"
+
+DECLARE_SINGLETONE_WITHOUT_CREATE(TextureLightPipeline)

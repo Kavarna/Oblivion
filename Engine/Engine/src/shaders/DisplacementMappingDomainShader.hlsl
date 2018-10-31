@@ -37,8 +37,8 @@ struct HS_CONSTANT_DATA_OUTPUT
 
 cbuffer cbCamera : register(b0)
 {
-	float4x4 View;
-	float4x4 Projection;
+	row_major float4x4 View;
+	row_major float4x4 Projection;
 }
 
 [domain("tri")]
@@ -49,10 +49,10 @@ DS_OUTPUT main(
 {
 	DS_OUTPUT Output;
 
-	Output.PosW = domain.x * patch[0].PosW + domain.y * patch[1].PosW + domain.z * patch[2].PosW;
-	Output.NormalW = domain.x * patch[0].NormalW + domain.y * patch[1].NormalW + domain.z * patch[2].NormalW;
-	Output.TangentW = domain.x * patch[0].TangentW + domain.y * patch[1].TangentW + domain.z * patch[2].TangentW;
-	Output.BinormalW = domain.x * patch[0].BinormalW + domain.y * patch[1].BinormalW + domain.z * patch[2].BinormalW;
+	Output.PosW			= domain.x * patch[0].PosW		+ domain.y * patch[1].PosW		+ domain.z * patch[2].PosW;
+	Output.NormalW		= domain.x * patch[0].NormalW	+ domain.y * patch[1].NormalW	+ domain.z * patch[2].NormalW;
+	Output.TangentW		= domain.x * patch[0].TangentW	+ domain.y * patch[1].TangentW	+ domain.z * patch[2].TangentW;
+	Output.BinormalW	= domain.x * patch[0].BinormalW + domain.y * patch[1].BinormalW + domain.z * patch[2].BinormalW;
 
 	Output.Tex = domain.x * patch[0].Tex + domain.y * patch[1].Tex + domain.z * patch[2].Tex;
 

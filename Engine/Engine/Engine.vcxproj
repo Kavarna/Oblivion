@@ -156,6 +156,8 @@
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\graphics\BillboardObject.cpp" />
     <ClCompile Include="src\graphics\Font.cpp" />
+    <ClCompile Include="src\graphics\Pipelines\DisplacementLightPipeline.cpp" />
+    <ClCompile Include="src\graphics\Pipelines\TextureLightPipeline.cpp" />
     <ClCompile Include="src\graphics\Projection.cpp" />
     <ClCompile Include="src\graphics\Shaders\BasicPixelShader.cpp" />
     <ClCompile Include="src\graphics\Shaders\ColorPixelShader.cpp" />
@@ -202,11 +204,15 @@
     <ClInclude Include="src\common\interfaces\Singletone.h" />
     <ClInclude Include="src\graphics\Pipelines\BasicPipeline.h" />
     <ClInclude Include="src\graphics\Pipelines\ColorPipeline.h" />
+    <ClInclude Include="src\graphics\Pipelines\DisplacementLightPipeline.h" />
     <ClInclude Include="src\graphics\Pipelines\Pipeline.h" />
     <ClInclude Include="src\graphics\Pipelines\TextureLightPipeline.h" />
     <ClInclude Include="src\graphics\Pipelines\TexturePipeline.h" />
     <ClInclude Include="src\graphics\Shaders\BasicPixelShader.h" />
     <ClInclude Include="src\graphics\Shaders\ColorPixelShader.h" />
+    <ClInclude Include="src\graphics\Shaders\DisplacementMappingDomainShader.h" />
+    <ClInclude Include="src\graphics\Shaders\DisplacementMappingHullShader.h" />
+    <ClInclude Include="src\graphics\Shaders\DisplacementMappingPixelShader.h" />
     <ClInclude Include="src\graphics\Shaders\EmptyShader.h" />
     <ClInclude Include="src\graphics\Shaders\InstancedVertexShader.h" />
     <ClInclude Include="src\graphics\Shaders\SimpleVertexShader.h" />

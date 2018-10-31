@@ -49,7 +49,7 @@ VSOut main(float3 pos : POSITION, float4 tex : TEXCOORD,
 	
 	float tess = saturate((g_minTessDistance - d) / (g_minTessDistance - g_maxTessDistance));
 
-	output.TessFactor = g_material.minTessFactor + tess * (g_material.maxTessFactor * g_material.minTessFactor);
+	output.TessFactor = g_material.minTessFactor + tess * (g_material.maxTessFactor - g_material.minTessFactor);
 
 	return output;
 

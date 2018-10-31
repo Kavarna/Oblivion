@@ -5,11 +5,11 @@
 struct VS_CONTROL_POINT_OUTPUT
 {
 	float4 PosH			: SV_POSITION;
+	float4 Tex			: TEXCOORD;
 	float3 PosW			: POSITION;
 	float3 NormalW		: NORMAL;
 	float3 TangentW		: TANGENT;
 	float3 BinormalW	: BINORMAL;
-	float2 Tex			: TEXCOORD;
 	float  TessFactor	: TESS;
 };
 
@@ -40,12 +40,6 @@ HS_CONSTANT_DATA_OUTPUT CalcHSPatchConstants(
 	uint PatchID : SV_PrimitiveID)
 {
 	HS_CONSTANT_DATA_OUTPUT Output;
-
-	//Output.EdgeTessFactor[0] = 1;
-	//Output.EdgeTessFactor[1] = 1;
-	//Output.EdgeTessFactor[2] = 1;
-	//Output.InsideTessFactor = 1;
-	//return Output;
 
 	// Insert code to compute Output here
 	Output.EdgeTessFactor[0] = 0.5f * (ip[1].TessFactor + ip[2].TessFactor);
@@ -81,7 +75,7 @@ HS_CONTROL_POINT_OUTPUT main(
 	Output.NormalW = ip[i].NormalW;
 	Output.TangentW = ip[i].TangentW;
 	Output.BinormalW = ip[i].BinormalW;
-	Output.Tex = ip[i].Tex;
+	Output.Tex = ip[i].Tex.xy;
 
 	return Output;
 }

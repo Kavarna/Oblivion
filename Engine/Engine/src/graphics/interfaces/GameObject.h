@@ -12,11 +12,7 @@
 #include "../Pipelines/BasicPipeline.h"
 #include "../Pipelines/TexturePipeline.h"
 #include "../Pipelines/TextureLightPipeline.h"
-
-//#include "../Shaders/BasicShader.h"
-//#include "../Shaders/TextureLightShader.h"
-//#include "../Shaders/TextureShader.h"
-//#include "../Shaders/DisplacementShader.h"
+#include "../Pipelines/DisplacementLightPipeline.h"
 
 #include "../Helpers/GraphicsDebugDraw.h"
 
@@ -67,7 +63,6 @@ public:
 	virtual inline	void RotateY(float Theta, int instanceID = 0) { m_objectWorld[instanceID] *= DirectX::XMMatrixRotationY(Theta); };
 	virtual inline	void RotateZ(float Theta, int instanceID = 0) { m_objectWorld[instanceID] *= DirectX::XMMatrixRotationZ(Theta); };
 
-public:
 public:
 					void							SetName(std::string const& name) { m_objectName = name; };
 					std::string						GetName() const { return m_objectName; };
@@ -159,6 +154,13 @@ inline void IGameObject::Render(ICamera * cam) const
 			return;
 		TextureLightPipeline::Get()->bind(cam);
 		RenderTextureLight(cam);
+	}
+	else if constexpr (std::is_same<Pipeline, DisplacementLightPipeline>::value)
+	{
+		if (!PrepareIA(PipelineEnum::PipelineDisplacementTextureLight))
+			return;
+		DisplacementLightPipeline::Get()->bind(cam);
+		RenderDisplacementTextureLight(cam);
 	}
 
 	DrawIndexedInstanced(cam);

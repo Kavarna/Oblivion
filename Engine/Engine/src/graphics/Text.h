@@ -3,12 +3,14 @@
 #include "Font.h"
 #include "interfaces/I2DTransforms.h"
 #include "interfaces/ICamera.h"
+#include "Helpers/BufferManager.h"
+#include "interfaces/GameObject.h"
 
 class Text sealed : public IGraphicsObject, public I2DTransforms
 {
-	MicrosoftPointer<ID3D11Buffer> mVertexBuffer;
-	MicrosoftPointer<ID3D11Buffer> mIndexBuffer;
-	MicrosoftPointer<ID3D11Buffer> mMaterialBuffer;
+	MicrosoftPointer<ID3D11Buffer>	mVertexBuffer;
+	MicrosoftPointer<ID3D11Buffer>	mIndexBuffer;
+	ConstantBufferHandle			mMaterialBuffer;
 
 	std::shared_ptr<CFont> mFont;
 

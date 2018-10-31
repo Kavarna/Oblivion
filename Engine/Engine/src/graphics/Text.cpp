@@ -35,9 +35,13 @@ void Text::InitializeBuffers(UINT length)
 	
 	ZeroMemoryAndDeclare(Shader::material_t, data);
 	data.hasTexture = TRUE;
-	ShaderHelper::CreateBuffer(m_d3d11Device.Get(), mMaterialBuffer.GetAddressOf(),
+	/*ShaderHelper::CreateBuffer(m_d3d11Device.Get(), mMaterialBuffer.GetAddressOf(),
 		D3D11_USAGE::D3D11_USAGE_IMMUTABLE, D3D11_BIND_FLAG::D3D11_BIND_CONSTANT_BUFFER,
-		sizeof(Shader::material_t), 0, &data);
+		sizeof(Shader::material_t), 0, &data);*/
+	Shader::material_t material;
+	material.hasTexture = TRUE;
+	mMaterialBuffer = BufferManager::Get()->CreateBuffer(D3D11_USAGE::D3D11_USAGE_IMMUTABLE,
+		sizeof(Shader::material_t), 0, &material);
 }
 
 
@@ -87,6 +91,7 @@ void Text::Render(ICamera * cam, const DirectX::XMFLOAT4& color)
 	static UINT Stride = sizeof(CFont::SVertex);
 	static UINT Offset = 0;
 	static auto renderer = Direct3D11::Get();
+	static auto bm = BufferManager::Get();
 
 	static auto pipeline = TexturePipeline::Get();
 	pipeline->bind(DirectX::XMMatrixIdentity(), cam);
@@ -110,7 +115,8 @@ void Text::Render(ICamera * cam, const DirectX::XMFLOAT4& color)
 
 	m_d3d11Context->PSSetShaderResources(0, 1, SRVs);
 	m_d3d11Context->PSSetSamplers(0, 1, renderer->m_linearWrapSampler.GetAddressOf());
-	m_d3d11Context->PSSetConstantBuffers(2, 1, mMaterialBuffer.GetAddressOf());
+	//m_d3d11Context->PSSetConstantBuffers(2, 1, mMaterialBuffer.GetAddressOf());
+	bm->bindPSBuffer(MATERIAL_SLOT, mMaterialBuffer);
 
 	m_d3d11Context->DrawIndexed(mIndexCount, 0, 0);
 	g_drawCalls++;

@@ -8,7 +8,7 @@ public:
 	I2DTransforms() = default;
 	I2DTransforms(float width, float height) :
 		m_windowWidth(width), m_windowHeight(height) {};
-	~I2DTransforms() = default;
+	virtual ~I2DTransforms() = default;
 public:
 	void SetWindowInfo(float windowWidth, float windowHeight)
 	{

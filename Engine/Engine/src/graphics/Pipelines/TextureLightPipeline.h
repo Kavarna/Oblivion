@@ -7,7 +7,7 @@
 #include "../Shaders/SimpleVertexShader.h"
 #include "../Shaders/TextureLightPixelShader.h"
 
-class TextureLightPipeline : public IPipeline, public Singletone<TextureLightPipeline>
+class TextureLightPipeline : public IPipeline
 {
 public:
 	TextureLightPipeline()
@@ -15,6 +15,9 @@ public:
 		m_usedStages = (uint32_t)Shader::ShaderType::ePixel |
 			(uint32_t)Shader::ShaderType::eVertex;
 	}
+
+	MAKE_SINGLETONE(TextureLightPipeline);
+
 public:
 
 	void setSunLight(const Sun& s)
@@ -23,7 +26,7 @@ public:
 	}
 
 	// Inherited via IPipeline
-	virtual void __vectorcall bind(ICamera * cam) const override final
+	virtual void __vectorcall bind(ICamera * cam) const override
 	{
 		clearPipeline();
 		auto vertexShader = InstancedVertexShader::Get();
@@ -36,7 +39,7 @@ public:
 		pixelShader->bind();
 		pixelShader->bindLightBuffer();
 	}
-	virtual void __vectorcall bind(DirectX::FXMMATRIX & world, ICamera * cam) const override final
+	virtual void __vectorcall bind(DirectX::FXMMATRIX & world, ICamera * cam) const override
 	{
 		clearPipeline();
 		auto vertexShader = SimpleVertexShader::Get();

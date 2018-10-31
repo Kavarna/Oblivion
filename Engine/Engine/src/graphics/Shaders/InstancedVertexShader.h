@@ -8,8 +8,8 @@ public:
 	InstancedVertexShader();
 
 private:
-	//MicrosoftPointer<ID3D11Buffer>		m_cameraBuffer;
 	ConstantBufferHandle					m_cameraBuffer;
+	ConstantBufferHandle					m_cameraAdditionalBuffer;
 
 public:
 	struct SCameraInfo
@@ -18,9 +18,19 @@ public:
 		DirectX::XMMATRIX Projection;
 	};
 
+	struct SAdditionalCameraInfo
+	{
+		DirectX::XMFLOAT3 g_eyePos;
+		float g_minTessDistance;
+		float g_maxTessDistance;
+		DirectX::XMFLOAT3 pad;
+	};
+
 public:
 	void __vectorcall					SetCamera(const SCameraInfo &);
+	void								SetCameraAdditionalInfo(const SAdditionalCameraInfo&);
 
+	ConstantBufferHandle				GetCameraBuffer() const { return m_cameraBuffer; }
 public:
 
 	// Inherited via Singletone<SimpleVertexShader>

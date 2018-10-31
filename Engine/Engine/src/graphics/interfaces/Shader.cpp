@@ -154,7 +154,7 @@ void IHullShader::unbind() const
 IHullShader::IHullShader(LPWSTR path)
 {
 	ID3D11HullShader ** HS = &m_hullShader;
-	ShaderHelper::CreateShaderFromFile(path, "ds_4_0",
+	ShaderHelper::CreateShaderFromFile(path, "hs_4_0",
 		m_d3d11Device.Get(), &m_shaderBlob,
 		reinterpret_cast<ID3D11DeviceChild**>(HS));
 }

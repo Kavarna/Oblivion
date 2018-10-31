@@ -206,6 +206,9 @@ void Game::Init3D()
 	m_billboardTest->AddInstance();
 	m_billboardTest->Scale(100.0f, 100.0f);
 	m_billboardTest->Translate(0.0f, 50.0f, 123.f);
+	instance = m_billboardTest->AddInstance();
+	m_billboardTest->Scale(100.f, 100.f, 1.0f, instance);
+	m_billboardTest->Translate(45.0f, 50.0f, 123.f, instance);
 	
 	//m_sponza = std::make_unique<CollisionObject>();
 	//m_sponza->Create("Resources/Sponza");
@@ -611,7 +614,7 @@ void Game::Render()
 	}*/
 	m_sphere->Render<TextureLightPipeline>(g_camera.get());
 	////m_sponza->Render<TextureLightShader>(g_camera.get());
-	m_ground->Render<TextureLightPipeline>(g_camera.get());
+	m_ground->Render<DisplacementLightPipeline>(g_camera.get());
 	m_tree->Render<TextureLightPipeline>(g_camera.get());
 	m_cup->Render<TextureLightPipeline>(g_camera.get());
 

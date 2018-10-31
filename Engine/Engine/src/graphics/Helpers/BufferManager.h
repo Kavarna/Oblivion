@@ -32,6 +32,7 @@ private:
 	template <Shader::ShaderType shader>
 	inline bool isBufferBound(uint32_t slot, ConstantBufferHandle handle)
 	{
+		//return false;
 		if constexpr (shader == Shader::ShaderType::eVertex)
 			return m_boundVSBuffers[slot] == handle;
 		else if constexpr (shader == Shader::ShaderType::eHull)

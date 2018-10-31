@@ -41,6 +41,8 @@
     <ClCompile Include="src\graphics\Shaders\TexturePixelShader.cpp" />
     <ClCompile Include="src\graphics\Shaders\TextureLightPixelShader.cpp" />
     <ClCompile Include="src\graphics\Shaders\ColorPixelShader.cpp" />
+    <ClCompile Include="src\graphics\Pipelines\TextureLightPipeline.cpp" />
+    <ClCompile Include="src\graphics\Pipelines\DisplacementLightPipeline.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\commonmath.h" />
@@ -103,6 +105,10 @@
     <ClInclude Include="src\graphics\Helpers\BufferManager.h" />
     <ClInclude Include="src\graphics\Shaders\ColorPixelShader.h" />
     <ClInclude Include="src\graphics\Pipelines\ColorPipeline.h" />
+    <ClInclude Include="src\graphics\Pipelines\DisplacementLightPipeline.h" />
+    <ClInclude Include="src\graphics\Shaders\DisplacementMappingHullShader.h" />
+    <ClInclude Include="src\graphics\Shaders\DisplacementMappingDomainShader.h" />
+    <ClInclude Include="src\graphics\Shaders\DisplacementMappingPixelShader.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\TextureLightPixelShader.hlsl" />

@@ -81,18 +81,6 @@ namespace CommonTypes
 
 namespace Oblivion
 {
-	typedef struct material_t
-	{
-		material_t() = default;
-		std::string name;
-		DirectX::XMFLOAT4 diffuseColor; // r, g, b, a
-		float specularPower;
-		std::string specularMap;
-		std::string diffuseMap;
-		std::string bumpMap;
-
-	} Material, SMaterial;
-
 	typedef struct mesh_t
 	{
 
