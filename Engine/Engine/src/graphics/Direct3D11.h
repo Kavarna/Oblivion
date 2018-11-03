@@ -44,6 +44,8 @@ public:
 
 	void										DefaultStates();
 
+	void										RSCustomState(ID3D11RasterizerState *);
+
 private:
 	void										CreateDepthStencilView(uint32_t width, uint32_t height);
 	void										InitializeStates();

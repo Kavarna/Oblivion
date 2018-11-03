@@ -24,7 +24,7 @@ public:
 	void setCamera(const DSCameraBuffer& ds)
 	{
 		static auto bm = BufferManager::Get();
-		bm->MapBuffer(m_cameraBuffer);
+		bm->MapBuffer(m_cameraBuffer, (void*)&ds);
 		bm->bindDSBuffer(0, m_cameraBuffer);
 	}
 

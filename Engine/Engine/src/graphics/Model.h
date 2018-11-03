@@ -40,7 +40,7 @@ private:
 			void							WriteMaterials();
 
 protected:
-			void							DrawIndexedInstanced(ICamera * cam) const override;
+			void							DrawIndexedInstanced(ICamera * cam, const std::function<void(UINT, UINT, UINT)>&) const override;
 			bool							PrepareIA(const PipelineEnum& p) const override;
 
 private:
@@ -56,8 +56,6 @@ private:
 	};
 private:
 	DirectX::BoundingBox					m_boundingBox;
-
-	mutable std::vector<uint32_t>			m_drawnInstances;
 
 	Rendering::Material*					m_selectedMaterial;
 	std::string								m_materialFile;

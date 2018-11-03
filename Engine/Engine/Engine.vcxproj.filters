@@ -109,6 +109,7 @@
     <ClInclude Include="src\graphics\Shaders\DisplacementMappingHullShader.h" />
     <ClInclude Include="src\graphics\Shaders\DisplacementMappingDomainShader.h" />
     <ClInclude Include="src\graphics\Shaders\DisplacementMappingPixelShader.h" />
+    <ClInclude Include="src\graphics\ShadowmapBuild.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\TextureLightPixelShader.hlsl" />

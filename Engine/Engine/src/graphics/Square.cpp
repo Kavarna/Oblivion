@@ -81,7 +81,7 @@ void Square::TranslateTo(float X, float Y, int InstanceID)
 	m_objectWorld[InstanceID] *= DirectX::XMMatrixTranslation(NewX, NewY, 0.0f);
 }
 
-void Square::DrawIndexedInstanced(ICamera * cam) const
+void Square::DrawIndexedInstanced(ICamera * cam, const std::function<void(UINT, UINT, UINT)>& renderFunction) const
 {
 	std::function<bool(uint32_t)> func = [](int) ->bool { return true; };
 	int renderInstances = PrepareInstances(func);
@@ -96,8 +96,10 @@ void Square::DrawIndexedInstanced(ICamera * cam) const
 		return;
 
 	BindMaterial(m_material, m_bindMaterialToShader);
-	m_d3d11Context->DrawIndexedInstanced(GetIndexCount(),
-		renderInstances, m_indexRange.begin, m_vertexRange.begin, 0);
+	//m_d3d11Context->DrawIndexedInstanced(GetIndexCount(),
+	//	renderInstances, m_indexRange.begin, m_vertexRange.begin, 0);
+	renderFunction(GetIndexCount(),
+		m_indexRange.begin, m_vertexRange.begin);
 	if (g_isDeveloper)
 		g_drawCalls++;
 }

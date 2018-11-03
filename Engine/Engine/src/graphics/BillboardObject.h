@@ -12,7 +12,7 @@ public:
 
 					void		CreateFromTexture(std::shared_ptr<Texture> texture);
 
-	virtual			void		DrawIndexedInstanced(ICamera * cam) const override;
+	virtual			void		DrawIndexedInstanced(ICamera * cam, const std::function<void(UINT, UINT, UINT)>&) const override;
 	virtual			void		Destroy() override;
 
 	virtual inline	void		RotateX(float, int) override {};

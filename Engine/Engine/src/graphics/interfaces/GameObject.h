@@ -90,7 +90,8 @@ protected:
 	virtual			void							RenderTexture(ICamera * cam) const;
 	virtual			void							RenderTextureLight(ICamera * cam) const;
 	virtual			void							RenderDisplacementTextureLight(ICamera * cam) const;
-	virtual			void							DrawIndexedInstanced(ICamera * cam) const = 0;
+	virtual			void							DrawIndexedInstanced(ICamera * cam,
+														const std::function<void(UINT,UINT,UINT)> & render = std::function<void(UINT,UINT,UINT)>()) const = 0;
 	virtual			bool							PrepareIA(const PipelineEnum&) const = 0;
 
 protected:
@@ -121,6 +122,7 @@ protected:
 			std::vector<DirectX::XMMATRIX>			m_objectWorld;
 			ConstantBufferHandle					m_materialBuffer;
 	mutable int										m_bindMaterialToShader;
+	mutable std::vector<uint32_t>					m_drawnInstances;
 			std::string								m_objectName;
 };
 
@@ -138,30 +140,43 @@ inline void IGameObject::Render(ICamera * cam) const
 	{
 		if (!PrepareIA(PipelineEnum::PipelineBasic))
 			return;
-		BasicPipeline::Get()->bind(cam);
 		RenderBasic(cam);
 	}
 	else if constexpr (std::is_same<Pipeline, TexturePipeline>::value)
 	{
 		if (!PrepareIA(PipelineEnum::PipelineTexture))
 			return;
-		TexturePipeline::Get()->bind(cam);
 		RenderTexture(cam);
 	}
 	else if constexpr (std::is_same<Pipeline, TextureLightPipeline>::value)
 	{
 		if (!PrepareIA(PipelineEnum::PipelineTextureLight))
 			return;
-		TextureLightPipeline::Get()->bind(cam);
 		RenderTextureLight(cam);
 	}
 	else if constexpr (std::is_same<Pipeline, DisplacementLightPipeline>::value)
 	{
 		if (!PrepareIA(PipelineEnum::PipelineDisplacementTextureLight))
 			return;
-		DisplacementLightPipeline::Get()->bind(cam);
 		RenderDisplacementTextureLight(cam);
 	}
 
-	DrawIndexedInstanced(cam);
+	if (m_objectWorld.size() == 1)
+	{
+		auto drawFunc = [&](UINT indexCount, UINT indexStart, UINT vertexStart)
+		{
+			m_d3d11Context->DrawIndexed(indexCount, indexStart, vertexStart);
+		};
+		Pipeline::Get()->bind(m_objectWorld[0], cam);
+		DrawIndexedInstanced(cam, drawFunc);
+	}
+	else
+	{
+		auto drawFunc = [&](UINT indexCount, UINT indexStart, UINT vertexStart)
+		{
+			m_d3d11Context->DrawIndexedInstanced(indexCount, m_drawnInstances.size(), indexStart, vertexStart, 0);
+		};
+		Pipeline::Get()->bind(cam);
+		DrawIndexedInstanced(cam, drawFunc);
+	}
 }

@@ -334,7 +334,7 @@ void Model::WriteMaterials()
 	boost::property_tree::write_json(m_materialFile, materialsTree);
 }
 
-void Model::DrawIndexedInstanced(ICamera * cam) const
+void Model::DrawIndexedInstanced(ICamera * cam, const std::function<void(UINT, UINT, UINT)>& renderFunction) const
 {
 	//std::function<bool(uint32_t)> func = std::bind(&Model::ShouldRenderInstance, this, cam, std::placeholders::_1);
 	m_drawnInstances.clear();
@@ -391,9 +391,12 @@ void Model::DrawIndexedInstanced(ICamera * cam) const
 			//if (shouldRenderMesh(mesh, m_drawnInstances[i]))
 			{
 				BindMaterial(m_materials[mesh.m_materialIndex], m_bindMaterialToShader);
-				m_d3d11Context->DrawIndexedInstanced((UINT)(mesh.m_indexRange.end - mesh.m_indexRange.begin),
-					(UINT)renderInstances, (UINT)mesh.m_indexRange.begin,
-					(UINT)mesh.m_vertexRange.begin, 0);
+				//m_d3d11Context->DrawIndexedInstanced((UINT)(mesh.m_indexRange.end - mesh.m_indexRange.begin),
+				//	(UINT)renderInstances, (UINT)mesh.m_indexRange.begin,
+				//	(UINT)mesh.m_vertexRange.begin, 0);
+				renderFunction((UINT)mesh.m_indexRange.end - mesh.m_indexRange.begin,
+					(UINT)mesh.m_indexRange.begin, (UINT)mesh.m_vertexRange.begin);
+				
 				if (g_isDeveloper)
 					g_drawCalls++;
 			}
@@ -411,9 +414,11 @@ void Model::DrawIndexedInstanced(ICamera * cam) const
 			{
 				renderer->OMTransparency(opacity);
 				BindMaterial(m_materials[mesh.m_materialIndex], m_bindMaterialToShader);
-				m_d3d11Context->DrawIndexedInstanced((UINT)(mesh.m_indexRange.end - mesh.m_indexRange.begin),
-					(UINT)renderInstances, (UINT)mesh.m_indexRange.begin,
-					(UINT)mesh.m_vertexRange.begin, 0);
+				//m_d3d11Context->DrawIndexedInstanced((UINT)(mesh.m_indexRange.end - mesh.m_indexRange.begin),
+				//	(UINT)renderInstances, (UINT)mesh.m_indexRange.begin,
+				//	(UINT)mesh.m_vertexRange.begin, 0);
+				renderFunction((UINT)mesh.m_indexRange.end - mesh.m_indexRange.begin,
+					(UINT)mesh.m_indexRange.begin, (UINT)mesh.m_vertexRange.begin);
 				if (g_isDeveloper)
 				{
 					g_drawCalls++;

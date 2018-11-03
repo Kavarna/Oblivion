@@ -22,7 +22,8 @@ Texture::Texture(float width, float height, bool hasUAV)
 		1, 0);
 
 	TextureUtilities::CreateSRVFromTexture(m_d3d11Device.Get(), mTexture.Get(), &mTextureSRV);
-	TextureUtilities::CreateUAVFromTexture(m_d3d11Device.Get(), mTexture.Get(), &mTextureUAV);
+	if (hasUAV)
+		TextureUtilities::CreateUAVFromTexture(m_d3d11Device.Get(), mTexture.Get(), &mTextureUAV);
 }
 
 Texture::Texture(LPWSTR lpPath, bool hasUAV)

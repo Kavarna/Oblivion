@@ -218,6 +218,7 @@
     <ClInclude Include="src\graphics\Shaders\SimpleVertexShader.h" />
     <ClInclude Include="src\graphics\Shaders\TextureLightPixelShader.h" />
     <ClInclude Include="src\graphics\Shaders\TexturePixelShader.h" />
+    <ClInclude Include="src\graphics\ShadowmapBuild.h" />
     <ClInclude Include="src\graphics\Text.h" />
     <ClInclude Include="src\physics\CollisionObject.h" />
     <ClInclude Include="src\physics\PhysicsDebugDraw.h" />

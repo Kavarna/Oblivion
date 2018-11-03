@@ -77,6 +77,11 @@ void Direct3D11::DefaultStates()
 	OMDefaultBlend();
 }
 
+void Direct3D11::RSCustomState(ID3D11RasterizerState * state)
+{
+	m_d3d11Context->RSSetState(state);
+}
+
 void Direct3D11::OnResize(HWND hWnd, uint32_t width, uint32_t height)
 {
 	m_viewPort.TopLeftX = 0;

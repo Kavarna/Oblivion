@@ -3,9 +3,9 @@
 
 
 RenderTexture::RenderTexture(uint32_t width, uint32_t height,
-	bool depth, uint32_t MSAACount, uint32_t MSAAQuality)
+	RenderTextureFlags flags, uint32_t MSAACount, uint32_t MSAAQuality)
 {
-	Reset(width, height, depth, MSAACount, MSAAQuality);
+	Reset(width, height, flags, MSAACount, MSAAQuality);
 }
 
 RenderTexture::~RenderTexture()
@@ -13,18 +13,32 @@ RenderTexture::~RenderTexture()
 }
 
 void RenderTexture::Reset(uint32_t width, uint32_t height,
-	bool depth, uint32_t MSAACount, uint32_t MSAAQuality)
+	RenderTextureFlags flags, uint32_t MSAACount, uint32_t MSAAQuality)
 {
 	using namespace TextureUtilities;
 	Reset();
+	UINT bindFlags = 0;
+	m_textureFlags = flags;
+	bool depth = false;
+	if (flags & RenderTextureFlags::ColorReadEnable)
+		bindFlags |= D3D11_BIND_FLAG::D3D11_BIND_SHADER_RESOURCE;
+	if (flags & RenderTextureFlags::ColorWriteEnable)
+		bindFlags |= D3D11_BIND_FLAG::D3D11_BIND_RENDER_TARGET;
+	if (flags & RenderTextureFlags::DepthWriteEnable)
+		depth = true;
+	if (flags & RenderTextureFlags::UnorderedAccess)
+		bindFlags |= D3D11_BIND_FLAG::D3D11_BIND_UNORDERED_ACCESS;
+
 	CreateTexture(m_d3d11Device.Get(), &m_texture,
-		width, height, D3D11_BIND_RENDER_TARGET |
-		D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS,
+		width, height, bindFlags,
 		DXGI_FORMAT_R32G32B32A32_FLOAT, MSAACount, MSAAQuality);
 
-	CreateRTVFromTexture(m_d3d11Device.Get(), m_texture.Get(), &m_renderTargetView);
-	CreateSRVFromTexture(m_d3d11Device.Get(), m_texture.Get(), &m_shaderResourceView);
-	CreateUAVFromTexture(m_d3d11Device.Get(), m_texture.Get(), &m_unorderedAccessView);
+	if (flags & RenderTextureFlags::ColorWriteEnable)
+		CreateRTVFromTexture(m_d3d11Device.Get(), m_texture.Get(), &m_renderTargetView);
+	if (flags & RenderTextureFlags::ColorReadEnable)
+		CreateSRVFromTexture(m_d3d11Device.Get(), m_texture.Get(), &m_shaderResourceView);
+	if (flags & RenderTextureFlags::UnorderedAccess)
+		CreateUAVFromTexture(m_d3d11Device.Get(), m_texture.Get(), &m_unorderedAccessView);
 
 	if (depth)
 	{
@@ -32,6 +46,11 @@ void RenderTexture::Reset(uint32_t width, uint32_t height,
 			width, height, D3D11_BIND_DEPTH_STENCIL,
 			DXGI_FORMAT_D32_FLOAT, MSAACount, MSAAQuality);
 		CreateDSVFromTexture(m_d3d11Device.Get(), m_textureDepth.Get(), &m_depthView);
+		if (flags & RenderTextureFlags::DepthReadEnable)
+		{
+			CreateSRVFromTexture(m_d3d11Device.Get(), m_textureDepth.Get(), &m_depthShaderResource);
+			m_oblDepth = std::make_shared<Texture>(m_textureDepth.Get(), m_depthShaderResource.Get());
+		}
 	}
 
 	m_oblTexture = std::make_shared<Texture>(m_texture.Get(), m_shaderResourceView.Get(), m_unorderedAccessView.Get());
