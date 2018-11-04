@@ -85,6 +85,7 @@ enum PixelShaderEnum
 	PixelShaderDisplacement,
 	PixelShaderTexture,
 	PixelShaderTextureLight,
+	PixelShaderReject,
 	PixelShaderCustom = ~0
 };
 

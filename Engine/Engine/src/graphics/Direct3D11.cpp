@@ -226,6 +226,7 @@ void Direct3D11::InitializeStates()
 	rastDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_NONE;
 	rastDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_WIREFRAME;
 	rastDesc.MultisampleEnable = m_hasMSAA ? TRUE : FALSE;
+	rastDesc.DepthClipEnable = TRUE;
 	ThrowIfFailed(
 		m_d3d11Device->CreateRasterizerState(&rastDesc, &m_wireFrameNoCulling)
 	);

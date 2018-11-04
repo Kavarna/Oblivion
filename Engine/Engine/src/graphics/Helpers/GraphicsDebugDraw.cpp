@@ -59,7 +59,7 @@ void GraphicsDebugDraw::RenderBoundingBox(DirectX::BoundingBox const & box)
 
 void GraphicsDebugDraw::RenderBoundingFrustum(DirectX::BoundingFrustum const & frustum)
 {
-	if (m_insideBeginEnd)
+	if (!m_insideBeginEnd)
 		return;
 	if (m_debugFlags & DBG_DRAW_BOUNDING_FRUSTUM)
 	{

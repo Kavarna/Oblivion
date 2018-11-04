@@ -16,6 +16,7 @@ enum PipelineEnum
 	PipelineTextureLight = 3,
 	PipelineDisplacementTextureLight = 4,
 	PipelineCompute2D = 5,
+	PipelineDepthmap = 6,
 	PipelineCustom = INT_MAX
 };
 

@@ -43,6 +43,8 @@
     <ClCompile Include="src\graphics\Shaders\ColorPixelShader.cpp" />
     <ClCompile Include="src\graphics\Pipelines\TextureLightPipeline.cpp" />
     <ClCompile Include="src\graphics\Pipelines\DisplacementLightPipeline.cpp" />
+    <ClCompile Include="src\graphics\ShadowmapBuild.cpp" />
+    <ClCompile Include="src\graphics\Shaders\RejectPixelShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\commonmath.h" />
@@ -110,6 +112,8 @@
     <ClInclude Include="src\graphics\Shaders\DisplacementMappingDomainShader.h" />
     <ClInclude Include="src\graphics\Shaders\DisplacementMappingPixelShader.h" />
     <ClInclude Include="src\graphics\ShadowmapBuild.h" />
+    <ClInclude Include="src\graphics\Pipelines\DepthmapPipeline.h" />
+    <ClInclude Include="src\graphics\Shaders\RejectPixelShader.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\TextureLightPixelShader.hlsl" />
@@ -120,6 +124,7 @@
     <FxCompile Include="src\shaders\InstancedVertexShader.hlsl" />
     <FxCompile Include="src\shaders\SimpleVertexShader.hlsl" />
     <FxCompile Include="src\shaders\ColorPixelShader.hlsl" />
+    <FxCompile Include="src\shaders\RejectPixelShader.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\Lights.hlsli" />

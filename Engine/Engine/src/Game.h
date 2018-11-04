@@ -77,9 +77,13 @@ private:
 
 	std::unique_ptr<BillboardObject>					m_billboardTest;
 
+	std::unique_ptr<ShadowmapBuild>						m_shadowMap;
+
 	std::vector<IGameObject*>							m_gameObjects;
 	std::vector<Model*>									m_models;
 	Model*												m_selectedObject;
+
+	std::unique_ptr<DirectionalLightView>				m_directionalLight;
 
 private:
 	std::unique_ptr<DirectX::Mouse>						m_mouse;

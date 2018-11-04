@@ -224,6 +224,23 @@ void Game::Init3D()
 	m_models.push_back(m_sphere.get());
 	m_models.push_back(m_tree.get());
 	m_models.push_back(m_cup.get());
+
+	m_directionalLight = std::make_unique<DirectionalLightView>();
+	m_directionalLight->setDiffuseColor(1.0f, 1.0f, 1.0f);
+	m_directionalLight->setDimensions(1024.f, 1024.f);
+	m_directionalLight->setFarZ(200.0f);
+	m_directionalLight->setNearZ(10.0f);
+	m_directionalLight->setFov(DirectX::XM_PI / 4.f);
+	m_directionalLight->setPosition(0.0f, 150.0f, 0.0f);
+	m_directionalLight->setDirection(0.0f, -1.0f, 0.0f);
+	m_directionalLight->build<ProjectionTypes::Ortographic>();
+
+	m_shadowMap = std::make_unique<ShadowmapBuild>(); // Use defaults for now
+	m_shadowMap->AddGameObject(m_tree.get());
+	m_shadowMap->AddGameObject(m_cup.get());
+	m_shadowMap->AddGameObject(m_sphere.get());
+	m_shadowMap->AddGameObject(m_ground.get());
+	DepthmapPipeline::Get()->EnableDisplacement();
 }
 
 void Game::InitSizeDependent()
@@ -604,9 +621,12 @@ void Game::Render()
 		graphicsDebugDrawer->Begin();
 		btDebugDraw::Get()->Render();
 	}
+	m_directionalLight->RenderDebug();
 
 	IGameObject::BindStaticVertexBuffer();
+	m_shadowMap->Build(m_directionalLight.get());
 
+	renderer->SetRenderTargetAndDepth();
 
 	/*for (const auto & model : m_models)
 	{

@@ -24,13 +24,13 @@ namespace TextureUtilities
 
 	/// <summary>Creates a shader resource view for a texture. Note: The texture must have D3D11_BIND_SHADER_RESOURCE bind flag</summary>
 	inline void CreateSRVFromTexture(ID3D11Device * device, ID3D11Texture2D * texture,
-		ID3D11ShaderResourceView ** finalResult)
+		ID3D11ShaderResourceView ** finalResult, DXGI_FORMAT format = DXGI_FORMAT::DXGI_FORMAT_UNKNOWN)
 	{
 		D3D11_TEXTURE2D_DESC texDesc;
 		texture->GetDesc(&texDesc);
 
 		ZeroMemoryAndDeclare(D3D11_SHADER_RESOURCE_VIEW_DESC, srvDesc);
-		srvDesc.Format = texDesc.Format;
+		srvDesc.Format = format == DXGI_FORMAT_UNKNOWN ? texDesc.Format : format;
 		if (texDesc.SampleDesc.Quality == 0)
 		{
 			srvDesc.Texture2D.MipLevels = texDesc.MipLevels;
@@ -76,13 +76,13 @@ namespace TextureUtilities
 
 	/// <summary>Creates a depth stencil view for a texture. Note: The texture must have D3D11_DEPTH_STENCIL bind flag and an according format</summary>
 	inline void CreateDSVFromTexture(ID3D11Device * device, ID3D11Texture2D * texture,
-		ID3D11DepthStencilView ** finalResult, UINT mipSlice = 0)
+		ID3D11DepthStencilView ** finalResult, DXGI_FORMAT format = DXGI_FORMAT::DXGI_FORMAT_UNKNOWN, UINT mipSlice = 0)
 	{
 		D3D11_TEXTURE2D_DESC texDesc;
 		texture->GetDesc(&texDesc);
 
 		ZeroMemoryAndDeclare(D3D11_DEPTH_STENCIL_VIEW_DESC, depthDesc);
-		depthDesc.Format = texDesc.Format;
+		depthDesc.Format = format == DXGI_FORMAT::DXGI_FORMAT_UNKNOWN ? texDesc.Format : format;
 		if (texDesc.SampleDesc.Quality == 0)
 		{
 			depthDesc.Texture2D.MipSlice = 0;
