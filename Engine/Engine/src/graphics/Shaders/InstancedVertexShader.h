@@ -9,7 +9,8 @@ public:
 
 private:
 	ConstantBufferHandle					m_cameraBuffer;
-	ConstantBufferHandle					m_cameraAdditionalBuffer;
+	ConstantBufferHandle					m_perCameraBuffer;
+	ConstantBufferHandle					m_additionalCameraBuffer;
 
 public:
 	struct SCameraInfo
@@ -29,6 +30,7 @@ public:
 public:
 	void __vectorcall					SetCamera(const SCameraInfo &);
 	void								SetCameraAdditionalInfo(const SAdditionalCameraInfo&);
+	void __vectorcall					SetAdditionalCamera(const SCameraInfo &);
 
 	ConstantBufferHandle				GetCameraBuffer() const { return m_cameraBuffer; }
 public:

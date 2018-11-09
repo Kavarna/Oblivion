@@ -169,6 +169,8 @@ void Game::InitPipelines()
 	s.m_diffuseColor = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	s.m_ambientColor = DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 	TextureLightPipeline::Get()->setSunLight(s);
+	DepthmapPipeline::Get()->EnableDisplacement();
+	ShadowMappingPipeline::Get()->EnableDisplacement();
 }
 
 void Game::Init2D()
@@ -233,14 +235,15 @@ void Game::Init3D()
 	m_directionalLight->setFov(DirectX::XM_PI / 4.f);
 	m_directionalLight->setPosition(0.0f, 150.0f, 0.0f);
 	m_directionalLight->setDirection(0.0f, -1.0f, 0.0f);
-	m_directionalLight->build<ProjectionTypes::Ortographic>();
+	m_directionalLight->build<ProjectionTypes::Perspective>();
 
-	m_shadowMap = std::make_unique<ShadowmapBuild>(); // Use defaults for now
+	m_shadowMap = std::make_unique<ShadowmapBuild>(2048.f, 15, 3.f);
 	m_shadowMap->AddGameObject(m_tree.get());
 	m_shadowMap->AddGameObject(m_cup.get());
 	m_shadowMap->AddGameObject(m_sphere.get());
 	m_shadowMap->AddGameObject(m_ground.get());
-	DepthmapPipeline::Get()->EnableDisplacement();
+	m_shadowMap->SetLightView(m_directionalLight.get());
+	ShadowMappingPipeline::Get()->setShadowMap(m_shadowMap->GetShadowmapTexture(), m_shadowMap->GetLightView());
 }
 
 void Game::InitSizeDependent()
@@ -624,7 +627,7 @@ void Game::Render()
 	m_directionalLight->RenderDebug();
 
 	IGameObject::BindStaticVertexBuffer();
-	m_shadowMap->Build(m_directionalLight.get());
+	m_shadowMap->Build();
 
 	renderer->SetRenderTargetAndDepth();
 
@@ -632,11 +635,13 @@ void Game::Render()
 	{
 		model->Render<DisplacementShader>(g_camera.get());
 	}*/
-	m_sphere->Render<DisplacementLightPipeline>(g_camera.get());
+	ShadowMappingPipeline::Get()->EnableDisplacement();
+	m_sphere->Render<ShadowMappingPipeline>(g_camera.get());
 	////m_sponza->Render<TextureLightShader>(g_camera.get());
-	m_ground->Render<DisplacementLightPipeline>(g_camera.get());
-	m_tree->Render<TextureLightPipeline>(g_camera.get());
-	m_cup->Render<TextureLightPipeline>(g_camera.get());
+	m_ground->Render<ShadowMappingPipeline>(g_camera.get());
+	ShadowMappingPipeline::Get()->DisableDisplacement();
+	m_tree->Render<ShadowMappingPipeline>(g_camera.get());
+	m_cup->Render<ShadowMappingPipeline>(g_camera.get());
 
 	m_billboardTest->Render<TexturePipeline>(g_camera.get());
 

@@ -65,6 +65,7 @@ public:
 	MicrosoftPointer<ID3D11SamplerState>		m_linearWrapSampler			= nullptr;
 	MicrosoftPointer<ID3D11SamplerState>		m_linearClampSampler		= nullptr;
 	MicrosoftPointer<ID3D11SamplerState>		m_anisotropicWrapSampler	= nullptr;
+	MicrosoftPointer<ID3D11SamplerState>		m_comparisonLinearClampSampler = nullptr;
 
 private: // States
 	// Rasterizer

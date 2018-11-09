@@ -14,6 +14,7 @@
 #include "../Pipelines/TextureLightPipeline.h"
 #include "../Pipelines/DisplacementLightPipeline.h"
 #include "../Pipelines/DepthmapPipeline.h"
+#include "../Pipelines/ShadowMappingPipeline.h"
 
 #include "../Helpers/GraphicsDebugDraw.h"
 
@@ -161,10 +162,11 @@ inline void IGameObject::Render(ICamera * cam) const
 			return;
 		RenderDisplacementTextureLight(cam);
 	}
-	else if constexpr (std::is_same<Pipeline, DepthmapPipeline>::value)
+	else if constexpr (std::is_same<Pipeline, DepthmapPipeline>::value || 
+		std::is_same<Pipeline,ShadowMappingPipeline>::value)
 	{
 		auto pipeline = Pipeline::Get();
-		// Just use the closes IA and rendering
+		// Just use the closest IA for rendering
 		if (pipeline->useDisplacement())
 		{
 			if (!PrepareIA(PipelineEnum::PipelineDisplacementTextureLight))

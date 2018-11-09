@@ -9,7 +9,8 @@ public:
 
 private:
 	ConstantBufferHandle	m_cameraBuffer;
-	ConstantBufferHandle	m_cameraAdditionalBuffer;
+	ConstantBufferHandle	m_perCameraBuffer;
+	ConstantBufferHandle	m_additionalCameraBuffer;
 
 public:
 	struct SCameraInfo
@@ -27,9 +28,16 @@ public:
 		DirectX::XMFLOAT3 pad;
 	};
 
+	struct SCameraInfo2
+	{
+		DirectX::XMMATRIX View;
+		DirectX::XMMATRIX Projection;
+	};
+
 public:
 	void __vectorcall					SetCamera(const SCameraInfo &);
 	void								SetCameraAdditionalInfo(const SAdditionalCameraInfo&);
+	void __vectorcall					SetAdditionalCamera(const SCameraInfo2&);
 
 public:
 

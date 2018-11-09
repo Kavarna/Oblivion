@@ -11,7 +11,8 @@
 
 
 
-class DepthmapPipeline : public IPipeline, public Singletone<DepthmapPipeline>
+class DepthmapPipeline : public IPipeline, public Singletone<DepthmapPipeline>,
+	public IDynamicDisplacementPipeline
 {
 public:
 	DepthmapPipeline()
@@ -19,17 +20,6 @@ public:
 		m_usedStages = (uint32_t)Shader::ShaderType::eVertex |
 			(uint32_t)Shader::ShaderType::eHull | (uint32_t)Shader::ShaderType::eDomain;
 	}
-
-private:
-	bool m_useDisplacement = false;
-
-public:
-
-	void ToggleDisplacement() { m_useDisplacement = !m_useDisplacement; };
-	void EnableDisplacement() { m_useDisplacement = true; };
-	void DisableDisplacement() { m_useDisplacement = false; };
-
-	bool useDisplacement() { return m_useDisplacement; };
 
 	// Inherited via IPipeline
 	virtual void __vectorcall bind(ICamera * cam) const override final
@@ -47,7 +37,7 @@ public:
 			cam->GetProjection()
 			});
 		pixelShader->bind();
-		if (m_useDisplacement)
+		if (useDisplacement())
 		{
 			domainShader->bind();
 			ConstantBufferHandle cameraBuffer = vertexShader->GetCameraBuffer();
@@ -76,7 +66,7 @@ public:
 			cam->GetProjection()
 			});
 		pixelShader->bind();
-		if (m_useDisplacement)
+		if (useDisplacement())
 		{
 			domainShader->bind();
 			domainShader->setCamera({

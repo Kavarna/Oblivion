@@ -29,9 +29,10 @@ void RenderTexture::Reset(uint32_t width, uint32_t height,
 	if (flags & RenderTextureFlags::UnorderedAccess)
 		bindFlags |= D3D11_BIND_FLAG::D3D11_BIND_UNORDERED_ACCESS;
 
-	CreateTexture(m_d3d11Device.Get(), &m_texture,
-		width, height, bindFlags,
-		DXGI_FORMAT_R32G32B32A32_FLOAT, MSAACount, MSAAQuality);
+	if (bindFlags)
+		CreateTexture(m_d3d11Device.Get(), &m_texture,
+			width, height, bindFlags,
+			DXGI_FORMAT_R32G32B32A32_FLOAT, MSAACount, MSAAQuality);
 
 	if (flags & RenderTextureFlags::ColorWriteEnable)
 		CreateRTVFromTexture(m_d3d11Device.Get(), m_texture.Get(), &m_renderTargetView);
@@ -58,7 +59,8 @@ void RenderTexture::Reset(uint32_t width, uint32_t height,
 		}
 	}
 
-	m_oblTexture = std::make_shared<Texture>(m_texture.Get(), m_shaderResourceView.Get(), m_unorderedAccessView.Get());
+	if (m_texture)
+		m_oblTexture = std::make_shared<Texture>(m_texture.Get(), m_shaderResourceView.Get(), m_unorderedAccessView.Get());
 
 	m_viewPort.TopLeftX = 0;
 	m_viewPort.TopLeftY = 0;
@@ -68,10 +70,28 @@ void RenderTexture::Reset(uint32_t width, uint32_t height,
 	m_viewPort.MaxDepth = 1.0f;
 }
 
+void RenderTexture::Clear(float r, float g, float b, float a)
+{
+	ClearTexture(r, g, b, a);
+	ClearDepth();
+}
+
 void RenderTexture::ClearTexture(float r, float g, float b, float a)
 {
-	FLOAT color[4] = { r,g,b,a };
-	m_d3d11Context->ClearRenderTargetView(m_renderTargetView.Get(), color);
+	if (m_textureFlags & RenderTextureFlags::ColorWriteEnable)
+	{
+		FLOAT color[4] = { r,g,b,a };
+		m_d3d11Context->ClearRenderTargetView(m_renderTargetView.Get(), color);
+	}
+}
+
+void RenderTexture::ClearDepth()
+{
+	if (m_textureFlags & RenderTextureFlags::DepthWriteEnable)
+	{
+		m_d3d11Context->ClearDepthStencilView(m_depthView.Get(),
+			D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	}
 }
 
 void RenderTexture::SetRenderTarget()

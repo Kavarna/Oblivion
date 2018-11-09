@@ -1,5 +1,4 @@
 #include "ShadowmapBuild.h"
-#include "Helpers/Lights.h"
 #include "Pipelines/DepthmapPipeline.h"
 
 ShadowmapBuild::ShadowmapBuild(uint32_t shadowMapsize, INT depthBias, FLOAT slopeScaledDepthBias, FLOAT depthBiasClamp)
@@ -27,13 +26,20 @@ void ShadowmapBuild::Create(uint32_t shadowmapSize, INT depthBias, FLOAT slopeSc
 		(RenderTextureFlags)(RenderTextureFlags::DepthReadEnable | RenderTextureFlags::DepthWriteEnable));
 }
 
-void ShadowmapBuild::Build(DirectionalLightView* directionalLightView)
+void ShadowmapBuild::Build()
 {
+	ID3D11ShaderResourceView * nullSRV[] =
+	{
+		nullptr
+	};
+	m_d3d11Context->PSSetShaderResources(4, 1, nullSRV);
+
 	m_renderTexture->SetRenderTarget();
+	m_renderTexture->Clear();
 
 	for (const auto & gameObject : m_occluders)
 	{
-		gameObject->Render<DepthmapPipeline>(directionalLightView);
+		gameObject->Render<DepthmapPipeline>(m_lightView);
 	}
 }
 

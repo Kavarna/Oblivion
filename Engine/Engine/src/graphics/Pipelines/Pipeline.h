@@ -17,6 +17,7 @@ enum PipelineEnum
 	PipelineDisplacementTextureLight = 4,
 	PipelineCompute2D = 5,
 	PipelineDepthmap = 6,
+	PipelineShadowMapping = 7,
 	PipelineCustom = INT_MAX
 };
 
@@ -44,3 +45,16 @@ public:
 
 };
 
+class IDynamicDisplacementPipeline
+{
+private:
+	bool m_useDisplacement = false;
+
+public:
+
+	void ToggleDisplacement() { m_useDisplacement = !m_useDisplacement; };
+	void EnableDisplacement() { m_useDisplacement = true; };
+	void DisableDisplacement() { m_useDisplacement = false; };
+
+	bool useDisplacement() const { return m_useDisplacement; };
+};

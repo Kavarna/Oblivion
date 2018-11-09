@@ -19,6 +19,12 @@ struct Sun
 	}
 };
 
+struct DirectionalLight
+{
+	float4 Position;
+	float4 Diffuse;
+};
+
 float3 NormalSampleToWorldSpace(float3 Sample,
 	float3 UnitNormalW, float3 TangentW, float3 BinormalW)
 {

@@ -46,7 +46,11 @@ void IVertexShader::bind() const
 
 void IVertexShader::unbind() const
 {
-	m_d3d11Context->VSSetShader(nullptr, nullptr, 0);
+	if (shouldBind(VertexShaderEnum::VertexShaderNone))
+	{
+		m_d3d11Context->PSSetShader(nullptr, nullptr, 0);
+		m_boundVertexShader = VertexShaderEnum::VertexShaderNone;
+	}
 }
 
 bool IPixelShader::shouldBind(const PixelShaderEnum ps)
@@ -68,7 +72,11 @@ void IPixelShader::bind() const
 
 void IPixelShader::unbind() const
 {
-	m_d3d11Context->PSSetShader(nullptr, nullptr, 0);
+	if (shouldBind(PixelShaderEnum::PixelShaderNone))
+	{
+		m_d3d11Context->PSSetShader(nullptr, nullptr, 0);
+		m_boundPixelShader = PixelShaderEnum::PixelShaderNone;
+	}
 }
 
 IPixelShader::IPixelShader(LPWSTR path)
@@ -108,7 +116,11 @@ void IDomainShader::bind() const
 
 void IDomainShader::unbind() const
 {
-	m_d3d11Context->DSSetShader(nullptr, nullptr, 0);
+	if (shouldBind(DomainShaderEnum::DomainShaderNone))
+	{
+		m_d3d11Context->DSSetShader(nullptr, nullptr, 0);
+		m_boundDomainShader = DomainShaderEnum::DomainShaderNone;
+	}
 }
 
 IDomainShader::IDomainShader(LPWSTR path)
@@ -148,7 +160,11 @@ void IHullShader::bind() const
 
 void IHullShader::unbind() const
 {
-	m_d3d11Context->HSSetShader(nullptr, nullptr, 0);
+	if (shouldBind(HullShaderEnum::HullShaderNone))
+	{
+		m_d3d11Context->HSSetShader(nullptr, nullptr, 0);
+		m_boundHullShader = HullShaderEnum::HullShaderNone;
+	}
 }
 
 IHullShader::IHullShader(LPWSTR path)
@@ -188,7 +204,11 @@ void IGeometryShader::bind() const
 
 void IGeometryShader::unbind() const
 {
-	m_d3d11Context->HSSetShader(nullptr, nullptr, 0);
+	if (shouldBind(GeometryShaderEnum::GeometryShaderNone))
+	{
+		m_d3d11Context->GSSetShader(nullptr, nullptr, 0);
+		m_boundGeometryShader = GeometryShaderEnum::GeometryShaderNone;
+	}
 }
 
 IGeometryShader::IGeometryShader(LPWSTR path)

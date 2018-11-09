@@ -157,12 +157,14 @@
     <ClCompile Include="src\graphics\BillboardObject.cpp" />
     <ClCompile Include="src\graphics\Font.cpp" />
     <ClCompile Include="src\graphics\Pipelines\DisplacementLightPipeline.cpp" />
+    <ClCompile Include="src\graphics\Pipelines\ShadowMappingPipeline.cpp" />
     <ClCompile Include="src\graphics\Pipelines\TextureLightPipeline.cpp" />
     <ClCompile Include="src\graphics\Projection.cpp" />
     <ClCompile Include="src\graphics\Shaders\BasicPixelShader.cpp" />
     <ClCompile Include="src\graphics\Shaders\ColorPixelShader.cpp" />
     <ClCompile Include="src\graphics\Shaders\InstancedVertexShader.cpp" />
     <ClCompile Include="src\graphics\Shaders\RejectPixelShader.cpp" />
+    <ClCompile Include="src\graphics\Shaders\ShadowMappingPixelShader.cpp" />
     <ClCompile Include="src\graphics\Shaders\SimpleVertexShader.cpp" />
     <ClCompile Include="src\graphics\Shaders\TextureLightPixelShader.cpp" />
     <ClCompile Include="src\graphics\Shaders\TexturePixelShader.cpp" />
@@ -209,6 +211,7 @@
     <ClInclude Include="src\graphics\Pipelines\DepthmapPipeline.h" />
     <ClInclude Include="src\graphics\Pipelines\DisplacementLightPipeline.h" />
     <ClInclude Include="src\graphics\Pipelines\Pipeline.h" />
+    <ClInclude Include="src\graphics\Pipelines\ShadowMappingPipeline.h" />
     <ClInclude Include="src\graphics\Pipelines\TextureLightPipeline.h" />
     <ClInclude Include="src\graphics\Pipelines\TexturePipeline.h" />
     <ClInclude Include="src\graphics\Shaders\BasicPixelShader.h" />
@@ -219,6 +222,7 @@
     <ClInclude Include="src\graphics\Shaders\EmptyShader.h" />
     <ClInclude Include="src\graphics\Shaders\InstancedVertexShader.h" />
     <ClInclude Include="src\graphics\Shaders\RejectPixelShader.h" />
+    <ClInclude Include="src\graphics\Shaders\ShadowMappingPixelShader.h" />
     <ClInclude Include="src\graphics\Shaders\SimpleVertexShader.h" />
     <ClInclude Include="src\graphics\Shaders\TextureLightPixelShader.h" />
     <ClInclude Include="src\graphics\Shaders\TexturePixelShader.h" />
@@ -340,6 +344,20 @@
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(LocalDebuggerWorkingDirectory)Shaders\%(Filename).cso</ObjectFileOutput>
       <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</SuppressStartupBanner>
       <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</SuppressStartupBanner>
+    </FxCompile>
+    <FxCompile Include="src\shaders\ShadowMappingPixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(LocalDebuggerWorkingDirectory)Shaders\%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(LocalDebuggerWorkingDirectory)Shaders\%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)Shaders\%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)Shaders\%(Filename).cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="src\shaders\SimpleVertexShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>

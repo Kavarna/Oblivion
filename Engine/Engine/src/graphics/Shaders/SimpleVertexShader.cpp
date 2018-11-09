@@ -5,8 +5,12 @@ SimpleVertexShader::SimpleVertexShader() :
 {
 	m_cameraBuffer = BufferManager::Get()->CreateBuffer(D3D11_USAGE::D3D11_USAGE_DYNAMIC,
 		sizeof(SCameraInfo), D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE);
-	m_cameraAdditionalBuffer = BufferManager::Get()->CreateBuffer(
+	m_perCameraBuffer = BufferManager::Get()->CreateBuffer(
 		D3D11_USAGE::D3D11_USAGE_DYNAMIC, sizeof(SAdditionalCameraInfo),
+		D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE
+	);
+	m_additionalCameraBuffer = BufferManager::Get()->CreateBuffer(
+		D3D11_USAGE::D3D11_USAGE_DYNAMIC, sizeof(SCameraInfo2),
 		D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE
 	);
 }
@@ -21,8 +25,15 @@ void __vectorcall SimpleVertexShader::SetCamera(const SCameraInfo & WVP)
 void SimpleVertexShader::SetCameraAdditionalInfo(const SAdditionalCameraInfo & ad)
 {
 	static auto bufferManager = BufferManager::Get();
-	bufferManager->MapBuffer(m_cameraAdditionalBuffer, (void*)&ad);
-	bufferManager->bindVSBuffer(1, m_cameraAdditionalBuffer);
+	bufferManager->MapBuffer(m_perCameraBuffer, (void*)&ad);
+	bufferManager->bindVSBuffer(1, m_perCameraBuffer);
+}
+
+void __vectorcall SimpleVertexShader::SetAdditionalCamera(const SCameraInfo2 & WVP)
+{
+	static auto bufferManager = BufferManager::Get();
+	bufferManager->MapBuffer(m_additionalCameraBuffer, (void*)&WVP);
+	bufferManager->bindVSBuffer(3, m_additionalCameraBuffer);
 }
 
 void SimpleVertexShader::Create()

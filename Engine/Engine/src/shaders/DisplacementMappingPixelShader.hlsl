@@ -13,12 +13,14 @@ cbuffer cbLight : register(b0)
 
 struct PSIn
 {
-	float4 PosH			: SV_POSITION;
-	float3 PosW			: POSITION;
-	float3 NormalW		: NORMAL;
-	float3 TangentW		: TANGENT;
-	float3 BinormalW	: BINORMAL;
-	float2 Tex			: TEXCOORD;
+	float4 PosH				: SV_POSITION;
+	float4 Tex				: TEXCOORD;
+	float3 PosW				: POSITION;
+	float3 NormalW			: NORMAL;
+	float3 TangentW			: TANGENT;
+	float3 BinormalW		: BINORMAL;
+	float  TessFactor		: TESS;
+	float4 LightPositionH	: POSITION1;
 };
 
 
@@ -28,9 +30,9 @@ float4 main(PSIn input) : SV_TARGET
 	input.TangentW = normalize(input.TangentW);
 	input.BinormalW = normalize(input.BinormalW);
 
-	float4 matColor = g_material.GetColor(ObjTexture, ObjWrapSampler, input.Tex);
+	float4 matColor = g_material.GetColor(ObjTexture, ObjWrapSampler, input.Tex.xy);
 
-	float3 normal = g_material.GetNormal(ObjBumpMap, ObjWrapSampler, input.Tex,
+	float3 normal = g_material.GetNormal(ObjBumpMap, ObjWrapSampler, input.Tex.xy,
 		input.NormalW, input.TangentW, input.BinormalW);
 
 

@@ -7,23 +7,27 @@ SamplerState ObjWrapSampler : register(s0);
 
 struct DS_OUTPUT
 {
-	float4 PosH			: SV_POSITION;
-	float3 PosW			: POSITION;
-	float3 NormalW		: NORMAL;
-	float3 TangentW		: TANGENT;
-	float3 BinormalW	: BINORMAL;
-	float2 Tex			: TEXCOORD;
+	float4 PosH				: SV_POSITION;
+	float4 Tex				: TEXCOORD;
+	float3 PosW				: POSITION;
+	float3 NormalW			: NORMAL;
+	float3 TangentW			: TANGENT;
+	float3 BinormalW		: BINORMAL;
+	float  TessFactor		: TESS;
+	float4 LightPositionH	: POSITION1;
 };
 
 // Output control point
 struct HS_CONTROL_POINT_OUTPUT
 {
-	float4 PosH			: SV_POSITION;
-	float3 PosW			: POSITION;
-	float3 NormalW		: NORMAL;
-	float3 TangentW		: TANGENT;
-	float3 BinormalW	: BINORMAL;
-	float2 Tex			: TEXCOORD;
+	float4 PosH				: SV_POSITION;
+	float4 Tex				: TEXCOORD;
+	float3 PosW				: POSITION;
+	float3 NormalW			: NORMAL;
+	float3 TangentW			: TANGENT;
+	float3 BinormalW		: BINORMAL;
+	float  TessFactor		: TESS;
+	float4 LightPositionH	: POSITION1;
 };
 
 // Output patch constant data.
@@ -49,10 +53,11 @@ DS_OUTPUT main(
 {
 	DS_OUTPUT Output;
 
-	Output.PosW			= domain.x * patch[0].PosW		+ domain.y * patch[1].PosW		+ domain.z * patch[2].PosW;
-	Output.NormalW		= domain.x * patch[0].NormalW	+ domain.y * patch[1].NormalW	+ domain.z * patch[2].NormalW;
-	Output.TangentW		= domain.x * patch[0].TangentW	+ domain.y * patch[1].TangentW	+ domain.z * patch[2].TangentW;
-	Output.BinormalW	= domain.x * patch[0].BinormalW + domain.y * patch[1].BinormalW + domain.z * patch[2].BinormalW;
+	Output.PosW				= domain.x * patch[0].PosW				+ domain.y * patch[1].PosW				+ domain.z * patch[2].PosW;
+	Output.NormalW			= domain.x * patch[0].NormalW			+ domain.y * patch[1].NormalW			+ domain.z * patch[2].NormalW;
+	Output.TangentW			= domain.x * patch[0].TangentW			+ domain.y * patch[1].TangentW			+ domain.z * patch[2].TangentW;
+	Output.BinormalW		= domain.x * patch[0].BinormalW			+ domain.y * patch[1].BinormalW			+ domain.z * patch[2].BinormalW;
+	Output.LightPositionH	= domain.x * patch[0].LightPositionH	+ domain.y * patch[1].LightPositionH	+ domain.z * patch[2].LightPositionH;
 
 	Output.Tex = domain.x * patch[0].Tex + domain.y * patch[1].Tex + domain.z * patch[2].Tex;
 
@@ -60,7 +65,7 @@ DS_OUTPUT main(
 
 	if (!(g_material.minTessFactor == 1 && g_material.minTessFactor == g_material.maxTessFactor))
 	{
-		float h = ObjBumpMap.SampleLevel(ObjWrapSampler, Output.Tex, 0).a;
+		float h = ObjBumpMap.SampleLevel(ObjWrapSampler, Output.Tex.xy, 0).a;
 
 		Output.PosW += (g_material.tessScale * (h - 1.0f)) * Output.NormalW;
 	}

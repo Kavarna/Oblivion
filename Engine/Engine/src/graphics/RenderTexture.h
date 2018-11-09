@@ -26,7 +26,9 @@ public:
 
 public:
 	void Reset(uint32_t width, uint32_t height, RenderTextureFlags flags, uint32_t MSAACount = 1, uint32_t MSAAQuality = 0);
+	void Clear(float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 0.0f);
 	void ClearTexture(float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 0.0f);
+	void ClearDepth();
 	void SetRenderTarget();
 
 public:

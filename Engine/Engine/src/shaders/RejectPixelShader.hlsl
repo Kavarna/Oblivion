@@ -11,16 +11,18 @@ cbuffer cbColor : register(b13)
 
 struct PSIn
 {
-	float4 PosH			: SV_POSITION;
-	float3 PosW			: POSITION;
-	float3 NormalW		: NORMAL;
-	float3 TangentW		: TANGENT;
-	float3 BinormalW	: BINORMAL;
-	float2 Tex			: TEXCOORD;
+	float4 PosH				: SV_POSITION;
+	float4 Tex				: TEXCOORD;
+	float3 PosW				: POSITION;
+	float3 NormalW			: NORMAL;
+	float3 TangentW			: TANGENT;
+	float3 BinormalW		: BINORMAL;
+	float  TessFactor		: TESS;
+	float4 LightPositionH	: POSITION1;
 };
 
 void main(PSIn input)
 {
-	float4 matColor = g_material.GetColor(ObjTexture, ObjWrapSampler, input.Tex);
+	float4 matColor = g_material.GetColor(ObjTexture, ObjWrapSampler, input.Tex.xy);
 	clip(matColor.a - 0.15f);
 }

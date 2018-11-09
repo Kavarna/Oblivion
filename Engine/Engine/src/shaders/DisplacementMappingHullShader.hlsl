@@ -4,24 +4,27 @@
 // Input control point
 struct VS_CONTROL_POINT_OUTPUT
 {
-	float4 PosH			: SV_POSITION;
-	float4 Tex			: TEXCOORD;
-	float3 PosW			: POSITION;
-	float3 NormalW		: NORMAL;
-	float3 TangentW		: TANGENT;
-	float3 BinormalW	: BINORMAL;
-	float  TessFactor	: TESS;
+	float4 PosH				: SV_POSITION;
+	float4 Tex				: TEXCOORD;
+	float3 PosW				: POSITION;
+	float3 NormalW			: NORMAL;
+	float3 TangentW			: TANGENT;
+	float3 BinormalW		: BINORMAL;
+	float  TessFactor		: TESS;
+	float4 LightPositionH	: POSITION1;
 };
 
 // Output control point
 struct HS_CONTROL_POINT_OUTPUT
 {
-	float4 PosH			: SV_POSITION;
-	float3 PosW			: POSITION;
-	float3 NormalW		: NORMAL;
-	float3 TangentW		: TANGENT;
-	float3 BinormalW	: BINORMAL;
-	float2 Tex			: TEXCOORD;
+	float4 PosH				: SV_POSITION;
+	float4 Tex				: TEXCOORD;
+	float3 PosW				: POSITION;
+	float3 NormalW			: NORMAL;
+	float3 TangentW			: TANGENT;
+	float3 BinormalW		: BINORMAL;
+	float  TessFactor		: TESS;
+	float4 LightPositionH	: POSITION1;
 };
 
 // Output patch constant data.
@@ -75,7 +78,8 @@ HS_CONTROL_POINT_OUTPUT main(
 	Output.NormalW = ip[i].NormalW;
 	Output.TangentW = ip[i].TangentW;
 	Output.BinormalW = ip[i].BinormalW;
-	Output.Tex = ip[i].Tex.xy;
+	Output.Tex = ip[i].Tex;
+	Output.LightPositionH = ip[i].LightPositionH;
 
 	return Output;
 }
