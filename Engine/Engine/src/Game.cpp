@@ -193,7 +193,7 @@ void Game::Init3D()
 	m_tree->AddInstance();
 	
 	uint32_t instance = m_tree->AddInstance();
-	m_tree->Translate(25.0f, 0.0f, 3.0f, instance);
+	m_tree->Translate(60.0f, 0.0f, 3.0f, instance);
 	m_tree->Scale(1.5f, 1.5f, 1.5f, instance);
 	m_tree->Deactivate(instance);
 
@@ -229,15 +229,16 @@ void Game::Init3D()
 
 	m_directionalLight = std::make_unique<DirectionalLightView>();
 	m_directionalLight->setDiffuseColor(1.0f, 1.0f, 1.0f);
-	m_directionalLight->setDimensions(1024.f, 1024.f);
-	m_directionalLight->setFarZ(200.0f);
+	m_directionalLight->setAmbientColor(0.2f, 0.2f, 0.2f);
+	m_directionalLight->setDimensions(2048.f, 2048.f);
+	m_directionalLight->setFarZ(300.0f);
 	m_directionalLight->setNearZ(10.0f);
 	m_directionalLight->setFov(DirectX::XM_PI / 4.f);
-	m_directionalLight->setPosition(0.0f, 150.0f, 0.0f);
+	m_directionalLight->setPosition(150.0f, 150.0f, 0.0f);
 	m_directionalLight->setDirection(0.0f, -1.0f, 0.0f);
 	m_directionalLight->build<ProjectionTypes::Perspective>();
 
-	m_shadowMap = std::make_unique<ShadowmapBuild>(2048.f, 15, 3.f);
+	m_shadowMap = std::make_unique<ShadowmapBuild>(2048, 50, 2.f);
 	m_shadowMap->AddGameObject(m_tree.get());
 	m_shadowMap->AddGameObject(m_cup.get());
 	m_shadowMap->AddGameObject(m_sphere.get());

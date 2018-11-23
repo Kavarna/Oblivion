@@ -5,6 +5,8 @@ void ShadowMappingPipeline::setShadowMap(const Texture * tex, DirectionalLightVi
 {
 	m_shadowmapTexture = tex;
 	m_directionalLight = directionalLight;
+	ShadowMappingPixelShader::Get()->setLight(directionalLight->m_position,
+		directionalLight->m_diffuseColor, directionalLight->m_ambientColor);
 }
 
 void __vectorcall ShadowMappingPipeline::bind(ICamera * cam) const
@@ -40,8 +42,12 @@ void __vectorcall ShadowMappingPipeline::bind(ICamera * cam) const
 		};
 
 		m_d3d11Context->PSSetShaderResources(4, 1, shadowmap);
-		m_d3d11Context->PSSetSamplers(1, 1, renderer->m_linearClampSampler.GetAddressOf());
+		m_d3d11Context->PSSetSamplers(0, 1, renderer->m_linearWrapSampler.GetAddressOf());
+		m_d3d11Context->PSSetSamplers(1, 1, renderer->m_comparisonLinearClampSampler.GetAddressOf());
 		pixelShader->bind();
+		pixelShader->bindLight();
+
+		
 
 		if (useDisplacement())
 		{
@@ -100,9 +106,10 @@ void __vectorcall ShadowMappingPipeline::bind(DirectX::FXMMATRIX & world, ICamer
 		};
 
 		m_d3d11Context->PSSetShaderResources(4, 1, shadowmap);
-		m_d3d11Context->PSSetSamplers(1, 1, renderer->m_linearClampSampler.GetAddressOf());
-		m_d3d11Context->PSSetSamplers(2, 1, renderer->m_comparisonLinearClampSampler.GetAddressOf());
+		m_d3d11Context->PSSetSamplers(0, 1, renderer->m_linearWrapSampler.GetAddressOf());
+		m_d3d11Context->PSSetSamplers(1, 1, renderer->m_comparisonLinearClampSampler.GetAddressOf());
 		pixelShader->bind();
+		pixelShader->bindLight();
 
 		if (useDisplacement())
 		{

@@ -18,6 +18,7 @@ cbuffer cbLight : register(b0)
 {
 	float4 g_lightPosition;
 	float4 g_lightDiffuse;
+	float4 g_lightAmbient;
 };
 
 Texture2D ObjTexture : register(t0);
@@ -30,14 +31,17 @@ SamplerComparisonState ObjComparisonSampler : register(s1);
 float CalcShadowMap(float3 projectedTexCoord)
 {
 	float lightDepth = projectedTexCoord.z;
+	uint width, height;
+	ObjShadowmap.GetDimensions(width, height);
 
-	float dx = 1.0f / 2048.f;
+	float dx = 1.0f / (float)width;
+	float dy = 1.0f / (float)height;
 
 	float2 offsets[9] =
 	{
-		float2(-dx,  -dx), float2(0.0f,  -dx), float2(dx,  -dx),
+		float2(-dx,  -dy), float2(0.0f,  -dy), float2(dx,  -dy),
 		float2(-dx, 0.0f), float2(0.0f, 0.0f), float2(dx, 0.0f),
-		float2(-dx,  +dx), float2(0.0f,  +dx), float2(dx,  +dx)
+		float2(-dx,  +dy), float2(0.0f,  +dy), float2(dx,  +dy)
 	};
 
 	float percentLit = 0.0f;
@@ -58,6 +62,7 @@ float4 main(PSIn input) : SV_TARGET
 
 	float4 matColor = g_material.GetColor(ObjTexture, ObjWrapSampler, input.Tex.xy);
 
+		
 	float3 normal = g_material.GetNormal(ObjBumpMap, ObjWrapSampler, input.Tex.xy,
 		input.NormalW, input.TangentW, input.BinormalW);
 
@@ -66,12 +71,21 @@ float4 main(PSIn input) : SV_TARGET
 	projectedTexCoord.y = -input.LightPositionH.y / input.LightPositionH.w / 2.0f + 0.5f;
 	projectedTexCoord.z = input.LightPositionH.z / input.LightPositionH.w - 0.001f;
 
+	float4 color = g_lightAmbient;
+
 	if (saturate(projectedTexCoord.x) == projectedTexCoord.x &&
 		saturate(projectedTexCoord.y) == projectedTexCoord.y)
 	{
-		float percentLit = CalcShadowMap(projectedTexCoord) + 0.5f;
-		return matColor * percentLit;
+		float3 toLight = g_lightPosition.xyz - input.PosW;
+		toLight = normalize(toLight);
+		float howMuchlight = dot(normal, toLight);
+		float percentLit = CalcShadowMap(projectedTexCoord);
+		float4 litColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
+		if (howMuchlight > 0.0)
+			litColor += howMuchlight * g_lightDiffuse;
+		color += litColor * percentLit;
 	}
 
-	return matColor * 0.2f;
+	color = saturate(color);
+	return matColor * color;
 }

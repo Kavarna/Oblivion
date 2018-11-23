@@ -48,6 +48,7 @@ public:
 	DirectX::XMFLOAT4 m_direction;
 	DirectX::XMFLOAT4 m_up = DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 0.0f);
 	DirectX::XMFLOAT4 m_diffuseColor;
+	DirectX::XMFLOAT4 m_ambientColor;
 
 	float m_nearZ, m_farZ;
 	float m_width, m_height;
@@ -88,6 +89,11 @@ public:
 		m_diffuseColor.w = 1.0f;
 	}
 	
+	void setAmbientColor(float r, float g, float b)
+	{
+		m_ambientColor = { r,g,b,1.0f };
+	}
+
 	virtual DirectX::XMFLOAT3 GetPosition() const override
 	{
 		return { m_position.x, m_position.y, m_position.z };

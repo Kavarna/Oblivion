@@ -1,9 +1,9 @@
 #include "Game.h"
+#include <typeinfo>
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	LPWSTR lpCmdLine, int iShow)
 {
-
 	try
 	{
 		srand((unsigned int)time(NULL));

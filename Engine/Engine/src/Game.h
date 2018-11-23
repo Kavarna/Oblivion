@@ -55,11 +55,11 @@ private:
 	void Render();
 
 private:
-	HINSTANCE											m_windowInstance;
-	HWND												m_windowHandle;
+	HINSTANCE											m_windowInstance = NULL;
+	HWND												m_windowHandle = NULL;
 	
-	uint32_t											m_windowWidth;
-	uint32_t											m_windowHeight;
+	uint32_t											m_windowWidth = 0;
+	uint32_t											m_windowHeight = 0;
 	bool												m_menuActive = true;
 	float												m_mouseSensivity = 2.0f;
 	bool												m_showDeveloperConsole = false;

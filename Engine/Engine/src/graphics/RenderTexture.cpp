@@ -48,13 +48,13 @@ void RenderTexture::Reset(uint32_t width, uint32_t height,
 			bindFlags |= D3D11_BIND_SHADER_RESOURCE;
 		CreateTexture(m_d3d11Device.Get(), &m_textureDepth,
 			width, height, bindFlags,
-			DXGI_FORMAT_R24G8_TYPELESS, MSAACount, MSAAQuality);
+			DXGI_FORMAT_R32_TYPELESS, MSAACount, MSAAQuality);
 		CreateDSVFromTexture(m_d3d11Device.Get(), m_textureDepth.Get(), &m_depthView,
-			DXGI_FORMAT::DXGI_FORMAT_D24_UNORM_S8_UINT);
+			DXGI_FORMAT::DXGI_FORMAT_D32_FLOAT);
 		if (flags & RenderTextureFlags::DepthReadEnable)
 		{
 			CreateSRVFromTexture(m_d3d11Device.Get(), m_textureDepth.Get(), &m_depthShaderResource,
-				DXGI_FORMAT_R24_UNORM_X8_TYPELESS);
+				DXGI_FORMAT::DXGI_FORMAT_R32_FLOAT);
 			m_oblDepth = std::make_shared<Texture>(m_textureDepth.Get(), m_depthShaderResource.Get());
 		}
 	}

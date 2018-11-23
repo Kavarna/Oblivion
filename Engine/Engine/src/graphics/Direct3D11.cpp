@@ -258,11 +258,21 @@ void Direct3D11::InitializeStates()
 		sampDesc.AddressV =
 		sampDesc.AddressW =
 		D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP;
-	sampDesc.ComparisonFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS;
+	sampDesc.ComparisonFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
 	sampDesc.Filter = D3D11_FILTER::D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
 	ThrowIfFailed(
 		m_d3d11Device->CreateSamplerState(&sampDesc, &m_comparisonLinearClampSampler)
 	);
+	ZeroVariable(sampDesc);
+	sampDesc.AddressU =
+		sampDesc.AddressV =
+		sampDesc.AddressW =
+		D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP;
+	sampDesc.Filter = D3D11_FILTER::D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	sampDesc.MaxAnisotropy = 16;
+	sampDesc.MaxLOD = FLT_MAX;
+	sampDesc.MinLOD = 0;
+	sampDesc.MipLODBias = 0;
 	ThrowIfFailed(
 		m_d3d11Device->CreateSamplerState(&sampDesc, &m_linearClampSampler)
 	);

@@ -9,7 +9,7 @@ ShadowmapBuild::ShadowmapBuild(uint32_t shadowMapsize, INT depthBias, FLOAT slop
 void ShadowmapBuild::Create(uint32_t shadowmapSize, INT depthBias, FLOAT slopeScaledDepthBias, FLOAT depthBiasClamp)
 {
 	ZeroMemoryAndDeclare(D3D11_RASTERIZER_DESC, rastDesc);
-	rastDesc.AntialiasedLineEnable = TRUE;
+	rastDesc.AntialiasedLineEnable = FALSE;
 	rastDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_BACK;
 	rastDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
 	rastDesc.DepthBias = depthBias;

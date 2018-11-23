@@ -733,7 +733,7 @@ void Model::Create(EDefaultObject object)
 	}
 	else if (object == EDefaultObject::Sphere)
 	{
-		g.CreateSphere(1.0f, 12, 12, data);
+		g.CreateSphere(1.0f, 10, 10, data);
 		m_boundingBox = DirectX::BoundingBox(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f));
 	}
 	std::vector<Oblivion::SVertex> vertices;
