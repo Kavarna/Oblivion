@@ -69,7 +69,7 @@ float4 main(PSIn input) : SV_TARGET
 	float3 projectedTexCoord;
 	projectedTexCoord.x = input.LightPositionH.x / input.LightPositionH.w / 2.0f + 0.5f;
 	projectedTexCoord.y = -input.LightPositionH.y / input.LightPositionH.w / 2.0f + 0.5f;
-	projectedTexCoord.z = input.LightPositionH.z / input.LightPositionH.w - 0.001f;
+	projectedTexCoord.z = input.LightPositionH.z / input.LightPositionH.w;
 
 	float4 color = g_lightAmbient;
 

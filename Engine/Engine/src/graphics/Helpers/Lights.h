@@ -111,10 +111,10 @@ public:
 		return m_farZ;
 	}
 
-	void setDimensions(float width, float height)
+	void setDimensions(float widthheight)
 	{
-		m_width = width;
-		m_height = height;
+		m_width = widthheight;
+		m_height = widthheight;
 	}
 
 	void setNearZ(float z)

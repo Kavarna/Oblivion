@@ -180,69 +180,71 @@ void Game::Init2D()
 
 void Game::Init3D()
 {
-	m_ground = std::make_unique<CollisionObject>();
-	m_ground->Create(EDefaultObject::Grid);
-	m_ground->AddInstance();
-	m_ground->Scale(5.0f, 1.0f, 5.0f);
+	//m_ground = std::make_unique<CollisionObject>();
+	//m_ground->Create(EDefaultObject::Grid);
+	//m_ground->AddInstance();
+	//m_ground->Scale(5.0f, 1.0f, 5.0f);
 
-	m_sphere = std::make_unique<CollisionObject>();
-	m_sphere->Create(EDefaultObject::Sphere);
+	//m_sphere = std::make_unique<CollisionObject>();
+	//m_sphere->Create(EDefaultObject::Sphere);
 
-	m_tree = std::make_unique<CollisionObject>();
-	m_tree->Create("Resources/LowPolyTree");
-	m_tree->AddInstance();
+	//m_tree = std::make_unique<CollisionObject>();
+	//m_tree->Create("Resources/LowPolyTree");
+	//m_tree->AddInstance();
+	//
+	//uint32_t instance = m_tree->AddInstance();
+	//m_tree->Translate(60.0f, 0.0f, 3.0f, instance);
+	//m_tree->Scale(1.5f, 1.5f, 1.5f, instance);
+	//m_tree->Deactivate(instance);
+
+	//m_cup = std::make_unique<CollisionObject>();
+	//m_cup->Create("Resources/Cup");
+	//m_cup->AddInstance(DirectX::XMMatrixTranslation(0.0f, 30.f, 15.0f));
+	//m_cup->Translate(0.0f, 30.0f, 0.0f, 0);
+	//m_cup->GlobalScale(3.0f, 3.0f, 3.0f);
+
+	//m_billboardTest = std::make_unique<BillboardObject>();
+	//m_billboardTest->Create("Resources/tree0.dds");
+	//m_billboardTest->AddInstance();
+	//m_billboardTest->Scale(100.0f, 100.0f);
+	//m_billboardTest->Translate(0.0f, 50.0f, 123.f);
+	//instance = m_billboardTest->AddInstance();
+	//m_billboardTest->Scale(100.f, 100.f, 1.0f, instance);
+	//m_billboardTest->Translate(45.0f, 50.0f, 123.f, instance);
 	
-	uint32_t instance = m_tree->AddInstance();
-	m_tree->Translate(60.0f, 0.0f, 3.0f, instance);
-	m_tree->Scale(1.5f, 1.5f, 1.5f, instance);
-	m_tree->Deactivate(instance);
+	m_sponza = std::make_unique<CollisionObject>();
+	m_sponza->Create("Resources/Sponza");
+	m_sponza->AddInstance();
 
-	m_cup = std::make_unique<CollisionObject>();
-	m_cup->Create("Resources/Cup");
-	m_cup->AddInstance(DirectX::XMMatrixTranslation(0.0f, 30.f, 15.0f));
-	m_cup->Translate(0.0f, 30.0f, 0.0f, 0);
-	m_cup->GlobalScale(3.0f, 3.0f, 3.0f);
+	//m_gameObjects.push_back(m_ground.get());
+	//m_gameObjects.push_back(m_sphere.get());
+	//m_gameObjects.push_back(m_tree.get());
+	//m_gameObjects.push_back(m_cup.get());
+	m_models.push_back(m_sponza.get());
 
-	m_billboardTest = std::make_unique<BillboardObject>();
-	m_billboardTest->Create("Resources/tree0.dds");
-	m_billboardTest->AddInstance();
-	m_billboardTest->Scale(100.0f, 100.0f);
-	m_billboardTest->Translate(0.0f, 50.0f, 123.f);
-	instance = m_billboardTest->AddInstance();
-	m_billboardTest->Scale(100.f, 100.f, 1.0f, instance);
-	m_billboardTest->Translate(45.0f, 50.0f, 123.f, instance);
-	
-	//m_sponza = std::make_unique<CollisionObject>();
-	//m_sponza->Create("Resources/Sponza");
-	//m_sponza->AddInstance();
-
-	m_gameObjects.push_back(m_ground.get());
-	m_gameObjects.push_back(m_sphere.get());
-	m_gameObjects.push_back(m_tree.get());
-	m_gameObjects.push_back(m_cup.get());
-	////m_models.push_back(m_sponza.get());
-
-	m_models.push_back(m_ground.get());
-	m_models.push_back(m_sphere.get());
-	m_models.push_back(m_tree.get());
-	m_models.push_back(m_cup.get());
+	//m_models.push_back(m_ground.get());
+	//m_models.push_back(m_sphere.get());
+	//m_models.push_back(m_tree.get());
+	//m_models.push_back(m_cup.get());
+	m_models.push_back(m_sponza.get());
 
 	m_directionalLight = std::make_unique<DirectionalLightView>();
 	m_directionalLight->setDiffuseColor(1.0f, 1.0f, 1.0f);
 	m_directionalLight->setAmbientColor(0.2f, 0.2f, 0.2f);
-	m_directionalLight->setDimensions(2048.f, 2048.f);
-	m_directionalLight->setFarZ(300.0f);
-	m_directionalLight->setNearZ(10.0f);
+	m_directionalLight->setDimensions(2048.f);
+	m_directionalLight->setFarZ(10000.0f);
+	m_directionalLight->setNearZ(1000.0f);
 	m_directionalLight->setFov(DirectX::XM_PI / 4.f);
-	m_directionalLight->setPosition(150.0f, 150.0f, 0.0f);
+	m_directionalLight->setPosition(0.0f, 2500.f, 0.0f);
 	m_directionalLight->setDirection(0.0f, -1.0f, 0.0f);
-	m_directionalLight->build<ProjectionTypes::Perspective>();
+	m_directionalLight->build<ProjectionTypes::Ortographic>();
 
-	m_shadowMap = std::make_unique<ShadowmapBuild>(2048, 50, 2.f);
-	m_shadowMap->AddGameObject(m_tree.get());
-	m_shadowMap->AddGameObject(m_cup.get());
-	m_shadowMap->AddGameObject(m_sphere.get());
-	m_shadowMap->AddGameObject(m_ground.get());
+	m_shadowMap = std::make_unique<ShadowmapBuild>(m_directionalLight.get(), 50, 2.f);
+	//m_shadowMap->AddGameObject(m_tree.get());
+	//m_shadowMap->AddGameObject(m_cup.get());
+	//m_shadowMap->AddGameObject(m_sphere.get());
+	//m_shadowMap->AddGameObject(m_ground.get());
+	m_shadowMap->AddGameObject(m_sponza.get());
 	m_shadowMap->SetLightView(m_directionalLight.get());
 	ShadowMappingPipeline::Get()->setShadowMap(m_shadowMap->GetShadowmapTexture(), m_shadowMap->GetLightView());
 }
@@ -632,19 +634,15 @@ void Game::Render()
 
 	renderer->SetRenderTargetAndDepth();
 
-	/*for (const auto & model : m_models)
-	{
-		model->Render<DisplacementShader>(g_camera.get());
-	}*/
 	ShadowMappingPipeline::Get()->EnableDisplacement();
-	m_sphere->Render<ShadowMappingPipeline>(g_camera.get());
-	////m_sponza->Render<TextureLightShader>(g_camera.get());
-	m_ground->Render<ShadowMappingPipeline>(g_camera.get());
+	//m_sphere->Render<ShadowMappingPipeline>(g_camera.get());
+	m_sponza->Render<ShadowMappingPipeline>(g_camera.get());
+	//m_ground->Render<ShadowMappingPipeline>(g_camera.get());
 	ShadowMappingPipeline::Get()->DisableDisplacement();
-	m_tree->Render<ShadowMappingPipeline>(g_camera.get());
-	m_cup->Render<ShadowMappingPipeline>(g_camera.get());
+	//m_tree->Render<ShadowMappingPipeline>(g_camera.get());
+	//m_cup->Render<ShadowMappingPipeline>(g_camera.get());
 
-	m_billboardTest->Render<TexturePipeline>(g_camera.get());
+	//m_billboardTest->Render<TexturePipeline>(g_camera.get());
 
 	auto camPos = g_camera->GetPosition();
 	wchar_t buffer[128];

@@ -26,7 +26,7 @@ public:
 
 public:
 	inline float GetNearZ() const { return 1.0f; };
-	inline float GetFarZ() const { return 1000.0f; };
+	inline float GetFarZ() const { return 10000.0f; };
 
 public:
 	void OnSize(uint32_t width, uint32_t height);
@@ -70,7 +70,7 @@ private:
 	std::unique_ptr<CollisionObject>					m_sphere;
 	std::unique_ptr<CollisionObject>					m_tree;
 	std::unique_ptr<CollisionObject>					m_cup;
-	//std::unique_ptr<CollisionObject>					m_sponza;
+	std::unique_ptr<CollisionObject>					m_sponza;
 
 	std::shared_ptr<CFont>								m_32SegoeScriptExtented;
 	std::unique_ptr<Text>								m_camPosText;

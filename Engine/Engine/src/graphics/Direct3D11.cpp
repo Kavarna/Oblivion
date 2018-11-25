@@ -79,6 +79,7 @@ void Direct3D11::DefaultStates()
 
 void Direct3D11::RSCustomState(ID3D11RasterizerState * state)
 {
+	m_d3d11Context->RSGetState(&m_lastRSState);
 	m_d3d11Context->RSSetState(state);
 }
 

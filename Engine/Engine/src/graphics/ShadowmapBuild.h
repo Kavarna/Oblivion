@@ -8,9 +8,11 @@
 #include "interfaces/GameObject.h"
 #include "Pipelines/ShadowMappingPipeline.h"
 
+
 class ShadowmapBuild : public IGraphicsObject
 {
 public:
+	ShadowmapBuild(DirectionalLightView *, INT depthBias = 10, FLOAT slopeScaledDepthBias = 2.f, FLOAT depthBiasClamp = 0.0f);
 	ShadowmapBuild(uint32_t shadowMapsize = 1024, INT depthBias = 10, FLOAT slopeScaledDepthBias = 2.f, FLOAT depthBiasClamp = 0.0f);
 	~ShadowmapBuild() = default;
 

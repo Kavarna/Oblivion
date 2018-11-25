@@ -52,7 +52,7 @@ private:
 		CommonTypes::Range					m_vertexRange;
 		CommonTypes::Range					m_indexRange;
 		int									m_materialIndex;
-		DirectX::BoundingBox				m_boundingBox; /// kinda useless
+		DirectX::BoundingBox				m_boundingBox;
 	};
 private:
 	DirectX::BoundingBox					m_boundingBox;

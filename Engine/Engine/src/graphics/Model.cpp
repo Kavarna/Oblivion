@@ -37,6 +37,17 @@ static void ReadTillEnd(std::ifstream &fin)
 	}
 }
 
+static bool ShouldRenderMesh(ICamera * cam, const DirectX::BoundingBox& bb, DirectX::FXMMATRIX& world)
+{
+	auto frustum = cam->GetFrustum();
+
+	DirectX::BoundingBox toRender;
+	//toRender = bb;
+	bb.Transform(toRender, world);
+
+	return frustum.Contains(toRender);
+}
+
 Model::Model()
 {
 	//ShaderHelper::CreateBuffer(m_d3d11Device.Get(), &m_materialBuffer,
@@ -336,38 +347,50 @@ void Model::WriteMaterials()
 
 void Model::DrawIndexedInstanced(ICamera * cam, const std::function<void(UINT, UINT, UINT)>& renderFunction) const
 {
-	//std::function<bool(uint32_t)> func = std::bind(&Model::ShouldRenderInstance, this, cam, std::placeholders::_1);
 	m_drawnInstances.clear();
-	std::function<bool(uint32_t) > f1 = [&](uint32_t instanceID)->bool const
-	{
-		if (ShouldRenderInstance(cam, instanceID))
-		{
-			m_drawnInstances.push_back(instanceID);
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-		
-	};
-	std::function<bool(const Model::Mesh&, uint32_t)> shouldRenderMesh;
+	std::function<bool(uint32_t)> f1;
+	std::unordered_map<uint32_t, const Model::Mesh&> renderMesh;
 	if (m_meshes.size() > m_advancedCheckMinimum)
 	{
-		shouldRenderMesh = [&](const Model::Mesh& m, uint32_t instanceID)->bool const
+		f1 = [&](uint32_t instanceID)->bool const
 		{
-			auto frustum = cam->GetFrustum();
-			DirectX::BoundingBox toRender;
-			m.m_boundingBox.Transform(toRender, m_objectWorld[instanceID]);
-			return frustum.Contains(toRender);
+			static auto end = m_meshes.end();
+			if (ShouldRenderInstance(cam, instanceID))
+			{
+				m_drawnInstances.push_back(instanceID);
+				for (uint32_t i = 0; i < m_meshes.size(); ++i)
+				{
+					if (renderMesh.find(i) == renderMesh.end())
+					{
+						if (ShouldRenderMesh(cam, m_meshes[i].m_boundingBox, m_objectWorld[instanceID]))
+							renderMesh.insert({ i, m_meshes[i] });
+					}
+				}
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+
 		};
-	
 	}
 	else
 	{
-		shouldRenderMesh = [&](const Model::Mesh& m, uint32_t instanceID)->bool const
+		for (uint32_t i = 0; i < m_meshes.size(); ++i)
+			renderMesh.insert({ i, m_meshes[i] });
+		f1 = [&](uint32_t instanceID)->bool const
 		{
-			return true;
+			if (ShouldRenderInstance(cam, instanceID))
+			{
+				m_drawnInstances.push_back(instanceID);
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+
 		};
 	}
 	uint32_t renderInstances = PrepareInstances(f1);
@@ -381,21 +404,16 @@ void Model::DrawIndexedInstanced(ICamera * cam, const std::function<void(UINT, U
 	if (renderInstances == 0)
 		return;
 	
-	/// TODO: Fix this. Make it render a mesh when it's visible at least one
-	//for (uint32_t i = 0; i < m_drawnInstances.size(); ++i) /// Might be useful another time
+
 	{
-		for (auto & mesh : m_meshes)
+		for (auto & mesh : renderMesh)
 		{
-			if (m_materials[mesh.m_materialIndex].opacity != 1.0f)
+			if (m_materials[mesh.second.m_materialIndex].opacity != 1.0f)
 				continue;
-			//if (shouldRenderMesh(mesh, m_drawnInstances[i]))
 			{
-				BindMaterial(m_materials[mesh.m_materialIndex], m_bindMaterialToShader);
-				//m_d3d11Context->DrawIndexedInstanced((UINT)(mesh.m_indexRange.end - mesh.m_indexRange.begin),
-				//	(UINT)renderInstances, (UINT)mesh.m_indexRange.begin,
-				//	(UINT)mesh.m_vertexRange.begin, 0);
-				renderFunction((UINT)mesh.m_indexRange.end - mesh.m_indexRange.begin,
-					(UINT)mesh.m_indexRange.begin, (UINT)mesh.m_vertexRange.begin);
+				BindMaterial(m_materials[mesh.second.m_materialIndex], m_bindMaterialToShader);
+				renderFunction((UINT)mesh.second.m_indexRange.end - mesh.second.m_indexRange.begin,
+					(UINT)mesh.second.m_indexRange.begin, (UINT)mesh.second.m_vertexRange.begin);
 				
 				if (g_isDeveloper)
 					g_drawCalls++;
@@ -403,22 +421,17 @@ void Model::DrawIndexedInstanced(ICamera * cam, const std::function<void(UINT, U
 		}
 	}
 	auto renderer = Direct3D11::Get();
-	//for (uint32_t i = 0; i < m_drawnInstances.size(); ++i) /// Might be useful another time
 	{
-		for (auto & mesh : m_meshes)
+		for (auto & mesh : renderMesh)
 		{
-			float opacity = m_materials[mesh.m_materialIndex].opacity;
+			float opacity = m_materials[mesh.second.m_materialIndex].opacity;
 			if (opacity == 1.0f)
 				continue;
-			//if (shouldRenderMesh(mesh, m_drawnInstances[i]))
 			{
 				renderer->OMTransparency(opacity);
-				BindMaterial(m_materials[mesh.m_materialIndex], m_bindMaterialToShader);
-				//m_d3d11Context->DrawIndexedInstanced((UINT)(mesh.m_indexRange.end - mesh.m_indexRange.begin),
-				//	(UINT)renderInstances, (UINT)mesh.m_indexRange.begin,
-				//	(UINT)mesh.m_vertexRange.begin, 0);
-				renderFunction((UINT)mesh.m_indexRange.end - mesh.m_indexRange.begin,
-					(UINT)mesh.m_indexRange.begin, (UINT)mesh.m_vertexRange.begin);
+				BindMaterial(m_materials[mesh.second.m_materialIndex], m_bindMaterialToShader);
+				renderFunction((UINT)mesh.second.m_indexRange.end - mesh.second.m_indexRange.begin,
+					(UINT)mesh.second.m_indexRange.begin, (UINT)mesh.second.m_vertexRange.begin);
 				if (g_isDeveloper)
 				{
 					g_drawCalls++;
@@ -468,17 +481,7 @@ bool Model::PrepareIA(const PipelineEnum & p) const
 
 bool Model::ShouldRenderInstance(ICamera * cam, uint32_t id) const
 {
-	auto frustum = cam->GetFrustum();
-
-	DirectX::BoundingBox toRender;
-
-	toRender = m_boundingBox;
-	m_boundingBox.Transform(toRender, m_objectWorld[id]);
-
-	if (frustum.Contains(toRender))
-		return true;
-
-	return false;
+	return ShouldRenderMesh(cam, m_boundingBox, m_objectWorld[id]);
 }
 
 void Model::Create(std::string const& filename)
