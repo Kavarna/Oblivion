@@ -20,6 +20,7 @@ void BillboardObject::Destroy()
 
 void BillboardObject::DrawIndexedInstanced(ICamera * cam, const std::function<void(UINT,UINT,UINT)>& renderFunction) const
 {
+	m_drawnInstances.clear();
 	auto renderer = Direct3D11::Get();
 	std::function<bool(uint32_t)> func = [&](uint32_t index) -> bool
 	{
@@ -27,7 +28,12 @@ void BillboardObject::DrawIndexedInstanced(ICamera * cam, const std::function<vo
 		DirectX::BoundingFrustum frustum = cam->GetFrustum();
 		DirectX::BoundingBox transformedBoundingBox;
 		bb.Transform(transformedBoundingBox, m_objectWorld[index]);
-		return frustum.Contains(transformedBoundingBox);
+		if (frustum.Contains(transformedBoundingBox))
+		{
+			m_drawnInstances.push_back(index);
+			return true;
+		}
+		return false;
 	};
 	int renderInstances = PrepareInstances(func, [&](DirectX::FXMMATRIX mat)
 	{
@@ -55,9 +61,9 @@ void BillboardObject::DrawIndexedInstanced(ICamera * cam, const std::function<vo
 
 	renderer->OMBillboardBlend();
 	BindMaterial(m_material, m_bindMaterialToShader);
-	//m_d3d11Context->DrawIndexedInstanced(GetIndexCount(),
-		//renderInstances, m_indexRange.begin, m_vertexRange.begin, 0);
-	renderFunction(GetIndexCount(), m_indexRange.begin, m_vertexRange.begin);
+	m_d3d11Context->DrawIndexedInstanced(GetIndexCount(),
+		renderInstances, m_indexRange.begin, m_vertexRange.begin, 0); // This one produces the desired result
+	//renderFunction(GetIndexCount(), m_indexRange.begin, m_vertexRange.begin);
 	if (g_isDeveloper)
 		g_drawCalls++;
 	renderer->OMDefaultBlend();

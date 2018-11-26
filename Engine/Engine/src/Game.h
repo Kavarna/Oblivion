@@ -70,7 +70,7 @@ private:
 	std::unique_ptr<CollisionObject>					m_sphere;
 	std::unique_ptr<CollisionObject>					m_tree;
 	std::unique_ptr<CollisionObject>					m_cup;
-	std::unique_ptr<CollisionObject>					m_sponza;
+	//std::unique_ptr<CollisionObject>					m_sponza;
 
 	std::shared_ptr<CFont>								m_32SegoeScriptExtented;
 	std::unique_ptr<Text>								m_camPosText;
