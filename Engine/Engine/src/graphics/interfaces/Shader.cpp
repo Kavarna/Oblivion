@@ -5,6 +5,7 @@ PixelShaderEnum		IPixelShader::m_boundPixelShader		= PixelShaderNone;
 DomainShaderEnum	IDomainShader::m_boundDomainShader		= DomainShaderNone;
 HullShaderEnum		IHullShader::m_boundHullShader			= HullShaderNone;
 GeometryShaderEnum	IGeometryShader::m_boundGeometryShader	= GeometryShaderNone;
+ComputeShaderEnum	IComputeShader::m_boundComputeShader	= ComputeShaderNone;
 
 bool IVertexShader::shouldBind(const VertexShaderEnum vs)
 {
@@ -227,4 +228,47 @@ IGeometryShader::~IGeometryShader()
 inline Shader::ShaderType IGeometryShader::getShaderType() const
 {
 	return Shader::ShaderType::eGeometry;
+}
+
+bool IComputeShader::shouldBind(const ComputeShaderEnum cs)
+{
+	if (m_boundComputeShader == cs && cs != ComputeShaderEnum::ComputeShaderCustom)
+		return false;
+	return true;
+}
+
+void IComputeShader::bind() const
+{
+	auto shaderType = getComputeShaderType();
+	if (shouldBind(shaderType)) // if current shader is not bound already
+	{
+		m_d3d11Context->CSSetShader(m_computeShader.Get(), nullptr, 0);
+		m_boundComputeShader = shaderType;
+	}
+}
+
+void IComputeShader::unbind() const
+{
+	if (shouldBind(ComputeShaderEnum::ComputeShaderNone))
+	{
+		m_d3d11Context->GSSetShader(nullptr, nullptr, 0);
+		m_boundComputeShader = ComputeShaderEnum::ComputeShaderNone;
+	}
+}
+
+IComputeShader::IComputeShader(LPWSTR path)
+{
+	ID3D11ComputeShader ** CS = &m_computeShader;
+	ShaderHelper::CreateShaderFromFile(path, "cs_5_0", m_d3d11Device.Get(),
+		&m_shaderBlob, reinterpret_cast<ID3D11DeviceChild**>(CS));
+}
+
+IComputeShader::~IComputeShader()
+{
+	m_computeShader.Reset();
+}
+
+inline Shader::ShaderType IComputeShader::getShaderType() const
+{
+	return Shader::ShaderType::eCompute;
 }

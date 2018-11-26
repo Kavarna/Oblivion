@@ -231,13 +231,13 @@ void Game::Init3D()
 	m_directionalLight = std::make_unique<DirectionalLightView>();
 	m_directionalLight->setDiffuseColor(1.0f, 1.0f, 1.0f);
 	m_directionalLight->setAmbientColor(0.2f, 0.2f, 0.2f);
-	m_directionalLight->setDimensions(2048.f);
+	m_directionalLight->setDimensions(1024.f);
 	m_directionalLight->setFarZ(10000.0f);
 	m_directionalLight->setNearZ(1000.0f);
 	m_directionalLight->setFov(DirectX::XM_PI / 4.f);
 	m_directionalLight->setPosition(0.0f, 2500.f, 0.0f);
 	m_directionalLight->setDirection(0.0f, -1.0f, 0.0f);
-	m_directionalLight->build<ProjectionTypes::Ortographic>();
+	m_directionalLight->build<ProjectionTypes::Perspective>();
 
 	m_shadowMap = std::make_unique<ShadowmapBuild>(m_directionalLight.get(), 50, 2.f);
 	//m_shadowMap->AddGameObject(m_tree.get());

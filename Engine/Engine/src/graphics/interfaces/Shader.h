@@ -197,3 +197,31 @@ public:
 private:
 	MicrosoftPointer<ID3D11GeometryShader>	m_geometryShader = nullptr;
 };
+
+enum ComputeShaderEnum
+{
+	ComputeShaderNone = 0,
+	ComputeShaderCustom = ~0
+};
+
+class IComputeShader : public IShader
+{
+private:
+	static ComputeShaderEnum				m_boundComputeShader;
+
+public:
+	static bool								shouldBind(const ComputeShaderEnum);
+	virtual void							bind() const;
+	virtual void							unbind() const;
+public:
+	IComputeShader() = default;
+	IComputeShader(LPWSTR path);
+	virtual ~IComputeShader();
+
+public:
+	virtual ComputeShaderEnum				getComputeShaderType() const = 0;
+	virtual inline Shader::ShaderType		getShaderType() const final;
+
+private:
+	MicrosoftPointer<ID3D11ComputeShader>	m_computeShader = nullptr;
+};
