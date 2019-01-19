@@ -126,7 +126,7 @@ public:
 			else if (CPUAccessFlag == D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE)
 				mapType = D3D11_MAP::D3D11_MAP_WRITE_DISCARD;
 		}
-		m_buffers.push_back({ buffer, Usage, mapType, CPUAccessFlag, DataSize });
+		m_buffers.push_back({ buffer, Usage, mapType, CPUAccessFlag, (uint32_t)DataSize });
 		return (ConstantBufferHandle)m_buffers.size() - 1;
 	}
 

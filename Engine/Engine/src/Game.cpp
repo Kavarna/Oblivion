@@ -208,9 +208,9 @@ void Game::Init3D()
 	m_billboardTest->AddInstance();
 	m_billboardTest->Scale(100.0f, 100.0f);
 	m_billboardTest->Translate(0.0f, 50.0f, 30.f);
-	//instance = m_billboardTest->AddInstance();
-	//m_billboardTest->Scale(100.f, 100.f, 1.0f, instance);
-	//m_billboardTest->Translate(30.0f, 50.0f, 30.0f, instance);
+	instance = m_billboardTest->AddInstance();
+	m_billboardTest->Scale(100.f, 100.f, 1.0f, instance);
+	m_billboardTest->Translate(30.0f, 50.0f, 30.0f, instance);
 	
 	//m_sponza = std::make_unique<CollisionObject>();
 	//m_sponza->Create("Resources/Sponza");
