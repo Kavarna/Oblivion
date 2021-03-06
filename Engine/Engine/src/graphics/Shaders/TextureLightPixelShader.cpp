@@ -1,7 +1,7 @@
 #include "TextureLightPixelShader.h"
 
 TextureLightPixelShader::TextureLightPixelShader() : 
-	IPixelShader(L"Shaders/TextureLightPixelShader.cso")
+	IPixelShader((LPWSTR)L"Shaders/TextureLightPixelShader.cso")
 {
 	static auto bufferManager = BufferManager::Get();
 	m_lightBuffer = bufferManager->CreateBuffer(

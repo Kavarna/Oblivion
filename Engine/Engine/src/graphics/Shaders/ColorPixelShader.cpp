@@ -1,7 +1,7 @@
 #include "ColorPixelShader.h"
 
 ColorPixelShader::ColorPixelShader() : 
-	IPixelShader(L"Shaders/ColorPixelShader.cso")
+	IPixelShader((LPWSTR)L"Shaders/ColorPixelShader.cso")
 {
 }
 

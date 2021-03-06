@@ -13,7 +13,7 @@ public:
 
 public:
 	DisplacementMappingDomainShader() :
-		IDomainShader(L"Shaders/DisplacementMappingDomainShader.cso")
+		IDomainShader((LPWSTR)L"Shaders/DisplacementMappingDomainShader.cso")
 	{
 		m_cameraBuffer = BufferManager::Get()->CreateBuffer(
 			D3D11_USAGE::D3D11_USAGE_DYNAMIC, sizeof(DSCameraBuffer),

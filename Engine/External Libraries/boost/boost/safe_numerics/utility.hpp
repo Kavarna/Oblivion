@@ -1,11 +1,6 @@
 #ifndef BOOST_NUMERIC_UTILITY_HPP
 #define BOOST_NUMERIC_UTILITY_HPP
 
-// MS compatible compilers support #pragma once
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
-
 //  Copyright (c) 2015 Robert Ramey
 //
 // Distributed under the Boost Software License, Version 1.0. (See
@@ -28,12 +23,19 @@ namespace utility {
 ///////////////////////////////////////////////////////////////////////////////
 // used for debugging
 
-// usage - print_type<T>;
-// provokes error message with name of type T
+// provokes warning message with names of type T
+// usage - print_types<T, ...>;
+// see https://cukic.co/2019/02/19/tmp-testing-and-debugging-templates
 
+/*
 template<typename Tx>
 using print_type = typename Tx::error_message;
+*/
+template <typename... Ts>
+struct [[deprecated]] print_types {};
 
+// display value of constexpr during compilation
+// usage print_value(N) pn;
 template<int N> 
 struct print_value
 {
@@ -41,6 +43,24 @@ struct print_value
         value = N < 0 ? N - 256 : N + 256
     };
 };
+
+#if 0
+// static warning - same as static_assert but doesn't
+// stop compilation. 
+template <typename T>
+struct static_test{};
+
+template <>
+struct static_test<std::false_type>{
+    [[deprecated]] static_test(){}
+};
+
+template<typename T>
+constexpr void static_warning(const T){
+   //using x = static_test<T>;
+   const static_test<T> x;
+}
+#endif
 
 /*
 // can be called by constexpr to produce a compile time
@@ -103,7 +123,7 @@ namespace ilog2_detail {
     constexpr static unsigned int ilog2(const boost::uint_t<8>::exact & t){
         #define LT(n) n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n
         const char LogTable256[256] = {
-            -1, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3,
+            static_cast<char>(-1), 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3,
             LT(4), LT(5), LT(5), LT(6), LT(6), LT(6), LT(6),
             LT(7), LT(7), LT(7), LT(7), LT(7), LT(7), LT(7), LT(7)
         };
@@ -128,7 +148,7 @@ namespace ilog2_detail {
             : 32 + ilog2(upper_half);
     }
 
-}; // ilog2_detail
+} // ilog2_detail
 
 template<typename T>
 constexpr unsigned int ilog2(const T & t){
@@ -216,7 +236,7 @@ using unsigned_stored_type = typename boost::uint_t<
 // b) is not guarenteed to handle non-assignable types
 template<typename T>
 constexpr std::pair<T, T>
-minmax(const std::initializer_list<T> l){
+minmax(const std::initializer_list<T> & l){
     assert(l.size() > 0);
     const T * minimum = l.begin();
     const T * maximum = l.begin();
@@ -241,13 +261,13 @@ constexpr T round_out(const T & t){
     if(t >= 0){
         const std::uint8_t sb = utility::significant_bits(t);
         return (sb < sizeof(T) * 8)
-            ? (1ul << sb) - 1
+            ? ((T)1 << sb) - 1
             : std::numeric_limits<T>::max();
     }
     else{
         const std::uint8_t sb = utility::significant_bits(~t);
         return (sb < sizeof(T) * 8)
-            ? ~((1ul << sb) - 1)
+            ? ~(((T)1 << sb) - 1)
             : std::numeric_limits<T>::min();
     }
 }

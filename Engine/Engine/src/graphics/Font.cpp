@@ -58,19 +58,19 @@ void CFont::Build(void * Vertices, void * Indices, UINT & VertexCount, UINT & In
 		int xOffset = (int)letter->xOffset + Kerning;
 
 		// Top-left
-		vertices[VertexCount].Position = DirectX::XMFLOAT3(x + xOffset, y - letter->yOffset, 0.0f);
+		vertices[VertexCount].Position = DirectX::XMFLOAT3(x + xOffset, y - letter->yOffset, 1.0f);
 		vertices[VertexCount].Texture = DirectX::XMFLOAT2(letter->u, letter->v);
 		indices[IndexCount++] = VertexCount++;
 
 
 		// Top-right
-		vertices[VertexCount].Position = DirectX::XMFLOAT3(x + xOffset + letter->swidth, y - letter->yOffset, 0.0f);
+		vertices[VertexCount].Position = DirectX::XMFLOAT3(x + xOffset + letter->swidth, y - letter->yOffset, 1.0f);
 		vertices[VertexCount].Texture = DirectX::XMFLOAT2(letter->u + letter->width, letter->v);
 		indices[IndexCount++] = VertexCount++;
 
 
 		// Bottom-right
-		vertices[VertexCount].Position = DirectX::XMFLOAT3(x + xOffset + letter->swidth, y - letter->sheight - letter->yOffset, 0.0f);
+		vertices[VertexCount].Position = DirectX::XMFLOAT3(x + xOffset + letter->swidth, y - letter->sheight - letter->yOffset, 1.0f);
 		vertices[VertexCount].Texture = DirectX::XMFLOAT2(letter->u + letter->width, letter->v + letter->height);
 		indices[IndexCount++] = VertexCount++;
 
@@ -80,7 +80,7 @@ void CFont::Build(void * Vertices, void * Indices, UINT & VertexCount, UINT & In
 		IndexCount += 2;
 
 		// Bottom-left
-		vertices[VertexCount].Position = DirectX::XMFLOAT3(x + xOffset, y - letter->sheight - letter->yOffset, 0.0f);
+		vertices[VertexCount].Position = DirectX::XMFLOAT3(x + xOffset, y - letter->sheight - letter->yOffset, 1.0f);
 		vertices[VertexCount].Texture = DirectX::XMFLOAT2(letter->u, letter->v + letter->height);
 		indices[IndexCount++] = VertexCount++;
 

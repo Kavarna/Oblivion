@@ -154,6 +154,7 @@ void Direct3D11::OnResize(HWND hWnd, uint32_t width, uint32_t height)
 
 				swapDesc.SwapEffect = DXGI_SWAP_EFFECT::DXGI_SWAP_EFFECT_DISCARD;
 				
+				
 				swapDesc.Windowed = true;
 
 				ThrowIfFailed(

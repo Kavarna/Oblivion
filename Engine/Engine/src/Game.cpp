@@ -4,6 +4,8 @@
 #include "boost/property_tree/ini_parser.hpp"
 #include "boost/algorithm/string.hpp"
 
+#include "./graphics/Pipelines/ColorPipeline.h"
+
 std::once_flag			Game::m_gameFlag;
 std::unique_ptr<Game>	Game::m_gameInstance = nullptr;
 
@@ -141,11 +143,10 @@ void Game::InitDirect3D()
 	Direct3D11 * d3d = Direct3D11::Get();
 	d3d->Create(m_windowHandle);
 	d3d->OnResize(m_windowHandle, m_windowWidth, m_windowHeight);
-	Sun sunLight{
-		{ 0.0f,-1.0f,0.0f,1.0f },
-		{ 1.0f,1.0f,1.0f,1.0f },
-		{ 0.1f,0.1f,0.1f,1.0f }
-	};
+	Sun sunLight;
+	sunLight.setDirection(0.0f, -1.0f, 0.0f);
+	sunLight.setDiffuseColor(1.0f, 1.0f, 1.0f);
+	sunLight.setAmbientColor(0.1f, 0.1f, 0.1f);
 
 	BulletWorld::Get()->CreateDefaultWorld();
 }
@@ -175,59 +176,14 @@ void Game::InitPipelines()
 
 void Game::Init2D()
 {
-	m_32SegoeScriptExtented = std::make_shared<CFont>("Resources/Fonts/32SegoeScriptExtented.fnt");
+	m_batchRenderer = std::make_unique<BatchRenderer>();
+	m_batchRenderer->Create();
+
+	g_screenNDC = std::make_unique<ProjectionNDC>();
 }
 
 void Game::Init3D()
 {
-	m_ground = std::make_unique<CollisionObject>();
-	m_ground->Create(EDefaultObject::Grid);
-	m_ground->AddInstance();
-	m_ground->Scale(5.0f, 1.0f, 5.0f);
-
-	m_sphere = std::make_unique<CollisionObject>();
-	m_sphere->Create(EDefaultObject::Sphere);
-
-	m_tree = std::make_unique<CollisionObject>();
-	m_tree->Create("Resources/LowPolyTree");
-	m_tree->AddInstance();
-	
-	uint32_t instance = m_tree->AddInstance();
-	m_tree->Translate(60.0f, 0.0f, 3.0f, instance);
-	m_tree->Scale(1.5f, 1.5f, 1.5f, instance);
-	m_tree->Deactivate(instance);
-
-	m_cup = std::make_unique<CollisionObject>();
-	m_cup->Create("Resources/Cup");
-	m_cup->AddInstance(DirectX::XMMatrixTranslation(0.0f, 30.f, 15.0f));
-	m_cup->Translate(0.0f, 30.0f, 0.0f, 0);
-	m_cup->GlobalScale(10.0f, 10.0f, 10.0f);
-
-	m_billboardTest = std::make_unique<BillboardObject>();
-	m_billboardTest->Create("Resources/tree0.dds");
-	m_billboardTest->AddInstance();
-	m_billboardTest->Scale(100.0f, 100.0f);
-	m_billboardTest->Translate(0.0f, 50.0f, 30.f);
-	instance = m_billboardTest->AddInstance();
-	m_billboardTest->Scale(100.f, 100.f, 1.0f, instance);
-	m_billboardTest->Translate(30.0f, 50.0f, 30.0f, instance);
-	
-	//m_sponza = std::make_unique<CollisionObject>();
-	//m_sponza->Create("Resources/Sponza");
-	//m_sponza->AddInstance();
-
-	m_gameObjects.push_back(m_ground.get());
-	m_gameObjects.push_back(m_sphere.get());
-	m_gameObjects.push_back(m_tree.get());
-	m_gameObjects.push_back(m_cup.get());
-	//m_models.push_back(m_sponza.get());
-
-	m_models.push_back(m_ground.get());
-	m_models.push_back(m_sphere.get());
-	m_models.push_back(m_tree.get());
-	m_models.push_back(m_cup.get());
-	//m_models.push_back(m_sponza.get());
-
 	m_directionalLight = std::make_unique<DirectionalLightView>();
 	m_directionalLight->setDiffuseColor(1.0f, 1.0f, 1.0f);
 	m_directionalLight->setAmbientColor(0.2f, 0.2f, 0.2f);
@@ -240,11 +196,6 @@ void Game::Init3D()
 	m_directionalLight->build<ProjectionTypes::Perspective>();
 
 	m_shadowMap = std::make_unique<ShadowmapBuild>(m_directionalLight.get(), 50, 4.f);
-	m_shadowMap->AddGameObject(m_tree.get());
-	m_shadowMap->AddGameObject(m_cup.get());
-	m_shadowMap->AddGameObject(m_sphere.get());
-	m_shadowMap->AddGameObject(m_ground.get());
-	//m_shadowMap->AddGameObject(m_sponza.get());
 	m_shadowMap->SetLightView(m_directionalLight.get());
 	ShadowMappingPipeline::Get()->setShadowMap(m_shadowMap->GetShadowmapTexture(), m_shadowMap->GetLightView());
 }
@@ -279,9 +230,6 @@ void Game::InitSizeDependent()
 	g_screen->m_farZ = farZ;
 	g_screen->Construct();
 
-	m_camPosText.reset();
-	m_camPosText = std::make_unique<Text>(m_32SegoeScriptExtented, 0.0f, 0.0f);
-	m_camPosText->SetWindowInfo((float)m_windowWidth, (float)m_windowHeight);
 }
 
 void Game::Run()
@@ -331,6 +279,35 @@ void Game::Update()
 		g_camera->StrafeRight(cameraFrameTime);
 	if (kb.A)
 		g_camera->StrafeLeft(cameraFrameTime);
+
+	if (kb.D0 || kb.D1 || kb.D2)
+	{
+		m_selectedDisplay = 0;
+	}
+	else if (kb.D3)
+	{
+		m_selectedDisplay = 3;
+	}
+	else if (kb.D4)
+	{
+		m_selectedDisplay = 4;
+	}
+	else if (kb.D5)
+	{
+		m_selectedDisplay = 5;
+	}
+	else if (kb.D6)
+	{
+		m_selectedDisplay = 6;
+	}
+	else if (kb.D7)
+	{
+		m_selectedDisplay = 7;
+	}
+	else if (kb.D8)
+	{
+		m_selectedDisplay = 8;
+	}
 
 	static bool updatePhysics = true;
 	static bool pausePressed = false;
@@ -384,24 +361,6 @@ void Game::Update()
 		}
 
 	}
-
-	if (mouse.leftButton && !leftClickPressed)
-	{
-		leftClickPressed = true;
-		if (!m_showDeveloperConsole)
-		{
-			float scale = DX::randomNumber(0.3f, 3.0f);
-			uint32_t instanceID = m_sphere->AddInstance(scale);
-			auto camPos = g_camera->GetPosition();
-			m_sphere->Translate(camPos.x, camPos.y, camPos.z, instanceID);
-			auto camDir = g_camera->GetDirection();
-			const float speed = 25.0f;
-			m_sphere->Impulse(camDir.x * speed, camDir.y * speed, camDir.z * speed, instanceID);
-			m_sphere->Scale(scale, scale, scale, instanceID);
-		}
-	}
-	else if (!mouse.leftButton)
-		leftClickPressed = false;
 
 	if (m_menuActive)
 		g_camera->Update(frameTime, 0.0f, 0.0f);
@@ -630,27 +589,37 @@ void Game::Render()
 	m_directionalLight->RenderDebug();
 
 	IGameObject::BindStaticVertexBuffer();
-	m_shadowMap->Build();
 
 	renderer->SetRenderTargetAndDepth();
+	renderer->RSCullNone();
 
-	ShadowMappingPipeline::Get()->EnableDisplacement();
-	m_sphere->Render<ShadowMappingPipeline>(g_camera.get());
-	//m_sponza->Render<ShadowMappingPipeline>(g_camera.get());
-	m_ground->Render<ShadowMappingPipeline>(g_camera.get());
-	ShadowMappingPipeline::Get()->DisableDisplacement();
-	m_tree->Render<ShadowMappingPipeline>(g_camera.get());
-	m_cup->Render<ShadowMappingPipeline>(g_camera.get());
+	switch (m_selectedDisplay)
+	{
+		case 0:
+			break;
+		case 3:
+			Display3();
+			break;
+		case 4:
+			Display4();
+			break;
+		case 5:
+			Display5();
+			break;
+		case 6:
+			Display6();
+			break;
+		case 7:
+			Display7();
+			break;
+		case 8:
+			Display8();
+			break;
+		default:
+			break;
+	}
 
-	m_billboardTest->Render<TexturePipeline>(g_camera.get());
-
-	auto camPos = g_camera->GetPosition();
-	wchar_t buffer[128];
-	swprintf_s(buffer, L"Cam pos: (%.2f, %.2f, %.2f)",
-		camPos.x, camPos.y, camPos.z);
-
-	m_camPosText->Render(g_screen.get(), buffer, 0.0f, 64.f,
-		DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	renderer->RSLastState();
 
 	if (g_isDeveloper)
 	{
@@ -661,10 +630,130 @@ void Game::Render()
 	End();
 }
 
+void Game::Display3()
+{
+	m_batchRenderer->Begin();
+
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(-0.5f, +0.5f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+0.5f, +0.5f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(-0.5f, -0.5f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+0.5f, -0.5f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+
+	m_batchRenderer->End<ColorPipeline>(g_screenNDC.get(), D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+}
+
+void Game::Display4()
+{
+	m_batchRenderer->Begin();
+
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+1.0f, +1.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+1.0f, +0.9f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+0.8f, +0.8f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+0.8f, +0.7f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+
+	m_batchRenderer->End<ColorPipeline>(g_screenNDC.get(), D3D11_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);
+}
+
+void Game::Display5()
+{
+	m_batchRenderer->Begin();
+
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+1.0f, +1.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+1.0f, +0.9f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+0.8f, +0.8f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+0.8f, +0.7f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+1.0f, +1.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+
+	m_batchRenderer->End<ColorPipeline>(g_screenNDC.get(), D3D11_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);
+}
+
+void Game::Display6()
+{
+	m_batchRenderer->Begin();
+
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+1.0f, +1.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+1.0f, +0.9f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+0.9f, +0.9f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(-1.0f, -1.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(-1.0f, -0.9f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(-0.9f, -0.9f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+
+	m_batchRenderer->End<ColorPipeline>(g_screenNDC.get(), D3D11_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+
+void Game::Display7()
+{
+	m_batchRenderer->Begin();
+
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+1.0f, +1.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+0.7f, +0.7f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+1.0f, +0.7f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+0.7f, +0.7f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+1.0f, +0.7f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+1.0f, +0.6f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+0.7f, +0.7f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+1.0f, +0.6f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+0.8f, +0.6f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+
+
+	m_batchRenderer->End<ColorPipeline>(g_screenNDC.get(), D3D11_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+
+void Game::Display8()
+{
+	constexpr const unsigned int kPoints = 6;
+
+
+	std::vector<DirectX::XMFLOAT3> innerPoints, outerPoints;
+	innerPoints.reserve(kPoints + 1);
+	outerPoints.reserve(kPoints + 1);
+
+	for (unsigned int i = 0; i < kPoints; ++i)
+	{
+		float x = cos(float(i) / kPoints * DirectX::XM_2PI);
+		float y = sin(float(i) / kPoints * DirectX::XM_2PI);
+
+		innerPoints.emplace_back(x * 0.2f, y * 0.2f, 0.0f);
+		outerPoints.emplace_back(x * 0.3f, y * 0.3f, 0.0f);
+	}
+
+	innerPoints.push_back(innerPoints[0]);
+	outerPoints.push_back(outerPoints[0]);
+
+	assert(innerPoints.size() == outerPoints.size() && "Unable to add some points");
+
+	m_batchRenderer->Begin();
+	for (std::size_t i = 0; i < outerPoints.size() - 1; ++i)
+	{
+		m_batchRenderer->Vertex(innerPoints[i], DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
+		m_batchRenderer->Vertex(outerPoints[i], DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
+		m_batchRenderer->Vertex(innerPoints[i + 1], DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
+
+		m_batchRenderer->Vertex(outerPoints[i], DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
+		m_batchRenderer->Vertex(innerPoints[i + 1], DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
+		m_batchRenderer->Vertex(outerPoints[i + 1], DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
+
+	}
+	m_batchRenderer->End<ColorPipeline>(g_screenNDC.get(), D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	m_batchRenderer->Begin();
+	for (const auto& point : innerPoints)
+	{
+		m_batchRenderer->Vertex(point, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	}
+	
+	m_batchRenderer->End<ColorPipeline>(g_screenNDC.get(), D3D11_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);
+}
+
 void Game::OnSize(uint32_t width, uint32_t height)
 {
 	if (width < 10 || height < 10)
 		return;
+	height = 300;
+	width = 300;
 	m_windowWidth = width;
 	m_windowHeight = height;
 

@@ -6,7 +6,7 @@ class DisplacementMappingHullShader : public IHullShader, public Singletone<Disp
 {
 public:
 	DisplacementMappingHullShader() :
-		IHullShader(L"Shaders/DisplacementMappingHullShader.cso")
+		IHullShader((LPWSTR)L"Shaders/DisplacementMappingHullShader.cso")
 	{}
 
 public:

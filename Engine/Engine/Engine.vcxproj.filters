@@ -118,6 +118,7 @@
     <ClInclude Include="src\graphics\Shaders\RejectPixelShader.h" />
     <ClInclude Include="src\graphics\Pipelines\ShadowMappingPipeline.h" />
     <ClInclude Include="src\graphics\Shaders\ShadowMappingPixelShader.h" />
+    <ClInclude Include="src\graphics\ProjectionNDC.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\TextureLightPixelShader.hlsl" />

@@ -16,7 +16,7 @@ class Text sealed : public IGraphicsObject, public I2DTransforms
 
 	float mLastX = -1;
 	float mLastY = -1;
-	LPWSTR mLastText = L"";
+	LPWSTR mLastText = (LPWSTR)L"";
 
 	UINT mSize;
 

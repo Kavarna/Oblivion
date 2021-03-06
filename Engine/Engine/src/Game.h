@@ -55,6 +55,15 @@ private:
 	void Render();
 
 private:
+	void Display3();
+	void Display4();
+	void Display5();
+	void Display6();
+	void Display7();
+	void Display8();
+
+
+private:
 	HINSTANCE											m_windowInstance = NULL;
 	HWND												m_windowHandle = NULL;
 	
@@ -66,16 +75,12 @@ private:
 	bool												m_selectObjects = false;
 
 private:
-	std::unique_ptr<CollisionObject>					m_ground;
+	/*std::unique_ptr<CollisionObject>					m_ground;
 	std::unique_ptr<CollisionObject>					m_sphere;
 	std::unique_ptr<CollisionObject>					m_tree;
 	std::unique_ptr<CollisionObject>					m_cup;
-	//std::unique_ptr<CollisionObject>					m_sponza;
-
-	std::shared_ptr<CFont>								m_32SegoeScriptExtented;
-	std::unique_ptr<Text>								m_camPosText;
-
-	std::unique_ptr<BillboardObject>					m_billboardTest;
+	//std::unique_ptr<CollisionObject>					m_sponza;*/
+	//std::unique_ptr<BillboardObject>					m_billboardTest;
 
 	std::unique_ptr<ShadowmapBuild>						m_shadowMap;
 
@@ -84,6 +89,10 @@ private:
 	Model*												m_selectedObject;
 
 	std::unique_ptr<DirectionalLightView>				m_directionalLight;
+
+	std::unique_ptr<BatchRenderer>                      m_batchRenderer;
+
+	unsigned int                                        m_selectedDisplay = 0;
 
 private:
 	std::unique_ptr<DirectX::Mouse>						m_mouse;

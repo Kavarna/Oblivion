@@ -115,11 +115,12 @@ void Text::Render(ICamera * cam, const DirectX::XMFLOAT4& color)
 
 	m_d3d11Context->PSSetShaderResources(0, 1, SRVs);
 	m_d3d11Context->PSSetSamplers(0, 1, renderer->m_linearWrapSampler.GetAddressOf());
-	//m_d3d11Context->PSSetConstantBuffers(2, 1, mMaterialBuffer.GetAddressOf());
 	bm->bindPSBuffer(MATERIAL_SLOT, mMaterialBuffer);
 
+	Direct3D11::Get()->RSCullNone();
 	m_d3d11Context->DrawIndexed(mIndexCount, 0, 0);
 	g_drawCalls++;
+	Direct3D11::Get()->RSLastState();
 
 	pipeline->lastAdditionalColor();
 }

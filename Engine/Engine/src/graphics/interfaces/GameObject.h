@@ -194,7 +194,7 @@ inline void IGameObject::Render(ICamera * cam) const
 	{
 		auto drawFunc = [&](UINT indexCount, UINT indexStart, UINT vertexStart)
 		{
-			m_d3d11Context->DrawIndexedInstanced(indexCount, m_drawnInstances.size(), indexStart, vertexStart, 0);
+			m_d3d11Context->DrawIndexedInstanced(indexCount, (UINT)m_drawnInstances.size(), indexStart, vertexStart, 0);
 		};
 		Pipeline::Get()->bind(cam);
 		DrawIndexedInstanced(cam, drawFunc);
