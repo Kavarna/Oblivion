@@ -280,7 +280,7 @@ void Game::Update()
 	if (kb.A)
 		g_camera->StrafeLeft(cameraFrameTime);
 
-	if (kb.D0 || kb.D1 || kb.D2)
+	if (kb.D1 || kb.D2)
 	{
 		m_selectedDisplay = 0;
 	}
@@ -307,6 +307,14 @@ void Game::Update()
 	else if (kb.D8)
 	{
 		m_selectedDisplay = 8;
+	}
+	else if (kb.D9)
+	{
+		m_selectedDisplay = 9;
+	}
+	else if (kb.D0)
+	{
+		m_selectedDisplay = 10;
 	}
 
 	static bool updatePhysics = true;
@@ -615,6 +623,12 @@ void Game::Render()
 		case 8:
 			Display8();
 			break;
+		case 9:
+			Display9();
+			break;
+		case 10:
+			Display10();
+			break;
 		default:
 			break;
 	}
@@ -632,119 +646,264 @@ void Game::Render()
 
 void Game::Display3()
 {
+
+	static float step = 0.05f;
+	static float maxX = 100.f;
+
+	ImGui::Begin("Display 3");
+	ImGui::SliderFloat("Step", &step, 0.002f, 0.2f);
+	ImGui::SliderFloat("Maximum x", &maxX, 10.f, 1000.f);
+	ImGui::End();
+
 	m_batchRenderer->Begin();
 
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(-0.5f, +0.5f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+0.5f, +0.5f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(-0.5f, -0.5f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+0.5f, -0.5f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	std::vector<DirectX::XMFLOAT3> points;
+	points.reserve(size_t(maxX / step + 0.5f) + 1);
+	float minY = FLT_MAX, maxY = -FLT_MAX;
+	for (float x = 0.0f; x <= maxX; x += step)
+	{
+		if (x == 0)
+		{
+			points.emplace_back(0.0f, 1.0f, 0.0f);
+		}
+		else
+		{
+			float y = fabs(round(x) - x);
+			y /= x;
+			points.emplace_back(x, y, 0.0f);
+		}
 
-	m_batchRenderer->End<ColorPipeline>(g_screenNDC.get(), D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+		auto pt = points.back();
+		maxY = max(pt.y, maxY);
+		minY = min(pt.y, minY);
+	}
+	maxY = max(fabs(minY), fabs(maxY));
+
+	for (auto& pt : points)
+	{
+		pt.y /= maxY;
+		pt.x /= (maxX * 0.25f);
+		m_batchRenderer->Vertex(pt, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	}
+
+	m_batchRenderer->End<ColorPipeline>(g_screenNDC.get(), D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
 }
 
 void Game::Display4()
 {
+	static float a = 0.3f;
+	static float b = 0.2f;
+	static float step = 0.05f;
+
+	ImGui::Begin("Display 4");
+	ImGui::SliderFloat("Step", &step, 0.002f, 0.2f);
+	ImGui::SliderFloat("Parameter a", &a, 0.02f, 0.5f);
+	ImGui::SliderFloat("Parameter b", &b, 0.02f, 0.5f);
+	ImGui::End();
+
 	m_batchRenderer->Begin();
 
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+1.0f, +1.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+1.0f, +0.9f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+0.8f, +0.8f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+0.8f, +0.7f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	for (float t = -DirectX::XM_PI; t <= DirectX::XM_PI; t += step)
+	{
+		float x = 2 * (a * cos(t) + b) * cos(t);
+		float y = 2 * (a * cos(t) + b) * sin(t);
+		m_batchRenderer->Vertex(DirectX::XMFLOAT3(x, y, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	}
 
 	m_batchRenderer->End<ColorPipeline>(g_screenNDC.get(), D3D11_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);
 }
 
 void Game::Display5()
 {
+	static float a = 0.2f;
+	static float step = 0.001f;
+
+	ImGui::Begin("Display 5");
+	ImGui::SliderFloat("Step", &step, 0.001f, 0.05f);
+	ImGui::SliderFloat("Parameter a", &a, 0.02f, 0.5f);
+	ImGui::End();
+
+	auto xFunctionEx = [](float t, float a) -> float
+	{
+		return float(a / (4 * pow(cos(t), 2) - 3));
+	};
+	auto yFunctionEx = [](float t, float a) -> float
+	{
+		return float((a * tan(t)) / (4 * pow(cos(t), 2) - 3));
+	};
+	auto xFunction = std::bind(xFunctionEx, std::placeholders::_1, a);
+	auto yFunction = std::bind(yFunctionEx, std::placeholders::_1, a);
+
 	m_batchRenderer->Begin();
 
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+1.0f, +1.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+1.0f, +0.9f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+0.8f, +0.8f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+0.8f, +0.7f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+1.0f, +1.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	for (float t = -DirectX::XM_PIDIV2 + step; t < -DirectX::XM_PI / 6.f - step; t += step * 2.f)
+	{
+
+		float x1, x2, y1, y2;
+		x1 = xFunction(t);
+		x2 = xFunction(t + step);
+		y1 = yFunction(t);
+		y2 = yFunction(t + step);
+
+			
+		m_batchRenderer->Vertex(DirectX::XMFLOAT3(-1.f, 1.f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+		m_batchRenderer->Vertex(DirectX::XMFLOAT3(x2, y2, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+		m_batchRenderer->Vertex(DirectX::XMFLOAT3(x1, y1, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	}
+
+	m_batchRenderer->End<ColorPipeline>(g_screenNDC.get(), D3D11_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	m_batchRenderer->Begin();
+
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(-1.f, 1.f, 0.1f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
+
+	for (float t = -DirectX::XM_PIDIV2 + step; t < -DirectX::XM_PI / 6.f - step; t += step)
+	{
+		m_batchRenderer->Vertex(DirectX::XMFLOAT3(xFunction(t), yFunction(t), 0.1f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
+	}
+	m_batchRenderer->Vertex(DirectX::XMFLOAT3(-1.f, 1.f, 0.1f), DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
 
 	m_batchRenderer->End<ColorPipeline>(g_screenNDC.get(), D3D11_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);
 }
 
 void Game::Display6()
 {
+	static float a = 0.1f;
+	static float b = 0.2f;
+	static float step = 0.05f;
+
+	ImGui::Begin("Display 6");
+	ImGui::SliderFloat("Step", &step, 0.002f, 0.2f);
+	ImGui::SliderFloat("Parameter a", &a, 0.02f, 0.5f);
+	ImGui::SliderFloat("Parameter b", &b, 0.02f, 0.5f);
+	ImGui::End();
+
+	// Approximated sin(t) = 1 respectively sin(t) = -1 and solved equation:
+	// x = -1 -> -1 = a * t - b - 1
+	// x = 1 -> 1 = a * t - b + 1
+	// Waste power in order to generate a better image
+	float minT = (b - 1 - 1) / a;
+	float maxT = (b + 1 + 1) / a;
+
 	m_batchRenderer->Begin();
+	
+	for (float t = minT; t <= maxT; t += step)
+	{
+		float x = a * t - b * sin(t);
+		float y = a - b * cos(t);
 
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+1.0f, +1.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+1.0f, +0.9f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+0.9f, +0.9f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+		m_batchRenderer->Vertex(DirectX::XMFLOAT3(x, y, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	}
 
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(-1.0f, -1.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(-1.0f, -0.9f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(-0.9f, -0.9f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-
-	m_batchRenderer->End<ColorPipeline>(g_screenNDC.get(), D3D11_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_batchRenderer->End<ColorPipeline>(g_screenNDC.get(), D3D11_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);
 }
 
 void Game::Display7()
 {
+	static float r = 0.3f;
+	static float R = 0.1f;
+	static float step = 0.05f;
+
+	ImGui::Begin("Display 7");
+	ImGui::SliderFloat("Step", &step, 0.002f, 0.2f);
+	ImGui::SliderFloat("Parameter r", &r, 0.02f, 0.5f);
+	ImGui::SliderFloat("Parameter R", &R, 0.02f, 0.5f);
+	ImGui::End();
+
 	m_batchRenderer->Begin();
 
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+1.0f, +1.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+0.7f, +0.7f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+1.0f, +0.7f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	for (float t = 0.0f; t <= DirectX::XM_2PI; t += step)
+	{
+		float x = (R + r) * cos((r / R) * t) - r * cos(t + (r / R) * t);
+		float y = (R + r) * sin((r / R) * t) - r * sin(t + (r / R) * t);
 
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+0.7f, +0.7f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+1.0f, +0.7f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+1.0f, +0.6f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-	
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+0.7f, +0.7f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+1.0f, +0.6f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-	m_batchRenderer->Vertex(DirectX::XMFLOAT3(+0.8f, +0.6f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+		m_batchRenderer->Vertex(DirectX::XMFLOAT3(x, y, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	}
 
-
-	m_batchRenderer->End<ColorPipeline>(g_screenNDC.get(), D3D11_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_batchRenderer->End<ColorPipeline>(g_screenNDC.get(), D3D11_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);
 }
 
 void Game::Display8()
 {
-	constexpr const unsigned int kPoints = 6;
+	static float r = 0.3f;
+	static float R = 0.1f;
+	static float step = 0.05f;
 
-
-	std::vector<DirectX::XMFLOAT3> innerPoints, outerPoints;
-	innerPoints.reserve(kPoints + 1);
-	outerPoints.reserve(kPoints + 1);
-
-	for (unsigned int i = 0; i < kPoints; ++i)
-	{
-		float x = cos(float(i) / kPoints * DirectX::XM_2PI);
-		float y = sin(float(i) / kPoints * DirectX::XM_2PI);
-
-		innerPoints.emplace_back(x * 0.2f, y * 0.2f, 0.0f);
-		outerPoints.emplace_back(x * 0.3f, y * 0.3f, 0.0f);
-	}
-
-	innerPoints.push_back(innerPoints[0]);
-	outerPoints.push_back(outerPoints[0]);
-
-	assert(innerPoints.size() == outerPoints.size() && "Unable to add some points");
+	ImGui::Begin("Display 8");
+	ImGui::SliderFloat("Step", &step, 0.002f, 0.2f);
+	ImGui::SliderFloat("Parameter r", &r, 0.02f, 0.5f);
+	ImGui::SliderFloat("Parameter R", &R, 0.02f, 0.5f);
+	ImGui::End();
 
 	m_batchRenderer->Begin();
-	for (std::size_t i = 0; i < outerPoints.size() - 1; ++i)
+
+	for (float t = 0.0f; t <= DirectX::XM_2PI; t += step)
 	{
-		m_batchRenderer->Vertex(innerPoints[i], DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
-		m_batchRenderer->Vertex(outerPoints[i], DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
-		m_batchRenderer->Vertex(innerPoints[i + 1], DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
+		float x = (R - r) * cos((r / R) * t) - r * cos(t - (r / R) * t);
+		float y = (R - r) * sin((r / R) * t) - r * sin(t - (r / R) * t);
 
-		m_batchRenderer->Vertex(outerPoints[i], DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
-		m_batchRenderer->Vertex(innerPoints[i + 1], DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
-		m_batchRenderer->Vertex(outerPoints[i + 1], DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
-
+		m_batchRenderer->Vertex(DirectX::XMFLOAT3(x, y, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
 	}
-	m_batchRenderer->End<ColorPipeline>(g_screenNDC.get(), D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	m_batchRenderer->End<ColorPipeline>(g_screenNDC.get(), D3D11_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);
+}
+
+void Game::Display9()
+{
+	static float a = 0.4f;
+	static float step = 0.000005f;
+
+	ImGui::Begin("Display 9");
+	ImGui::SliderFloat("Step", &step, 0.000001f, 0.2f, "%.6f");
+	ImGui::SliderFloat("Parameter a", &a, 0.02f, 0.5f);
+	ImGui::End();
 
 	m_batchRenderer->Begin();
-	for (const auto& point : innerPoints)
+
+	for (float t = DirectX::XM_PIDIV4 - step; t > -DirectX::XM_PIDIV4; t -= step)
 	{
-		m_batchRenderer->Vertex(point, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+		 float r = a * sqrt(2 * cos(2 * t));
+		 float x = r * cos(t);
+		 float y = r * sin(t);
+
+		m_batchRenderer->Vertex(DirectX::XMFLOAT3(x, y, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
 	}
-	
+
+	for (float t = -DirectX::XM_PIDIV4 + step; t < DirectX::XM_PIDIV4; t += step)
+	{
+		float r = -a * sqrt(2 * cos(2 * t));
+		float x = r * cos(t);
+		float y = r * sin(t);
+
+		m_batchRenderer->Vertex(DirectX::XMFLOAT3(x, y, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	}
+
+	m_batchRenderer->End<ColorPipeline>(g_screenNDC.get(), D3D11_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);
+}
+
+void Game::Display10()
+{
+	static float a = 0.02f;
+	static float step = 0.05f;
+	static float maxValue = 100;
+
+	ImGui::Begin("Display 10");
+	ImGui::SliderFloat("Step", &step, 0.000002f, 0.2f, "%.7f");
+	ImGui::SliderFloat("Parameter a", &a, 0.0002f, 0.5f, "%.5f");
+	ImGui::SliderFloat("Max t value", &maxValue, 10.f, 1000.f);
+	ImGui::End();
+
+	m_batchRenderer->Begin();
+
+	for (float t = 0.0f; t <= maxValue; t += step)
+	{
+		float r = a * exp(1 + t);
+		float x = r * cos(t);
+		float y = r * sin(t);
+
+		m_batchRenderer->Vertex(DirectX::XMFLOAT3(x, y, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	}
+
 	m_batchRenderer->End<ColorPipeline>(g_screenNDC.get(), D3D11_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);
 }
 
@@ -752,8 +911,6 @@ void Game::OnSize(uint32_t width, uint32_t height)
 {
 	if (width < 10 || height < 10)
 		return;
-	height = 300;
-	width = 300;
 	m_windowWidth = width;
 	m_windowHeight = height;
 
