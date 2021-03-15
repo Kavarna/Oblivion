@@ -1,7 +1,7 @@
 #include "BasicPixelShader.h"
 
 BasicPixelShader::BasicPixelShader() :
-	IPixelShader(L"Shaders/BasicPixelShader.cso")
+	IPixelShader((LPWSTR)L"Shaders/BasicPixelShader.cso")
 {
 }
 

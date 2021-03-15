@@ -1,7 +1,7 @@
 #include "TexturePixelShader.h"
 
 TexturePixelShader::TexturePixelShader() :
-	IPixelShader(L"Shaders/TexturePixelShader.cso")
+	IPixelShader((LPWSTR)L"Shaders/TexturePixelShader.cso")
 {
 	static auto bufferManager = BufferManager::Get();
 	DirectX::XMFLOAT4 color(1.0f, 1.0f, 1.0f, 1.0f);

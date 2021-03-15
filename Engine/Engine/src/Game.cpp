@@ -141,11 +141,10 @@ void Game::InitDirect3D()
 	Direct3D11 * d3d = Direct3D11::Get();
 	d3d->Create(m_windowHandle);
 	d3d->OnResize(m_windowHandle, m_windowWidth, m_windowHeight);
-	Sun sunLight{
-		{ 0.0f,-1.0f,0.0f,1.0f },
-		{ 1.0f,1.0f,1.0f,1.0f },
-		{ 0.1f,0.1f,0.1f,1.0f }
-	};
+	Sun sunLight;
+	sunLight.setDirection(0.0f, -1.0f, 0.0f);
+	sunLight.setDiffuseColor(1.0f, 1.0f, 1.0f);
+	sunLight.setAmbientColor(0.1f, 0.1f, 0.1f);
 
 	BulletWorld::Get()->CreateDefaultWorld();
 }

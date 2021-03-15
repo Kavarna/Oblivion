@@ -1,7 +1,7 @@
 #include "RejectPixelShader.h"
 
 RejectPixelShader::RejectPixelShader() :
-	IPixelShader(L"Shaders/RejectPixelShader.cso")
+	IPixelShader((LPWSTR)L"Shaders/RejectPixelShader.cso")
 {
 }
 

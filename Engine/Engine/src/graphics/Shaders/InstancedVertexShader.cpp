@@ -1,7 +1,7 @@
 #include "InstancedVertexShader.h"
 
 InstancedVertexShader::InstancedVertexShader() :
-	IVertexShader(L"Shaders/InstancedVertexShader.cso")
+	IVertexShader((LPWSTR)L"Shaders/InstancedVertexShader.cso")
 {
 	m_cameraBuffer = BufferManager::Get()->CreateBuffer(
 		D3D11_USAGE::D3D11_USAGE_DYNAMIC, sizeof(SCameraInfo),

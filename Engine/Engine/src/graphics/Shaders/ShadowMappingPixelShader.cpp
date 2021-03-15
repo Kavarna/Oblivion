@@ -1,7 +1,7 @@
 #include "ShadowMappingPixelShader.h"
 
 ShadowMappingPixelShader::ShadowMappingPixelShader() :
-	IPixelShader(L"Shaders/ShadowMappingPixelShader.cso")
+	IPixelShader((LPWSTR)L"Shaders/ShadowMappingPixelShader.cso")
 {
 	m_lightBuffer = BufferManager::Get()->CreateBuffer(
 		D3D11_USAGE::D3D11_USAGE_DEFAULT, sizeof(SLightBuffer), 0);

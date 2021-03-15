@@ -8,7 +8,7 @@ class DisplacementMappingPixelShader : public IPixelShader, public Singletone<Di
 {
 public:
 	DisplacementMappingPixelShader() :
-		IPixelShader(L"Shaders/DisplacementMappingPixelShader.cso")
+		IPixelShader((LPWSTR)L"Shaders/DisplacementMappingPixelShader.cso")
 	{}
 
 public:

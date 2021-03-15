@@ -17,7 +17,7 @@ bool IVertexShader::shouldBind(const VertexShaderEnum vs)
 IVertexShader::IVertexShader(LPWSTR path)
 {
 	ID3D11VertexShader ** VS = &m_vertexShader;
-	ShaderHelper::CreateShaderFromFile(path, "vs_4_0",
+	ShaderHelper::CreateShaderFromFile(path, (LPSTR)"vs_4_0",
 		m_d3d11Device.Get(), &m_shaderBlob,
 		reinterpret_cast<ID3D11DeviceChild**>(VS));
 }
@@ -83,7 +83,7 @@ void IPixelShader::unbind() const
 IPixelShader::IPixelShader(LPWSTR path)
 {
 	ID3D11PixelShader ** PS = &m_pixelShader;
-	ShaderHelper::CreateShaderFromFile(path, "ps_4_0",
+	ShaderHelper::CreateShaderFromFile(path, (LPSTR)"ps_4_0",
 		m_d3d11Device.Get(), &m_shaderBlob,
 		reinterpret_cast<ID3D11DeviceChild**>(PS));
 }
@@ -127,7 +127,7 @@ void IDomainShader::unbind() const
 IDomainShader::IDomainShader(LPWSTR path)
 {
 	ID3D11DomainShader ** DS = &m_domainShader;
-	ShaderHelper::CreateShaderFromFile(path, "ds_4_0",
+	ShaderHelper::CreateShaderFromFile(path, (LPSTR)"ds_4_0",
 		m_d3d11Device.Get(), &m_shaderBlob,
 		reinterpret_cast<ID3D11DeviceChild**>(DS));
 }
@@ -171,7 +171,7 @@ void IHullShader::unbind() const
 IHullShader::IHullShader(LPWSTR path)
 {
 	ID3D11HullShader ** HS = &m_hullShader;
-	ShaderHelper::CreateShaderFromFile(path, "hs_4_0",
+	ShaderHelper::CreateShaderFromFile(path, (LPSTR)"hs_4_0",
 		m_d3d11Device.Get(), &m_shaderBlob,
 		reinterpret_cast<ID3D11DeviceChild**>(HS));
 }
@@ -215,7 +215,7 @@ void IGeometryShader::unbind() const
 IGeometryShader::IGeometryShader(LPWSTR path)
 {
 	ID3D11GeometryShader ** HS = &m_geometryShader;
-	ShaderHelper::CreateShaderFromFile(path, "ds_4_0",
+	ShaderHelper::CreateShaderFromFile(path, (LPSTR)"ds_4_0",
 		m_d3d11Device.Get(), &m_shaderBlob,
 		reinterpret_cast<ID3D11DeviceChild**>(HS));
 }
@@ -259,7 +259,7 @@ void IComputeShader::unbind() const
 IComputeShader::IComputeShader(LPWSTR path)
 {
 	ID3D11ComputeShader ** CS = &m_computeShader;
-	ShaderHelper::CreateShaderFromFile(path, "cs_5_0", m_d3d11Device.Get(),
+	ShaderHelper::CreateShaderFromFile(path, (LPSTR)"cs_5_0", m_d3d11Device.Get(),
 		&m_shaderBlob, reinterpret_cast<ID3D11DeviceChild**>(CS));
 }
 

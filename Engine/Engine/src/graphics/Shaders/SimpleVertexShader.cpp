@@ -1,7 +1,7 @@
 #include "SimpleVertexShader.h"
 
 SimpleVertexShader::SimpleVertexShader() :
-	IVertexShader(L"Shaders/SimpleVertexShader.cso")
+	IVertexShader((LPWSTR)L"Shaders/SimpleVertexShader.cso")
 {
 	m_cameraBuffer = BufferManager::Get()->CreateBuffer(D3D11_USAGE::D3D11_USAGE_DYNAMIC,
 		sizeof(SCameraInfo), D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE);
