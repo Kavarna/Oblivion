@@ -18,7 +18,7 @@ void DisplacementShader::Create()
 	try
 	{
 		ID3D11VertexShader ** VS = &m_vertexShader;
-		ShaderHelper::CreateShaderFromFile(L"Shaders/DisplacementMappingVertexShader.cso", "vs_4_0",
+		ShaderHelper::CreateShaderFromFile((LPWSTR)L"Shaders/DisplacementMappingVertexShader.cso", (LPSTR)"vs_4_0",
 			m_d3d11Device.Get(), &m_shaderBlobs[0], reinterpret_cast<ID3D11DeviceChild**>(VS));
 
 		D3D11_INPUT_ELEMENT_DESC elementDesc[9];
@@ -95,15 +95,15 @@ void DisplacementShader::Create()
 		);
 
 		ID3D11HullShader ** HS = &m_hullShader;
-		ShaderHelper::CreateShaderFromFile(L"Shaders/DisplacementMappingHullShader.cso", "hs_4_0",
+		ShaderHelper::CreateShaderFromFile((LPWSTR)L"Shaders/DisplacementMappingHullShader.cso", (LPSTR)"hs_4_0",
 			m_d3d11Device.Get(), &m_shaderBlobs[1], reinterpret_cast<ID3D11DeviceChild**>(HS));
 
 		ID3D11DomainShader ** DS = &m_domainShader;
-		ShaderHelper::CreateShaderFromFile(L"Shaders/DisplacementMappingDomainShader.cso", "ds_4_0",
+		ShaderHelper::CreateShaderFromFile((LPWSTR)L"Shaders/DisplacementMappingDomainShader.cso", (LPSTR)"ds_4_0",
 			m_d3d11Device.Get(), &m_shaderBlobs[2], reinterpret_cast<ID3D11DeviceChild**>(DS));
 
 		ID3D11PixelShader ** PS = &m_pixelShader;
-		ShaderHelper::CreateShaderFromFile(L"Shaders/DisplacementMappingPixelShader.cso", "ps_4_0",
+		ShaderHelper::CreateShaderFromFile((LPWSTR)L"Shaders/DisplacementMappingPixelShader.cso", (LPSTR)"ps_4_0",
 			m_d3d11Device.Get(), &m_shaderBlobs[3], reinterpret_cast<ID3D11DeviceChild**>(PS));
 
 		ShaderHelper::CreateBuffer(m_d3d11Device.Get(), &m_cameraBufferVS,

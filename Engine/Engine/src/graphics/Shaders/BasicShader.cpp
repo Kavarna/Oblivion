@@ -14,7 +14,7 @@ void BasicShader::Create()
 	try
 	{
 		ID3D11VertexShader ** VS = &m_vertexShader;
-		ShaderHelper::CreateShaderFromFile(L"Shaders/BasicVertexShader.cso", "vs_4_0",
+		ShaderHelper::CreateShaderFromFile((LPWSTR)L"Shaders/BasicVertexShader.cso", (LPSTR)"vs_4_0",
 			m_d3d11Device.Get(), &m_shaderBlobs[0], reinterpret_cast<ID3D11DeviceChild**>(VS));
 
 		D3D11_INPUT_ELEMENT_DESC elementDesc[5];
@@ -61,7 +61,7 @@ void BasicShader::Create()
 			);
 
 		ID3D11PixelShader ** PS = &m_pixelShader;
-		ShaderHelper::CreateShaderFromFile(L"Shaders/BasicPixelShader.cso", "ps_4_0",
+		ShaderHelper::CreateShaderFromFile((LPWSTR)L"Shaders/BasicPixelShader.cso", (LPSTR)"ps_4_0",
 			m_d3d11Device.Get(), &m_shaderBlobs[1], reinterpret_cast<ID3D11DeviceChild**>(PS));
 
 		ShaderHelper::CreateBuffer(

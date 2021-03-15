@@ -146,7 +146,7 @@ void Model::ImGuiChangeMaterial()
 
 		if (ImGui::Button("Select diffuse texture"))
 		{
-			if (auto ret = COM::GetOpenFileDialog(L"Select diffuse texture", L"Select"); ret)
+			if (auto ret = COM::GetOpenFileDialog((LPWSTR)L"Select diffuse texture", (LPWSTR)L"Select"); ret)
 			{
 				try
 				{
@@ -174,7 +174,7 @@ void Model::ImGuiChangeMaterial()
 
 		if (ImGui::Button("Select bump texture"))
 		{
-			if (auto ret = COM::GetOpenFileDialog(L"Select bump texture", L"Select"); ret)
+			if (auto ret = COM::GetOpenFileDialog((LPWSTR)L"Select bump texture", (LPWSTR)L"Select"); ret)
 			{
 				try
 				{
@@ -202,7 +202,7 @@ void Model::ImGuiChangeMaterial()
 
 		if (ImGui::Button("Select specular texture"))
 		{
-			if (auto ret = COM::GetOpenFileDialog(L"Select specular texture", L"Select"); ret)
+			if (auto ret = COM::GetOpenFileDialog((LPWSTR)L"Select specular texture", (LPWSTR)L"Select"); ret)
 			{
 				try
 				{

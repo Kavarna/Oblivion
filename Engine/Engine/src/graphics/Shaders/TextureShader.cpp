@@ -15,7 +15,7 @@ void TextureShader::Create()
 	try
 	{
 		ID3D11VertexShader ** VS = &m_vertexShader;
-		ShaderHelper::CreateShaderFromFile(L"Shaders/TextureVertexShader.cso", "vs_4_0",
+		ShaderHelper::CreateShaderFromFile((LPWSTR)L"Shaders/TextureVertexShader.cso", (LPSTR)"vs_4_0",
 			m_d3d11Device.Get(), &m_shaderBlobs[0], reinterpret_cast<ID3D11DeviceChild**>(VS));
 
 		D3D11_INPUT_ELEMENT_DESC elementDesc[6];
@@ -71,7 +71,7 @@ void TextureShader::Create()
 		);
 
 		ID3D11PixelShader ** PS = &m_pixelShader;
-		ShaderHelper::CreateShaderFromFile(L"Shaders/TexturePixelShader.cso", "ps_4_0",
+		ShaderHelper::CreateShaderFromFile((LPWSTR)L"Shaders/TexturePixelShader.cso", (LPSTR)"ps_4_0",
 			m_d3d11Device.Get(), &m_shaderBlobs[1], reinterpret_cast<ID3D11DeviceChild**>(PS));
 
 

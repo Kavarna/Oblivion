@@ -15,7 +15,7 @@ public:
 		try
 		{
 			ID3D11VertexShader ** VS = &m_vertexShader;
-			ShaderHelper::CreateShaderFromFile(L"Shaders/ShadowMapVertexShader.cso", "vs_4_0",
+			ShaderHelper::CreateShaderFromFile((LPWSTR)L"Shaders/ShadowMapVertexShader.cso", (LPSTR)"vs_4_0",
 				m_d3d11Device.Get(), &m_shaderBlobs[0], reinterpret_cast<ID3D11DeviceChild**>(VS));
 			
 			std::vector<D3D11_INPUT_ELEMENT_DESC> layoutDesc(2);
@@ -37,7 +37,7 @@ public:
 				layoutDesc, m_inputLayout.GetAddressOf());
 
 			ID3D11PixelShader ** PS = &m_pixelShader;
-			ShaderHelper::CreateShaderFromFile(L"Shaders/ShadowMapPixelShader.cso", "ps_4_0",
+			ShaderHelper::CreateShaderFromFile((LPWSTR)L"Shaders/ShadowMapPixelShader.cso", (LPSTR)"ps_4_0",
 				m_d3d11Device.Get(), &m_shaderBlobs[1], reinterpret_cast<ID3D11DeviceChild**>(PS));
 
 
@@ -100,7 +100,7 @@ ShadowLight::ShadowLight() :
 {
 	ShadowmapShader::Get();
 	ID3D11ComputeShader ** CS = &m_buildShadowMapCS;
-	ShaderHelper::CreateShaderFromFile(L"Shaders/BuildShadowMapComputeShader.cso", "cs_5_0",
+	ShaderHelper::CreateShaderFromFile((LPWSTR)L"Shaders/BuildShadowMapComputeShader.cso", (LPSTR)"cs_5_0",
 		m_d3d11Device.Get(), &m_buildShadowMapCSBlob, reinterpret_cast<ID3D11DeviceChild**>(CS));
 
 	m_lights.emplace_back();

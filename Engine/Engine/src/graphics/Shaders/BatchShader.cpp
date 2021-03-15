@@ -22,7 +22,7 @@ void BatchShader::Create()
 	try
 	{
 		ID3D11VertexShader ** VS = &m_vertexShader;
-		ShaderHelper::CreateShaderFromFile(L"Shaders/BatchVertexShader.cso", "vs_4_0",
+		ShaderHelper::CreateShaderFromFile((LPWSTR)L"Shaders/BatchVertexShader.cso", (LPSTR)"vs_4_0",
 			m_d3d11Device.Get(), &m_shaderBlobs[0], reinterpret_cast<ID3D11DeviceChild**>(VS));
 
 		D3D11_INPUT_ELEMENT_DESC elementDesc[2];
@@ -48,7 +48,7 @@ void BatchShader::Create()
 		);
 
 		ID3D11PixelShader ** PS = &m_pixelShader;
-		ShaderHelper::CreateShaderFromFile(L"Shaders/BatchPixelShader.cso", "ps_4_0",
+		ShaderHelper::CreateShaderFromFile((LPWSTR)L"Shaders/BatchPixelShader.cso", (LPSTR)"ps_4_0",
 			m_d3d11Device.Get(), &m_shaderBlobs[0], reinterpret_cast<ID3D11DeviceChild**>(PS));
 	}
 	CATCH;
@@ -92,7 +92,7 @@ void TextureBatchShader::Create()
 	try
 	{
 		ID3D11VertexShader ** VS = &m_vertexShader;
-		ShaderHelper::CreateShaderFromFile(L"Shaders/TextureBatchVertexShader.cso", "vs_4_0",
+		ShaderHelper::CreateShaderFromFile((LPWSTR)L"Shaders/TextureBatchVertexShader.cso", (LPSTR)"vs_4_0",
 			m_d3d11Device.Get(), &m_shaderBlobs[0], reinterpret_cast<ID3D11DeviceChild**>(VS));
 
 		D3D11_INPUT_ELEMENT_DESC elementDesc[2];
@@ -118,7 +118,7 @@ void TextureBatchShader::Create()
 		);
 
 		ID3D11PixelShader ** PS = &m_pixelShader;
-		ShaderHelper::CreateShaderFromFile(L"Shaders/TextureBatchPixelShader.cso", "ps_4_0",
+		ShaderHelper::CreateShaderFromFile((LPWSTR)L"Shaders/TextureBatchPixelShader.cso", (LPSTR)"ps_4_0",
 			m_d3d11Device.Get(), &m_shaderBlobs[0], reinterpret_cast<ID3D11DeviceChild**>(PS));
 	}
 	CATCH;
